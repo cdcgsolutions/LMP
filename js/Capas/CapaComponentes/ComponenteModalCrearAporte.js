@@ -80,7 +80,9 @@ class ComponenteModalCrearAporte {
                         Cancelar
                     </button>
                     <button class="BotonAccionPrimario" id="BotonGuardarPublicarNuevoAporte">
-                        <i class="fa-solid fa-paper-plane"></i> Publicar en Letras Mi Poblau
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span class="TextoBotonLargo">Publicar en Letras Mi Poblau</span>
+                        <span class="TextoBotonCorto">Publicar</span>
                     </button>
                 </div>
             </div>

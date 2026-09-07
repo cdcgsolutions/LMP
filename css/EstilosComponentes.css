@@ -356,84 +356,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. BANDEJA DE HISTORIAS / REELS FOLKLÓRICOS
-   -------------------------------------------------------------------------- */
-.BandejaHistoriasContenedor {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-}
-
-.BandejaHistoriasContenedor::-webkit-scrollbar {
-    display: none;
-}
-
-.TarjetaHistoria {
-    position: relative;
-    min-width: 112px;
-    height: 190px;
-    border-radius: var(--RadioMediano);
-    overflow: hidden;
-    cursor: pointer;
-    background-color: var(--ColorFondoSuperficie);
-    box-shadow: var(--SombraNivelUno);
-    transition: transform var(--TransicionRapida), box-shadow var(--TransicionRapida);
-    flex-shrink: 0;
-}
-
-.TarjetaHistoria:hover {
-    transform: scale(1.02);
-    box-shadow: var(--SombraTarjetaHover);
-}
-
-.ImagenFondoHistoria {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.TarjetaHistoria:hover .ImagenFondoHistoria {
-    transform: scale(1.06);
-}
-
-.CapaGradienteHistoria {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%);
-}
-
-.AvatarEmisorHistoria {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 36px;
-    height: 36px;
-    border-radius: var(--RadioCircular);
-    border: 3px solid var(--ColorPrimarioAzul);
-    object-fit: cover;
-    z-index: 2;
-    background-color: var(--ColorFondoSuperficie);
-}
-
-.TituloTextoHistoria {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    color: #ffffff;
-    font-size: 12.5px;
-    font-weight: 600;
-    line-height: 1.2;
-    z-index: 2;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-}
-
-/* --------------------------------------------------------------------------
-   5. CAJA DE CREAR PUBLICACIÓN / APORTAR CANCIÓN
+   4. CAJA DE CREAR PUBLICACIÓN / APORTAR CANCIÓN
    -------------------------------------------------------------------------- */
 .TarjetaCrearPublicacion {
     background-color: var(--ColorFondoSuperficie);
@@ -443,7 +366,7 @@
     border: 1px solid var(--ColorBordeSuave);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .FilaSuperiorCrearPublicacion {
@@ -455,40 +378,45 @@
 .BotonDisparadorModalCrear {
     flex: 1;
     background-color: var(--ColorFondoEntrada);
-    border-radius: var(--RadioBotonPill);
-    padding: 10px 16px;
+    border-radius: var(--RadioPequeno);
+    padding: 10px 14px;
     text-align: left;
     color: var(--ColorTextoSecundario);
-    font-size: 14px;
+    font-size: 13.5px;
     cursor: pointer;
-    transition: background-color var(--TransicionRapida);
+    transition: background-color var(--TransicionRapida), border-color var(--TransicionRapida);
+    border: 1px solid transparent;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .BotonDisparadorModalCrear:hover {
     background-color: var(--ColorFondoActivo);
+    border-color: var(--ColorBordeSuave);
 }
 
-.DivisorCrearPublicacion {
-    height: 1px;
-    background-color: var(--ColorBordeDivisor);
-}
-
-.FilaBotonesAccionesRapidas {
-    display: flex;
-    justify-content: space-around;
-}
-
-.BotonAccionRapidaCrear {
-    flex: 1;
-    padding: 8px;
+.BotonAccionLetraCostado {
+    flex: initial;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    background-color: var(--ColorFondoEntrada);
     border-radius: var(--RadioPequeno);
     font-weight: 600;
     font-size: 13.5px;
-    color: var(--ColorTextoSecundario);
+    color: var(--ColorTextoPrincipal);
+    white-space: nowrap;
+    border: 1px solid var(--ColorBordeSuave);
+    cursor: pointer;
+    transition: all var(--TransicionRapida);
 }
 
-.BotonAccionRapidaCrear:hover {
+.BotonAccionLetraCostado:hover {
     background-color: var(--ColorFondoHover);
+    color: var(--ColorPrimarioAzul);
+    border-color: var(--ColorPrimarioAzul);
 }
 
 /* --------------------------------------------------------------------------
@@ -648,7 +576,7 @@ body.ModoOscuroActivo .AcordeMusical {
     min-width: 0;
 }
 
-.BotonReproducirTarjeta {
+.ReproductorEmbebidoTarjeta .BotonReproducirTarjeta {
     width: 38px;
     height: 38px;
     border-radius: var(--RadioCircular);
@@ -658,7 +586,7 @@ body.ModoOscuroActivo .AcordeMusical {
     flex-shrink: 0;
 }
 
-.BotonReproducirTarjeta:hover {
+.ReproductorEmbebidoTarjeta .BotonReproducirTarjeta:hover {
     background-color: var(--ColorPrimarioAzulHover);
     transform: scale(1.05);
 }
@@ -799,46 +727,106 @@ body.ModoOscuroActivo .AcordeMusical {
     color: var(--ColorPrimarioAzul);
 }
 
-/* Menú Emergente de Reacciones Flotantes FB */
+.IconoBotonReaccion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    margin-right: 6px;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.TextoBotonReaccion {
+    font-size: 13.5px;
+    transition: color 0.2s ease;
+}
+
+/* Menú Emergente de Reacciones Flotantes FB con Nombres Debajo */
 .ContenedorReaccionesEmergentes {
     position: absolute;
-    bottom: calc(100% + 4px);
-    left: 8px;
+    bottom: calc(100% + 8px);
+    left: 2px;
     background-color: var(--ColorFondoSuperficie);
-    border-radius: var(--RadioBotonPill);
+    border-radius: 20px;
     padding: 6px 8px;
     display: flex;
-    gap: 6px;
-    box-shadow: var(--SombraReacciones);
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.12);
     border: 1px solid var(--ColorBordeSuave);
     z-index: 100;
     opacity: 0;
-    transform: scale(0.8) translateY(10px);
+    transform: scale(0.85) translateY(10px);
     pointer-events: none;
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: calc(100vw - 36px);
 }
 
-.ContenedorBotonReaccionPrincipal:hover .ContenedorReaccionesEmergentes,
-.ContenedorReaccionesEmergentes:hover {
+.ContenedorBotonReaccionPrincipal:hover .ContenedorReaccionesEmergentes:not(.MenuReaccionesOculto),
+.ContenedorReaccionesEmergentes:hover:not(.MenuReaccionesOculto),
+.ContenedorReaccionesEmergentes.MenuReaccionesAbierto:not(.MenuReaccionesOculto) {
     opacity: 1;
     transform: scale(1) translateY(0);
     pointer-events: auto;
 }
 
+.ContenedorReaccionesEmergentes.MenuReaccionesOculto {
+    opacity: 0 !important;
+    transform: scale(0.85) translateY(10px) !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
 .BotonReaccionEmoji {
-    font-size: 24px;
-    width: 38px;
-    height: 38px;
-    border-radius: var(--RadioCircular);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 6px 6px 4px 6px;
+    border-radius: 12px;
     cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    min-width: 44px;
+    text-decoration: none;
 }
 
 .BotonReaccionEmoji:hover {
-    transform: scale(1.35) translateY(-6px);
+    background-color: var(--ColorFondoHover);
+    transform: translateY(-4px);
+}
+
+.BotonReaccionEmoji.ReaccionSeleccionada {
+    background-color: var(--ColorFondoHover);
+    box-shadow: 0 0 0 1.5px var(--ColorPrimarioAzul);
+}
+
+.IconoEmojiReaccion {
+    font-size: 22px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.BotonReaccionEmoji:hover .IconoEmojiReaccion {
+    transform: scale(1.32);
+}
+
+.EtiquetaNombreReaccion {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: var(--ColorTextoSecundario);
+    margin-top: 3px;
+    white-space: nowrap;
+    line-height: 1;
+    transition: color 0.15s ease;
+}
+
+.BotonReaccionEmoji:hover .EtiquetaNombreReaccion {
+    color: var(--ColorTextoPrincipal);
+    font-weight: 700;
 }
 
 /* Sección de Comentarios */
@@ -1300,6 +1288,10 @@ body.ModoOscuroActivo .AcordeMusical {
     justify-content: space-between;
     padding: 0 20px;
     z-index: 999;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform, opacity;
 }
 
 .BarraReproductorInferiorFlotante.ReproductorVisible {
@@ -1323,6 +1315,7 @@ body.ModoOscuroActivo .AcordeMusical {
     align-items: center;
     gap: 12px;
     width: 280px;
+    min-width: 0;
 }
 
 .CaratulaPistaReproductor {
@@ -1331,12 +1324,16 @@ body.ModoOscuroActivo .AcordeMusical {
     border-radius: var(--RadioPequeno);
     object-fit: cover;
     background-color: var(--ColorVerdeBeni);
+    flex-shrink: 0;
 }
 
 .TextoInfoPistaReproductor {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 0;
+    flex: 1;
+    justify-content: center;
 }
 
 .TituloPistaReproductor {
@@ -1346,11 +1343,16 @@ body.ModoOscuroActivo .AcordeMusical {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    line-height: 1.25;
 }
 
 .AutorPistaReproductor {
     font-size: 12px;
     color: var(--ColorTextoSecundario);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.25;
 }
 
 .SeccionControlesCentralesReproductor {

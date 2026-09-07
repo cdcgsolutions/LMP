@@ -49,6 +49,7 @@ class ControladorPrincipal {
         this.RenderizarTodaLaAplicacion();
         this.VincularEventosGlobalesDOM();
         this.ConfigurarVisualizadorCanvas();
+        this.ConfigurarDeslizamientoReproductorMovil();
     }
 
     SuscribirEventosDelEstado() {
@@ -241,13 +242,7 @@ class ControladorPrincipal {
             return;
         }
         if (Objetivo.closest("#BotonCerrarReproductorFlotante")) {
-            this.ServicioReproductor.DetenerReproduccion();
-            const BarraReproductor = document.getElementById("BarraReproductorInferiorFlotante");
-            if (BarraReproductor) {
-                BarraReproductor.classList.remove("ReproductorVisible");
-                document.body.classList.remove("ConReproductorActivo");
-            }
-            this.ServicioEstado.EstablecerCancionReproduciendo(null, false);
+            this.CerrarReproductorFlotante();
             return;
         }
         if (Objetivo.closest("#BotonSilenciarVolumen")) {
@@ -276,6 +271,13 @@ class ControladorPrincipal {
             return;
         }
 
+        // Cerrar menús de reacciones flotantes si se hace clic fuera
+        if (!Objetivo.closest(".ContenedorBotonReaccionPrincipal")) {
+            document.querySelectorAll(".ContenedorReaccionesEmergentes.MenuReaccionesAbierto").forEach(Menu => {
+                Menu.classList.remove("MenuReaccionesAbierto");
+            });
+        }
+
         // 7. Reacciones Estilo Facebook
         const BotonEmoji = Objetivo.closest(".BotonReaccionEmoji");
         if (BotonEmoji) {
@@ -288,7 +290,16 @@ class ControladorPrincipal {
         const BotonReaccionRapida = Objetivo.closest(".BotonDisparadorReaccionRapida");
         if (BotonReaccionRapida) {
             const IdPublicacion = BotonReaccionRapida.dataset.publicacionId;
-            this.RegistrarReaccion(IdPublicacion, "MeGusta");
+            const MenuEmergente = document.getElementById(`MenuReacciones_${IdPublicacion}`);
+            if (MenuEmergente) {
+                const YaEstaAbierto = MenuEmergente.classList.contains("MenuReaccionesAbierto");
+                document.querySelectorAll(".ContenedorReaccionesEmergentes.MenuReaccionesAbierto").forEach(Menu => {
+                    Menu.classList.remove("MenuReaccionesAbierto");
+                });
+                if (!YaEstaAbierto) {
+                    MenuEmergente.classList.add("MenuReaccionesAbierto");
+                }
+            }
             return;
         }
 
@@ -398,9 +409,6 @@ class ControladorPrincipal {
             Objetivo.closest("#BotonCrearNuevoAporte") || 
             Objetivo.closest("#BotonAbrirModalCrearPublicacion") ||
             Objetivo.closest("#BotonRapidoLetraAcordes") ||
-            Objetivo.closest("#BotonRapidoPartitura") ||
-            Objetivo.closest("#BotonRapidoRitmo") ||
-            Objetivo.closest("#TarjetaCrearHistoriaBoton") ||
             Objetivo.closest("#BotonAportarNuevaCancionEnSeccion") ||
             (Objetivo.closest("[data-accion='crear-aporte']"))
         ) {
@@ -424,15 +432,6 @@ class ControladorPrincipal {
             const GeneroElegido = BotonExplorarGenero.dataset.genero;
             this.ServicioEstado.EstablecerFiltrosCanciones(GeneroElegido, "Todos");
             this.ServicioEstado.EstablecerPestanaActiva("canciones");
-            return;
-        }
-
-        // Historia click -> reproducir canción asociada
-        const TarjetaHistoriaCancion = Objetivo.closest(".TarjetaHistoria[data-cancion-id]");
-        if (TarjetaHistoriaCancion) {
-            const IdCancion = TarjetaHistoriaCancion.dataset.cancionId;
-            this.EjecutarReproduccionCancionPorId(IdCancion);
-            this.AbrirModalLetra(IdCancion);
             return;
         }
     }
@@ -493,6 +492,9 @@ class ControladorPrincipal {
     ActualizarBarraReproductorFlotante(Cancion) {
         const BarraReproductor = document.getElementById("BarraReproductorInferiorFlotante");
         if (BarraReproductor) {
+            BarraReproductor.style.transform = "";
+            BarraReproductor.style.opacity = "";
+            BarraReproductor.style.transition = "";
             BarraReproductor.classList.add("ReproductorVisible");
             document.body.classList.add("ConReproductorActivo");
         }
@@ -569,20 +571,64 @@ class ControladorPrincipal {
     RegistrarReaccion(IdPublicacion, TipoReaccion) {
         const PublicacionActualizada = this.ModeloAlmacenamiento.RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion);
         if (PublicacionActualizada) {
+            // 1. Cerrar y forzar desaparición inmediata del menú flotante
+            const MenuEmergente = document.getElementById(`MenuReacciones_${IdPublicacion}`);
+            if (MenuEmergente) {
+                MenuEmergente.classList.remove("MenuReaccionesAbierto");
+                MenuEmergente.classList.add("MenuReaccionesOculto");
+                setTimeout(() => {
+                    MenuEmergente.classList.remove("MenuReaccionesOculto");
+                }, 350);
+            }
+
+            // 2. Actualizar contador total de likes / reacciones
             const Contador = document.getElementById(`ContadorLikes_${IdPublicacion}`);
             if (Contador) Contador.textContent = PublicacionActualizada.CantidadMeGusta;
 
-            const NombresReacciones = {
-                MeGusta: 'Me Gusta',
-                MeEncanta: 'Me Encanta',
-                VivaBeni: '¡Viva el Beni!',
-                Aplausos: 'Aplausos',
-                BuenRitmo: 'Buen Ritmo'
+            // 3. Obtener diccionario y reacción activa del usuario
+            const Diccionario = window.DiccionarioReaccionesLMP || {
+                MeGusta: { Titulo: "Me gusta", TituloCorto: "Me gusta", Icono: '<i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i>', Color: "#1877f2" },
+                MeEncanta: { Titulo: "Me encanta", TituloCorto: "Me encanta", Icono: '<i class="fa-solid fa-heart" style="color: #f3425f;"></i>', Color: "#f3425f" },
+                VivaBeni: { Titulo: "¡Viva el Beni!", TituloCorto: "¡Viva Beni!", Icono: '<i class="fa-solid fa-guitar" style="color: #2e7d32;"></i>', Color: "#2e7d32" },
+                Aplausos: { Titulo: "Aplausos folklóricos", TituloCorto: "Aplausos", Icono: '<i class="fa-solid fa-hands-clapping" style="color: #f7b125;"></i>', Color: "#f7b125" },
+                BuenRitmo: { Titulo: "¡Buen ritmo!", TituloCorto: "Buen ritmo", Icono: '<i class="fa-solid fa-music" style="color: #8b5cf6;"></i>', Color: "#8b5cf6" }
             };
-            this.ServicioNotificaciones.MostrarMensajeToast(
-                `Reaccionaste con ${NombresReacciones[TipoReaccion] || TipoReaccion}`,
-                '<i class="fa-solid fa-thumbs-up"></i>'
-            );
+
+            const MiReaccion = PublicacionActualizada.MiReaccionUsuario;
+            const BotonPrincipal = document.getElementById(`BotonReaccionPrincipal_${IdPublicacion}`);
+
+            // 4. Actualizar estado visual del botón de reaccionar principal
+            if (BotonPrincipal) {
+                const IconoElem = BotonPrincipal.querySelector(".IconoBotonReaccion");
+                const TextoElem = BotonPrincipal.querySelector(".TextoBotonReaccion");
+
+                if (MiReaccion && Diccionario[MiReaccion]) {
+                    const Config = Diccionario[MiReaccion];
+                    if (IconoElem) IconoElem.innerHTML = Config.Icono;
+                    if (TextoElem) TextoElem.textContent = Config.TituloCorto;
+                    BotonPrincipal.style.color = Config.Color;
+                    BotonPrincipal.style.fontWeight = "700";
+                    BotonPrincipal.classList.add("ReaccionadoActivo");
+                } else {
+                    if (IconoElem) IconoElem.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+                    if (TextoElem) TextoElem.textContent = 'Reaccionar';
+                    BotonPrincipal.style.color = "";
+                    BotonPrincipal.style.fontWeight = "";
+                    BotonPrincipal.classList.remove("ReaccionadoActivo");
+                }
+            }
+
+            // 5. Actualizar selección en las opciones del menú flotante
+            const ContenedorPadre = document.querySelector(`.ContenedorBotonReaccionPrincipal[data-publicacion-id="${IdPublicacion}"]`);
+            if (ContenedorPadre) {
+                ContenedorPadre.querySelectorAll(".BotonReaccionEmoji").forEach(Btn => {
+                    if (Btn.dataset.tipoReaccion === MiReaccion) {
+                        Btn.classList.add("ReaccionSeleccionada");
+                    } else {
+                        Btn.classList.remove("ReaccionSeleccionada");
+                    }
+                });
+            }
         }
     }
 
@@ -787,6 +833,163 @@ class ControladorPrincipal {
                 this.ServicioReproductor.DibujarVisualizadorEnLienzo(Lienzo);
             }
         }, 300);
+    }
+
+    CerrarReproductorFlotante() {
+        this.ServicioReproductor.DetenerReproduccion();
+        const BarraReproductor = document.getElementById("BarraReproductorInferiorFlotante");
+        if (BarraReproductor) {
+            BarraReproductor.classList.remove("ReproductorVisible");
+            BarraReproductor.style.transform = "";
+            BarraReproductor.style.opacity = "";
+            BarraReproductor.style.transition = "";
+            document.body.classList.remove("ConReproductorActivo");
+        }
+        this.ServicioEstado.EstablecerCancionReproduciendo(null, false);
+    }
+
+    ConfigurarDeslizamientoReproductorMovil() {
+        const BarraReproductor = document.getElementById("BarraReproductorInferiorFlotante");
+        if (!BarraReproductor) return;
+
+        let PosicionInicioX = 0;
+        let PosicionInicioY = 0;
+        let DesplazamientoActualX = 0;
+        let EstaDeslizando = false;
+        let MovimientoBloqueado = false;
+        let EsGestoHorizontal = false;
+
+        const IniciarGesto = (PosicionX, PosicionY, ElementoObjetivo) => {
+            // Ignorar si el toque/clic ocurrió sobre botones, deslizador de progreso o controles interactivos
+            if (ElementoObjetivo && ElementoObjetivo.closest('button, input, a, .BotonReproducirGrande, .BotonCircularIcono, .DeslizadorProgresoAudio, .DeslizadorVolumenAudio')) {
+                MovimientoBloqueado = true;
+                return;
+            }
+
+            PosicionInicioX = PosicionX;
+            PosicionInicioY = PosicionY;
+            DesplazamientoActualX = 0;
+            EstaDeslizando = true;
+            MovimientoBloqueado = false;
+            EsGestoHorizontal = false;
+            BarraReproductor.style.transition = "none";
+        };
+
+        const MoverGesto = (PosicionX, PosicionY, EventoOriginal) => {
+            if (!EstaDeslizando || MovimientoBloqueado) return;
+
+            const DeltaX = PosicionX - PosicionInicioX;
+            const DeltaY = PosicionY - PosicionInicioY;
+
+            // Determinar si el gesto es horizontal antes de interferir con scroll
+            if (!EsGestoHorizontal) {
+                if (Math.abs(DeltaX) > 6 || Math.abs(DeltaY) > 6) {
+                    if (Math.abs(DeltaX) >= Math.abs(DeltaY)) {
+                        EsGestoHorizontal = true;
+                    } else {
+                        // Scroll vertical de la página, cancelar gesto
+                        MovimientoBloqueado = true;
+                        BarraReproductor.style.transform = "";
+                        BarraReproductor.style.opacity = "";
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            }
+
+            if (EventoOriginal && EventoOriginal.cancelable) {
+                EventoOriginal.preventDefault();
+            }
+
+            const EstaReproduciendo = this.ServicioReproductor.EstaReproduciendo;
+
+            if (EstaReproduciendo) {
+                // Validación: Si está reproduciendo sonido, aplicar resistencia elástica (no descartar)
+                const Resistencia = Math.sign(DeltaX) * Math.min(Math.abs(DeltaX) * 0.15, 20);
+                DesplazamientoActualX = Resistencia;
+                BarraReproductor.style.transform = `translateX(${Resistencia}px)`;
+            } else {
+                // En pausa: deslizar libremente siguiendo el dedo y reducir opacidad
+                DesplazamientoActualX = DeltaX;
+                const AnchoBarra = BarraReproductor.offsetWidth || 320;
+                const Opacidad = Math.max(0.15, 1 - (Math.abs(DeltaX) / AnchoBarra) * 0.8);
+                BarraReproductor.style.transform = `translateX(${DeltaX}px)`;
+                BarraReproductor.style.opacity = Opacidad.toString();
+            }
+        };
+
+        const FinalizarGesto = () => {
+            if (!EstaDeslizando) return;
+            EstaDeslizando = false;
+
+            const EstaReproduciendo = this.ServicioReproductor.EstaReproduciendo;
+            const DeltaX = DesplazamientoActualX;
+            const UmbralDescarte = 50; // Píxeles requeridos para descartar
+
+            if (EstaReproduciendo) {
+                // Si estaba reproduciendo sonido, rebotar elásticamente al centro y notificar
+                BarraReproductor.style.transition = "transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                BarraReproductor.style.transform = "translateX(0)";
+                BarraReproductor.style.opacity = "1";
+
+                if (Math.abs(DeltaX) > 8) {
+                    this.ServicioNotificaciones.MostrarMensajeToast(
+                        "Pausa la música para poder descartar el reproductor",
+                        '<i class="fa-solid fa-circle-pause"></i>'
+                    );
+                }
+                setTimeout(() => {
+                    BarraReproductor.style.transition = "";
+                }, 260);
+            } else {
+                // Si está en pausa
+                if (Math.abs(DeltaX) >= UmbralDescarte) {
+                    // Descartar suavemente hacia el lado del deslizamiento
+                    const Direccion = DeltaX > 0 ? 1 : -1;
+                    BarraReproductor.style.transition = "transform 0.25s ease-out, opacity 0.25s ease-out";
+                    BarraReproductor.style.transform = `translateX(${Direccion * 115}%)`;
+                    BarraReproductor.style.opacity = "0";
+
+                    setTimeout(() => {
+                        this.CerrarReproductorFlotante();
+                    }, 250);
+                } else {
+                    // No alcanzó el umbral, retornar al centro
+                    BarraReproductor.style.transition = "transform 0.2s ease-out, opacity 0.2s ease-out";
+                    BarraReproductor.style.transform = "translateX(0)";
+                    BarraReproductor.style.opacity = "1";
+                    setTimeout(() => {
+                        BarraReproductor.style.transition = "";
+                    }, 210);
+                }
+            }
+
+            DesplazamientoActualX = 0;
+            MovimientoBloqueado = false;
+            EsGestoHorizontal = false;
+        };
+
+        // Soporte de eventos táctiles (Smartphones y Tablets)
+        BarraReproductor.addEventListener("touchstart", (e) => {
+            if (e.touches && e.touches.length === 1) {
+                IniciarGesto(e.touches[0].clientX, e.touches[0].clientY, e.target);
+            }
+        }, { passive: false });
+
+        BarraReproductor.addEventListener("touchmove", (e) => {
+            if (e.touches && e.touches.length === 1) {
+                MoverGesto(e.touches[0].clientX, e.touches[0].clientY, e);
+            }
+        }, { passive: false });
+
+        BarraReproductor.addEventListener("touchend", () => {
+            FinalizarGesto();
+        });
+
+        BarraReproductor.addEventListener("touchcancel", () => {
+            FinalizarGesto();
+        });
     }
 }
 

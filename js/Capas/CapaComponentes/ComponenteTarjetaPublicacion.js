@@ -1,7 +1,41 @@
-/* ==========================================================================
-   COMPONENTE: TARJETA DE PUBLICACIÓN (ESTILO FACEBOOK / META)
-   Nombres en PascalCase - Letras Mi Poblau (LMP)
-   ========================================================================== */
+const DiccionarioReaccionesLMP = {
+    MeGusta: {
+        Clave: "MeGusta",
+        Titulo: "Me gusta",
+        TituloCorto: "Me gusta",
+        Icono: '<i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i>',
+        Color: "#1877f2"
+    },
+    MeEncanta: {
+        Clave: "MeEncanta",
+        Titulo: "Me encanta",
+        TituloCorto: "Me encanta",
+        Icono: '<i class="fa-solid fa-heart" style="color: #f3425f;"></i>',
+        Color: "#f3425f"
+    },
+    VivaBeni: {
+        Clave: "VivaBeni",
+        Titulo: "¡Viva el Beni!",
+        TituloCorto: "¡Viva Beni!",
+        Icono: '<i class="fa-solid fa-guitar" style="color: #2e7d32;"></i>',
+        Color: "#2e7d32"
+    },
+    Aplausos: {
+        Clave: "Aplausos",
+        Titulo: "Aplausos folklóricos",
+        TituloCorto: "Aplausos",
+        Icono: '<i class="fa-solid fa-hands-clapping" style="color: #f7b125;"></i>',
+        Color: "#f7b125"
+    },
+    BuenRitmo: {
+        Clave: "BuenRitmo",
+        Titulo: "¡Buen ritmo!",
+        TituloCorto: "Buen ritmo",
+        Icono: '<i class="fa-solid fa-music" style="color: #8b5cf6;"></i>',
+        Color: "#8b5cf6"
+    }
+};
+window.DiccionarioReaccionesLMP = DiccionarioReaccionesLMP;
 
 class ComponenteTarjetaPublicacion {
     constructor(InstanciaServicioEstado, InstanciaModeloAlmacenamiento) {
@@ -23,6 +57,19 @@ class ComponenteTarjetaPublicacion {
         const TotalReacciones = ObjetoPublicacion.CantidadMeGusta || 0;
         const TotalComentarios = (ObjetoPublicacion.Comentarios && ObjetoPublicacion.Comentarios.length) || 0;
         const TotalCompartidos = ObjetoPublicacion.CantidadCompartidos || 0;
+
+        const MiReaccionActual = ObjetoPublicacion.MiReaccionUsuario;
+        const InfoReaccionActiva = MiReaccionActual ? DiccionarioReaccionesLMP[MiReaccionActual] : null;
+
+        const IconoBotonPrincipal = InfoReaccionActiva 
+            ? InfoReaccionActiva.Icono 
+            : '<i class="fa-regular fa-thumbs-up"></i>';
+        const TextoBotonPrincipal = InfoReaccionActiva 
+            ? InfoReaccionActiva.TituloCorto 
+            : 'Reaccionar';
+        const EstiloColorBoton = InfoReaccionActiva 
+            ? `color: ${InfoReaccionActiva.Color}; font-weight: 700;` 
+            : '';
 
         return `
         <article class="TarjetaPublicacionMuro" id="Publicacion_${ObjetoPublicacion.IdPublicacion}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}">
@@ -59,11 +106,6 @@ class ComponenteTarjetaPublicacion {
                         </div>
                     </div>
 
-                    <!-- Letra y Acordes Preview -->
-                    <div class="ContenedorLetraAcordes" id="ContenedorLetra_${ObjetoPublicacion.IdPublicacion}">
-${this.FormatearLetraConAcordes(CancionAsociada.LetraConAcordes)}
-                    </div>
-
                     <!-- Mini Reproductor Embebido -->
                     <div class="ReproductorEmbebidoTarjeta">
                         <button class="BotonReproducirTarjeta" data-cancion-id="${CancionAsociada.IdCancion}" title="Reproducir muestra de ${CancionAsociada.Titulo}">
@@ -75,7 +117,6 @@ ${this.FormatearLetraConAcordes(CancionAsociada.LetraConAcordes)}
                                 <div class="ProgresoActualPista" id="ProgresoTarjeta_${CancionAsociada.IdCancion}"></div>
                             </div>
                         </div>
-                        <span style="font-size: 11px; font-weight: 700; color: var(--ColorPrimarioAzul);">DEMO AUDIO</span>
                     </div>
 
                     <!-- Vista previa de Partitura si existe -->
@@ -108,38 +149,68 @@ ${this.FormatearLetraConAcordes(CancionAsociada.LetraConAcordes)}
             <!-- 4. Barra de Botones de Acción FB con Reacciones Flotantes -->
             <div class="BarraBotonesAccionPublicacion">
                 <!-- Botón de Reaccionar con Menú Emergente -->
-                <div class="ContenedorBotonReaccionPrincipal" style="flex: 1; display: flex; position: relative;">
-                    <div class="ContenedorReaccionesEmergentes">
-                        <span class="BotonReaccionEmoji" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="MeGusta" title="Me gusta"><i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i></span>
-                        <span class="BotonReaccionEmoji" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="MeEncanta" title="Me encanta"><i class="fa-solid fa-heart" style="color: #f3425f;"></i></span>
-                        <span class="BotonReaccionEmoji" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="VivaBeni" title="¡Viva el Beni!"><i class="fa-solid fa-guitar" style="color: #2e7d32;"></i></span>
-                        <span class="BotonReaccionEmoji" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="Aplausos" title="Aplausos folklóricos"><i class="fa-solid fa-hands-clapping" style="color: #f7b125;"></i></span>
-                        <span class="BotonReaccionEmoji" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="BuenRitmo" title="¡Buen ritmo!"><i class="fa-solid fa-music" style="color: #8b5cf6;"></i></span>
+                <div class="ContenedorBotonReaccionPrincipal" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" style="flex: 1; display: flex; position: relative;">
+                    <!-- Menú Flotante con Iconos y Nombres debajo -->
+                    <div class="ContenedorReaccionesEmergentes" id="MenuReacciones_${ObjetoPublicacion.IdPublicacion}">
+                        <div class="BotonReaccionEmoji ${MiReaccionActual === 'MeGusta' ? 'ReaccionSeleccionada' : ''}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="MeGusta" title="Me gusta">
+                            <span class="IconoEmojiReaccion"><i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i></span>
+                            <span class="EtiquetaNombreReaccion">Me gusta</span>
+                        </div>
+                        <div class="BotonReaccionEmoji ${MiReaccionActual === 'MeEncanta' ? 'ReaccionSeleccionada' : ''}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="MeEncanta" title="Me encanta">
+                            <span class="IconoEmojiReaccion"><i class="fa-solid fa-heart" style="color: #f3425f;"></i></span>
+                            <span class="EtiquetaNombreReaccion">Me encanta</span>
+                        </div>
+                        <div class="BotonReaccionEmoji ${MiReaccionActual === 'VivaBeni' ? 'ReaccionSeleccionada' : ''}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="VivaBeni" title="¡Viva el Beni!">
+                            <span class="IconoEmojiReaccion"><i class="fa-solid fa-guitar" style="color: #2e7d32;"></i></span>
+                            <span class="EtiquetaNombreReaccion">¡Viva Beni!</span>
+                        </div>
+                        <div class="BotonReaccionEmoji ${MiReaccionActual === 'Aplausos' ? 'ReaccionSeleccionada' : ''}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="Aplausos" title="Aplausos folklóricos">
+                            <span class="IconoEmojiReaccion"><i class="fa-solid fa-hands-clapping" style="color: #f7b125;"></i></span>
+                            <span class="EtiquetaNombreReaccion">Aplausos</span>
+                        </div>
+                        <div class="BotonReaccionEmoji ${MiReaccionActual === 'BuenRitmo' ? 'ReaccionSeleccionada' : ''}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" data-tipo-reaccion="BuenRitmo" title="¡Buen ritmo!">
+                            <span class="IconoEmojiReaccion"><i class="fa-solid fa-music" style="color: #8b5cf6;"></i></span>
+                            <span class="EtiquetaNombreReaccion">Buen ritmo</span>
+                        </div>
                     </div>
-                    <button class="BotonAccionInteraccion BotonDisparadorReaccionRapida" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" style="width: 100%;">
-                        <i class="fa-regular fa-thumbs-up"></i>
-                        <span>Reaccionar</span>
+
+                    <!-- Botón Principal que se actualiza con la reacción elegida -->
+                    <button class="BotonAccionInteraccion BotonDisparadorReaccionRapida ${MiReaccionActual ? 'ReaccionadoActivo' : ''}" 
+                            id="BotonReaccionPrincipal_${ObjetoPublicacion.IdPublicacion}" 
+                            data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" 
+                            style="width: 100%; ${EstiloColorBoton}">
+                        <span class="IconoBotonReaccion">${IconoBotonPrincipal}</span>
+                        <span class="TextoBotonReaccion">${TextoBotonPrincipal}</span>
                     </button>
                 </div>
 
                 <!-- Botón Comentar -->
                 <button class="BotonAccionInteraccion BotonEnfocarComentario" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}">
                     <i class="fa-regular fa-comment"></i>
-                    <span>Comentar</span>
+                    <span>
+                        <span class="TextoBotonLargo">Comentar</span>
+                        <span class="TextoBotonCorto">Opinar</span>
+                    </span>
                 </button>
 
                 <!-- Botón Ver Letra Completa -->
                 ${CancionAsociada ? `
                 <button class="BotonAccionInteraccion BotonAbrirModalLetra" data-cancion-id="${CancionAsociada.IdCancion}">
                     <i class="fa-solid fa-scroll"></i>
-                    <span>Ver Letra</span>
+                    <span>
+                        <span class="TextoBotonLargo">Ver Letra</span>
+                        <span class="TextoBotonCorto">Letra</span>
+                    </span>
                 </button>
                 ` : ''}
 
                 <!-- Botón Compartir -->
                 <button class="BotonAccionInteraccion BotonCompartirPublicacion" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}">
                     <i class="fa-solid fa-share"></i>
-                    <span>Compartir</span>
+                    <span>
+                        <span class="TextoBotonLargo">Compartir</span>
+                        <span class="TextoBotonCorto">Enviar</span>
+                    </span>
                 </button>
             </div>
 

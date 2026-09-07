@@ -30,7 +30,6 @@ const RECURSOS_PRECACHE = [
   './js/Capas/CapaComponentes/ComponenteEncabezado.js',
   './js/Capas/CapaComponentes/ComponenteBarraLateralIzquierda.js',
   './js/Capas/CapaComponentes/ComponenteBarraLateralDerecha.js',
-  './js/Capas/CapaComponentes/ComponenteHistorias.js',
   './js/Capas/CapaComponentes/ComponenteCrearPublicacion.js',
   './js/Capas/CapaComponentes/ComponenteTarjetaPublicacion.js',
   './js/Capas/CapaComponentes/ComponenteMuroPrincipal.js',

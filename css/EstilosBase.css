@@ -75,6 +75,14 @@ button:active {
     transform: scale(0.97);
 }
 
+.TextoBotonLargo {
+    display: inline;
+}
+
+.TextoBotonCorto {
+    display: none;
+}
+
 input, textarea, select {
     font-family: inherit;
     font-size: 14px;
@@ -193,7 +201,7 @@ body.ConReproductorActivo .ColumnaLateralDerecha {
     font-size: 12px;
     font-weight: 600;
     padding: 4px 10px;
-    border-radius: var(--RadioBotonPill);
+    border-radius: var(--RadioPequeno);
     letter-spacing: 0.3px;
     text-transform: uppercase;
 }

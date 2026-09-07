@@ -150,8 +150,9 @@
 
     .BarraReproductorInferiorFlotante {
         bottom: 56px;
-        height: 54px;
-        padding: 0 12px;
+        height: 56px;
+        padding: 0 10px;
+        gap: 8px;
     }
 
     .BarraReproductorInferiorFlotante.ReproductorVisible {
@@ -160,11 +161,74 @@
 
     .SeccionVolumenYOpcionesReproductor,
     .LienzoVisualizadorAudio {
-        display: none;
+        display: none !important;
     }
 
     .SeccionPistaReproductor {
-        width: 160px;
+        flex: 1;
+        min-width: 0;
+        max-width: 145px;
+        width: auto;
+        gap: 8px;
+    }
+
+    .CaratulaPistaReproductor {
+        width: 38px;
+        height: 38px;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+
+    .TextoInfoPistaReproductor {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        justify-content: center;
+    }
+
+    .TituloPistaReproductor {
+        font-size: 12.5px;
+        font-weight: 700;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 1.2;
+    }
+
+    .AutorPistaReproductor {
+        font-size: 11px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 1.2;
+    }
+
+    .SeccionControlesCentralesReproductor {
+        flex: 1;
+        min-width: 0;
+        max-width: 200px;
+        gap: 2px;
+    }
+
+    .BotonesControlesReproductor {
+        gap: 8px;
+    }
+
+    .BotonReproducirGrande {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .BotonesControlesReproductor .BotonCircularIcono {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 11px !important;
+    }
+
+    .FilaProgresoYDuracion {
+        gap: 4px;
+        font-size: 9.5px;
     }
 }
 
@@ -172,6 +236,15 @@
 @media (max-width: 600px) {
     :root {
         --AlturaEncabezado: 50px;
+    }
+
+    /* Cambio universal a texto corto para todos los botones en móviles */
+    .TextoBotonCorto {
+        display: inline !important;
+    }
+
+    .TextoBotonLargo {
+        display: none !important;
     }
 
     html, body {
@@ -238,12 +311,28 @@
         overflow: hidden;
     }
 
-    .FilaBotonesAccionesRapidas .BotonAccionRapidaCrear {
-        padding: 6px 4px;
+    .BotonDisparadorModalCrear {
+        font-size: 12px;
+        padding: 8px 10px;
     }
 
-    .FilaBotonesAccionesRapidas .BotonAccionRapidaCrear span {
-        font-size: 11.5px;
+    .BotonAccionLetraCostado {
+        padding: 8px;
+        min-width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--RadioPequeno);
+    }
+
+    .BotonAccionLetraCostado span {
+        display: none !important;
+    }
+
+    .BotonAccionLetraCostado i {
+        font-size: 16px;
+        margin: 0;
     }
 
     /* Barra de Botones de Interacción en Post (4 Columnas) */

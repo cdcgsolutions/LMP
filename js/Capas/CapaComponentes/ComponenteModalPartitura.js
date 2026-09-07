@@ -52,10 +52,14 @@ class ComponenteModalPartitura {
                 <!-- Pie de Modal -->
                 <div class="PieVentanaModal">
                     <button class="BotonAccionSecundario" id="BotonImprimirPartitura">
-                        <i class="fa-solid fa-print"></i> Imprimir Partitura
+                        <i class="fa-solid fa-print"></i>
+                        <span class="TextoBotonLargo">Imprimir Partitura</span>
+                        <span class="TextoBotonCorto">Imprimir</span>
                     </button>
                     <button class="BotonAccionPrimario" id="BotonDescargarPartitura">
-                        <i class="fa-solid fa-download"></i> Descargar Copia
+                        <i class="fa-solid fa-download"></i>
+                        <span class="TextoBotonLargo">Descargar Copia</span>
+                        <span class="TextoBotonCorto">Descargar</span>
                     </button>
                 </div>
             </div>

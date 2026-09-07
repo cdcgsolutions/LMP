@@ -138,15 +138,38 @@ class ModeloAlmacenamiento {
 
         if (PublicacionObjetivo) {
             if (!PublicacionObjetivo.ReaccionesDetalle) {
-                PublicacionObjetivo.ReaccionesDetalle = { MeGusta: 0, MeEncanta: 0, VivaBeni: 0, Aplausos: 0 };
+                PublicacionObjetivo.ReaccionesDetalle = { MeGusta: 0, MeEncanta: 0, VivaBeni: 0, Aplausos: 0, BuenRitmo: 0 };
             }
-            if (PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] !== undefined) {
-                PublicacionObjetivo.ReaccionesDetalle[TipoReaccion]++;
+
+            const ReaccionPrevia = PublicacionObjetivo.MiReaccionUsuario;
+
+            if (ReaccionPrevia === TipoReaccion) {
+                // Si hace clic en la misma reacción, se quita la reacción (toggle)
+                if (PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] && PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] > 0) {
+                    PublicacionObjetivo.ReaccionesDetalle[TipoReaccion]--;
+                }
+                PublicacionObjetivo.CantidadMeGusta = Math.max(0, (PublicacionObjetivo.CantidadMeGusta || 1) - 1);
+                PublicacionObjetivo.MiReaccionUsuario = null;
             } else {
-                PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] = 1;
+                // Si tenía una reacción previa distinta, restar la anterior
+                if (ReaccionPrevia && PublicacionObjetivo.ReaccionesDetalle[ReaccionPrevia] && PublicacionObjetivo.ReaccionesDetalle[ReaccionPrevia] > 0) {
+                    PublicacionObjetivo.ReaccionesDetalle[ReaccionPrevia]--;
+                } else if (!ReaccionPrevia) {
+                    // Es una nueva reacción, sumar al conteo total
+                    PublicacionObjetivo.CantidadMeGusta = (PublicacionObjetivo.CantidadMeGusta || 0) + 1;
+                }
+
+                // Sumar la nueva reacción elegida
+                if (PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] !== undefined) {
+                    PublicacionObjetivo.ReaccionesDetalle[TipoReaccion]++;
+                } else {
+                    PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] = 1;
+                }
+
+                PublicacionObjetivo.MiReaccionUsuario = TipoReaccion;
+                PublicacionObjetivo.TipoReaccionPredominante = TipoReaccion;
             }
-            PublicacionObjetivo.CantidadMeGusta++;
-            PublicacionObjetivo.TipoReaccionPredominante = TipoReaccion;
+
             localStorage.setItem(this.ClaveAlmacenamientoPublicaciones, JSON.stringify(PublicacionesActuales));
             return PublicacionObjetivo;
         }

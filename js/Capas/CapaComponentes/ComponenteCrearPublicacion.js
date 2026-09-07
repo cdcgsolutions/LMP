@@ -12,26 +12,13 @@ class ComponenteCrearPublicacion {
         return `
         <div class="TarjetaCrearPublicacion" id="TarjetaCrearPublicacion">
             <div class="FilaSuperiorCrearPublicacion">
-                <img src="Logo1.png" alt="Avatar" class="AvatarAutorPublicacion" style="width: 40px; height: 40px; border-radius: 50%;">
+                <img src="Logo1.png" alt="Avatar" class="AvatarAutorPublicacion" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;" onerror="this.src='Logo1.png'">
                 <div class="BotonDisparadorModalCrear" id="BotonAbrirModalCrearPublicacion">
-                    ¿Qué letra o composición del Beni deseas compartir hoy?
+                    ¿Qué letra del Beni deseas compartir hoy?
                 </div>
-            </div>
-
-            <div class="DivisorCrearPublicacion"></div>
-
-            <div class="FilaBotonesAccionesRapidas">
-                <button class="BotonAccionRapidaCrear" id="BotonRapidoLetraAcordes">
-                    <i class="fa-solid fa-pen-to-square" style="color: #45bd62; font-size: 18px;"></i>
-                    <span>Letra y Acordes</span>
-                </button>
-                <button class="BotonAccionRapidaCrear" id="BotonRapidoPartitura">
-                    <i class="fa-solid fa-file-lines" style="color: #f3425f; font-size: 18px;"></i>
-                    <span>Partitura / Manuscrito</span>
-                </button>
-                <button class="BotonAccionRapidaCrear" id="BotonRapidoRitmo">
-                    <i class="fa-solid fa-guitar" style="color: #f7b125; font-size: 18px;"></i>
-                    <span>Ritmo Beniano</span>
+                <button class="BotonAccionRapidaCrear BotonAccionLetraCostado" id="BotonRapidoLetraAcordes" title="Aportar Letra y Acordes">
+                    <i class="fa-solid fa-pen-to-square" style="color: #45bd62; font-size: 16px;"></i>
+                    <span class="TextoBotonLargo">Letra</span>
                 </button>
             </div>
         </div>

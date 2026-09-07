@@ -75,22 +75,34 @@ class ComponenteModalLetra {
                 </div>
 
                 <!-- Barra de Herramientas de Músico -->
-                <div style="background-color: var(--ColorFondoSecundario); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--ColorBordeDivisor);">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 13px; font-weight: 700;">Tono:</span>
-                        <button class="BotonAccionSecundario" id="BotonBajarSemitono" style="padding: 4px 8px; font-size: 12px;" title="Bajar semitono"><i class="fa-solid fa-minus" style="margin-right: 4px;"></i>1 Semitono</button>
-                        <span style="font-size: 13px; font-weight: 800; color: var(--ColorPrimarioAzul);" id="EtiquetaTonoActual">
+                <div style="background-color: var(--ColorFondoSecundario); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--ColorBordeDivisor);">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 12.5px; font-weight: 700;">Tono:</span>
+                        <button class="BotonAccionSecundario" id="BotonBajarSemitono" style="padding: 4px 8px; font-size: 12px;" title="Bajar semitono">
+                            <i class="fa-solid fa-minus"></i>
+                            <span class="TextoBotonLargo">1 Semitono</span>
+                            <span class="TextoBotonCorto">-1 st</span>
+                        </button>
+                        <span style="font-size: 13px; font-weight: 800; color: var(--ColorPrimarioAzul); padding: 0 2px;" id="EtiquetaTonoActual">
                             ${this.DesplazamientoSemitonos >= 0 ? `+${this.DesplazamientoSemitonos}` : this.DesplazamientoSemitonos} st
                         </span>
-                        <button class="BotonAccionSecundario" id="BotonSubirSemitono" style="padding: 4px 8px; font-size: 12px;" title="Subir semitono"><i class="fa-solid fa-plus" style="margin-right: 4px;"></i>1 Semitono</button>
+                        <button class="BotonAccionSecundario" id="BotonSubirSemitono" style="padding: 4px 8px; font-size: 12px;" title="Subir semitono">
+                            <i class="fa-solid fa-plus"></i>
+                            <span class="TextoBotonLargo">1 Semitono</span>
+                            <span class="TextoBotonCorto">+1 st</span>
+                        </button>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="BotonAccionSecundario" id="BotonAlternarAcordes" style="padding: 6px 12px; font-size: 12.5px;">
-                            ${this.MostrarAcordes ? '<i class="fa-solid fa-eye-slash" style="margin-right: 6px;"></i>Ocultar Acordes' : '<i class="fa-solid fa-guitar" style="margin-right: 6px;"></i>Mostrar Acordes'}
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="BotonAccionSecundario" id="BotonAlternarAcordes" style="padding: 6px 10px; font-size: 12px;">
+                            ${this.MostrarAcordes ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-guitar"></i>'}
+                            <span class="TextoBotonLargo">${this.MostrarAcordes ? 'Ocultar Acordes' : 'Mostrar Acordes'}</span>
+                            <span class="TextoBotonCorto">Acordes</span>
                         </button>
-                        <button class="BotonAccionSecundario" id="BotonAutoScrollKaraoke" style="padding: 6px 12px; font-size: 12.5px;">
-                            ${this.EstaDesplazandoAuto ? '<i class="fa-solid fa-stop" style="margin-right: 6px;"></i>Detener Scroll' : '<i class="fa-solid fa-arrow-down" style="margin-right: 6px;"></i>Auto-Scroll'}
+                        <button class="BotonAccionSecundario" id="BotonAutoScrollKaraoke" style="padding: 6px 10px; font-size: 12px;">
+                            ${this.EstaDesplazandoAuto ? '<i class="fa-solid fa-stop"></i>' : '<i class="fa-solid fa-arrow-down"></i>'}
+                            <span class="TextoBotonLargo">${this.EstaDesplazandoAuto ? 'Detener Scroll' : 'Auto-Scroll'}</span>
+                            <span class="TextoBotonCorto">Scroll</span>
                         </button>
                     </div>
                 </div>
@@ -103,10 +115,14 @@ class ComponenteModalLetra {
                 <!-- Pie de Modal con Acciones -->
                 <div class="PieVentanaModal">
                     <button class="BotonAccionSecundario" id="BotonCopiarLetraPortapapeles">
-                        <i class="fa-solid fa-copy" style="margin-right: 6px;"></i>Copiar Letra
+                        <i class="fa-solid fa-copy"></i>
+                        <span class="TextoBotonLargo">Copiar Letra</span>
+                        <span class="TextoBotonCorto">Copiar</span>
                     </button>
                     <button class="BotonAccionPrimario BotonReproducirTarjeta" data-cancion-id="${this.CancionSeleccionada.IdCancion}">
-                        <i class="fa-solid fa-play" style="margin-right: 6px;"></i>Reproducir Melodía
+                        <i class="fa-solid fa-play"></i>
+                        <span class="TextoBotonLargo">Reproducir Melodía</span>
+                        <span class="TextoBotonCorto">Reproducir</span>
                     </button>
                 </div>
             </div>

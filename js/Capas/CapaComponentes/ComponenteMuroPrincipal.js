@@ -7,7 +7,6 @@ class ComponenteMuroPrincipal {
     constructor(InstanciaServicioEstado, InstanciaModeloAlmacenamiento) {
         this.ServicioEstado = InstanciaServicioEstado;
         this.ModeloAlmacenamiento = InstanciaModeloAlmacenamiento;
-        this.ComponenteHistorias = new ComponenteHistorias(InstanciaServicioEstado);
         this.ComponenteCrearPublicacion = new ComponenteCrearPublicacion(InstanciaServicioEstado);
         this.ComponenteTarjetaPublicacion = new ComponenteTarjetaPublicacion(InstanciaServicioEstado, InstanciaModeloAlmacenamiento);
     }
@@ -36,13 +35,10 @@ class ComponenteMuroPrincipal {
 
         return `
         <div class="ContenedorMuroMaximo" id="ContenedorMuroMaximo">
-            <!-- 1. Bandeja de Historias / Reels -->
-            ${this.ComponenteHistorias.Renderizar()}
-
-            <!-- 2. Caja de Crear Publicación -->
+            <!-- 1. Caja de Crear Publicación / Aporte -->
             ${this.ComponenteCrearPublicacion.Renderizar()}
 
-            <!-- 3. Lista de Publicaciones del Feed -->
+            <!-- 2. Lista de Publicaciones del Feed -->
             <div id="ListaPublicacionesFeed" style="display: flex; flex-direction: column; gap: 16px;">
                 ${Publicaciones.length > 0 ? Publicaciones.map(Pub => this.ComponenteTarjetaPublicacion.Renderizar(Pub)).join('') : `
                     <div style="background-color: var(--ColorFondoSuperficie); padding: 40px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave);">

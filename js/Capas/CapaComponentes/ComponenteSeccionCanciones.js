@@ -44,7 +44,9 @@ class ComponenteSeccionCanciones {
                     </p>
                 </div>
                 <button class="BotonAccionPrimario" id="BotonAportarNuevaCancionEnSeccion">
-                    <i class="fa-solid fa-plus" style="margin-right: 6px;"></i>Aportar Nueva Letra
+                    <i class="fa-solid fa-plus" style="margin-right: 6px;"></i>
+                    <span class="TextoBotonLargo">Aportar Nueva Letra</span>
+                    <span class="TextoBotonCorto">Aportar</span>
                 </button>
             </div>
 
@@ -97,10 +99,14 @@ class ComponenteSeccionCanciones {
 
                     <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--ColorBordeDivisor);">
                         <button class="BotonAccionPrimario BotonReproducirTarjeta" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Escuchar">
-                            <i class="fa-solid fa-play" style="margin-right: 6px;"></i>Escuchar
+                            <i class="fa-solid fa-play" style="margin-right: 6px;"></i>
+                            <span class="TextoBotonLargo">Escuchar</span>
+                            <span class="TextoBotonCorto">Oír</span>
                         </button>
                         <button class="BotonAccionSecundario BotonAbrirModalLetra" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Ver letra y acordes">
-                            <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>Letra
+                            <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>
+                            <span class="TextoBotonLargo">Ver Letra</span>
+                            <span class="TextoBotonCorto">Letra</span>
                         </button>
                         ${Cancion.ImagenPartitura ? `
                         <button class="BotonCircularIcono BotonAbrirModalPartitura" data-cancion-id="${Cancion.IdCancion}" style="width: 34px; height: 34px; font-size: 14px;" title="Ver partitura">
