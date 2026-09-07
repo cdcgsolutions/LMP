@@ -39,6 +39,7 @@ class AplicacionLetrasMiPoblau {
 
         this.InstanciaServicioCloudinary = new window.ServicioCloudinary();
         this.InstanciaServicioEstado = new window.ServicioEstado();
+        this.InstanciaServicioEstado.SincronizarUsuarioConBaseDatos(this.InstanciaModeloAlmacenamiento.ObtenerTodosLosUsuarios());
         this.InstanciaServicioReproductor = new window.ServicioReproductor();
         this.InstanciaServicioNotificaciones = new window.ServicioNotificaciones();
 

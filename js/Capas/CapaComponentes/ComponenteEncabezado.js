@@ -12,6 +12,8 @@ class ComponenteEncabezado {
         const EstadoActual = this.ServicioEstado.ObtenerEstado();
         const PestanaActiva = EstadoActual.PestanaActiva;
         const ModoOscuro = EstadoActual.ModoOscuro;
+        const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual() || EstadoActual.UsuarioActual;
+        const EsInvitado = !UsuarioActual || UsuarioActual.EsInvitado === true || UsuarioActual.Nombre === "Usuario";
 
         return `
         <header class="EncabezadoSuperiorPrincipal" id="EncabezadoSuperiorPrincipal">
@@ -74,10 +76,19 @@ class ComponenteEncabezado {
                 <button class="BotonCircularIcono" id="BotonCrearNuevoAporte" title="Publicar nueva letra">
                     <i class="fa-solid fa-plus"></i>
                 </button>
-                <div class="PerfilUsuarioBoton" id="BotonPerfilUsuario" title="Perfil de Edna Miriam Edgley Cuellar">
-                    <img src="Logo1.png" alt="Avatar" class="AvatarUsuarioMini">
-                    <span>Edna Miriam</span>
+                ${EsInvitado ? `
+                <div class="PerfilUsuarioBoton PerfilInvitadoEncabezado" id="BotonPerfilUsuario" title="Modo Invitado - Clic para iniciar sesión" style="cursor: pointer;">
+                    <div class="AvatarUsuarioMini" style="display: flex; align-items: center; justify-content: center; background: var(--ColorFondoSecundario); border-radius: 50%; width: 28px; height: 28px; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeDivisor); flex-shrink: 0;">
+                        <i class="fa-solid fa-user" style="font-size: 13px;"></i>
+                    </div>
+                    <span>Usuario</span>
                 </div>
+                ` : `
+                <div class="PerfilUsuarioBoton" id="BotonPerfilUsuario" title="Perfil de ${UsuarioActual.Nombre}" style="cursor: pointer;">
+                    <img src="${UsuarioActual.FotoPerfil || 'Logo1.png'}" alt="Avatar" class="AvatarUsuarioMini" onerror="this.src='Logo1.png'">
+                    <span>${UsuarioActual.Nombre.split(' ').slice(0, 2).join(' ')}</span>
+                </div>
+                `}
             </div>
         </header>
         `;

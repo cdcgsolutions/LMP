@@ -15,18 +15,31 @@ class ComponenteSeccionArtistas {
         const CancionesDelArtista = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones()
             .filter(C => C.Autor && C.Autor.includes(ArtistaPrincipal.NombreCompleto || "Edna Miriam"));
 
+        const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
+        const EsUsuarioLogueado = UsuarioActual && !UsuarioActual.EsInvitado;
+        const EsPerfilPropio = EsUsuarioLogueado && ArtistaPrincipal.NombreCompleto && 
+            (UsuarioActual.Nombre.toLowerCase().includes("edna") || UsuarioActual.Nombre.trim().toLowerCase() === ArtistaPrincipal.NombreCompleto.trim().toLowerCase());
+
+        const FotoPortadaMostrar = (EsPerfilPropio && UsuarioActual.FotoPortada) 
+            ? UsuarioActual.FotoPortada 
+            : (ArtistaPrincipal.FotoPortada || 'Logo1.png');
+
+        const FotoPerfilMostrar = (EsPerfilPropio && UsuarioActual.FotoPerfil) 
+            ? UsuarioActual.FotoPerfil 
+            : (ArtistaPrincipal.FotoPerfil || 'Logo1.png');
+
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionArtistas">
             <!-- 1. Portada y Perfil Estilo Facebook de Artista Destacada -->
             <div class="TarjetaPerfilIFAEL">
                 <div class="PortadaInstitucionIFAEL">
-                    <img src="${ArtistaPrincipal.FotoPortada || 'IFAEL.jpg'}" alt="Portada" class="ImagenPortadaInstitucion">
+                    <img src="${FotoPortadaMostrar}" alt="Portada" class="ImagenPortadaInstitucion" onerror="this.src='Logo1.png'">
                 </div>
 
                 <div class="CuerpoPerfilInstitucion">
                     <div class="FilaAvatarYDatosPrincipales">
                         <div class="ContenedorAvatarFlotantePerfil">
-                            <img src="${ArtistaPrincipal.FotoPerfil || 'Logo1.png'}" alt="${ArtistaPrincipal.NombreCompleto}" class="AvatarInstitucionGrande">
+                            <img src="${FotoPerfilMostrar}" alt="${ArtistaPrincipal.NombreCompleto}" class="AvatarInstitucionGrande" onerror="this.src='Logo1.png'">
                         </div>
                         <div class="DatosTextoInstitucion">
                             <h1 class="NombreInstitucionGrande">

@@ -29,6 +29,7 @@ class ControladorPrincipal {
         this.ComponenteModalLetra = new ComponenteModalLetra(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalPartitura = new ComponenteModalPartitura(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalCrearAporte = new ComponenteModalCrearAporte(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteModalIniciarSesion = new ComponenteModalIniciarSesion(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteBarraNavegacionMovil = new ComponenteBarraNavegacionMovil(this.ServicioEstado);
         this.ComponenteReproductorFlotante = new ComponenteReproductorFlotante(this.ServicioEstado, this.ServicioReproductor);
 
@@ -50,6 +51,9 @@ class ControladorPrincipal {
             document.body.classList.add("ModoOscuroActivo");
             this.ServicioEstado.AlternarModoOscuro(true);
         }
+
+        // Sincronizar sesión activa con la base de datos de usuarios en Firestore
+        this.ServicioEstado.SincronizarUsuarioConBaseDatos(this.ModeloAlmacenamiento.ObtenerTodosLosUsuarios());
 
         this.SuscribirEventosDelEstado();
         this.RenderizarTodaLaAplicacion();
@@ -88,6 +92,11 @@ class ControladorPrincipal {
 
         this.ServicioReproductor.RegistrarCallbackProgreso((DatosProgreso) => {
             this.ActualizarProgresoAudioEnUI(DatosProgreso);
+        });
+
+        this.ServicioEstado.SuscribirEvento("CambioSesionUsuario", () => {
+            this.RenderizarTodaLaAplicacion();
+            this.ConfigurarVisualizadorCanvas();
         });
     }
 
@@ -182,12 +191,23 @@ class ControladorPrincipal {
                 return;
             }
             if (Evento.key === "Enter") {
+                const InputLogin = Evento.target.closest("#CampoEmailLogin, #CampoPasswordLogin");
+                if (InputLogin) {
+                    Evento.preventDefault();
+                    this.ProcesarIniciarSesionFormulario();
+                    return;
+                }
+
                 const InputComentario = Evento.target.closest(".CampoEntradaComentario");
                 if (InputComentario && InputComentario.id) {
                     const Partes = InputComentario.id.split("_");
                     const IdPublicacion = Partes[1];
                     if (IdPublicacion) {
                         Evento.preventDefault();
+                        if (!this.ServicioEstado.EstaAutenticado()) {
+                            this.AbrirModalIniciarSesion("Inicia sesión para comentar en las publicaciones.");
+                            return;
+                        }
                         this.AgregarComentarioDesdeEntrada(IdPublicacion);
                     }
                 }
@@ -312,6 +332,13 @@ class ControladorPrincipal {
         // 7. Reacciones Estilo Facebook
         const BotonEmoji = Objetivo.closest(".BotonReaccionEmoji");
         if (BotonEmoji) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                document.querySelectorAll(".ContenedorReaccionesEmergentes.MenuReaccionesAbierto").forEach(Menu => {
+                    Menu.classList.remove("MenuReaccionesAbierto");
+                });
+                this.AbrirModalIniciarSesion("Inicia sesión para reaccionar a las publicaciones.");
+                return;
+            }
             const IdPublicacion = BotonEmoji.dataset.publicacionId;
             const TipoReaccion = BotonEmoji.dataset.tipoReaccion;
             this.RegistrarReaccion(IdPublicacion, TipoReaccion);
@@ -320,6 +347,10 @@ class ControladorPrincipal {
 
         const BotonReaccionRapida = Objetivo.closest(".BotonDisparadorReaccionRapida");
         if (BotonReaccionRapida) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para reaccionar a las publicaciones.");
+                return;
+            }
             const IdPublicacion = BotonReaccionRapida.dataset.publicacionId;
             const MenuEmergente = document.getElementById(`MenuReacciones_${IdPublicacion}`);
             if (MenuEmergente) {
@@ -345,6 +376,10 @@ class ControladorPrincipal {
         // 8. Enviar Comentario
         const BotonEnviarComentario = Objetivo.closest(".BotonEnviarComentario");
         if (BotonEnviarComentario) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para comentar en las publicaciones.");
+                return;
+            }
             const IdPublicacion = BotonEnviarComentario.dataset.publicacionId;
             this.AgregarComentarioDesdeEntrada(IdPublicacion);
             return;
@@ -353,6 +388,10 @@ class ControladorPrincipal {
         // 8.1 Dar Like a un Comentario
         const BotonLikeComentario = Objetivo.closest(".BotonLikeComentario");
         if (BotonLikeComentario) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para reaccionar a los comentarios.");
+                return;
+            }
             const IdPublicacion = BotonLikeComentario.dataset.publicacionId;
             const IdComentario = BotonLikeComentario.dataset.comentarioId;
             this.AlternarLikeComentario(IdPublicacion, IdComentario);
@@ -362,6 +401,10 @@ class ControladorPrincipal {
         // 9. Enfocar Entrada de Comentario
         const BotonEnfocarComentario = Objetivo.closest(".BotonEnfocarComentario");
         if (BotonEnfocarComentario) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para comentar en las publicaciones.");
+                return;
+            }
             const IdPublicacion = BotonEnfocarComentario.dataset.publicacionId;
             const Entrada = document.getElementById(`EntradaComentario_${IdPublicacion}`);
             if (Entrada) Entrada.focus();
@@ -371,6 +414,10 @@ class ControladorPrincipal {
         // 10. Compartir Publicación
         const BotonCompartir = Objetivo.closest(".BotonCompartirPublicacion");
         if (BotonCompartir) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para compartir letras del Beni.");
+                return;
+            }
             this.ServicioNotificaciones.MostrarMensajeToast("¡Enlace de publicación copiado para compartir!", '<i class="fa-solid fa-share-nodes"></i>');
             return;
         }
@@ -531,11 +578,69 @@ class ControladorPrincipal {
             Objetivo.closest("#BotonAportarNuevaCancionEnSeccion") ||
             (Objetivo.closest("[data-accion='crear-aporte']"))
         ) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para aportar y publicar nuevas letras del Beni.");
+                return;
+            }
             this.AbrirModalCrearAporte();
             return;
         }
         if (Objetivo.closest("#BotonCerrarModalCrear") || Objetivo.closest("#BotonCancelarCrearAporte") || Objetivo.closest("#ModalCrearAporteFondo") === Objetivo) {
             this.CerrarModales();
+            return;
+        }
+
+        // 15. Seguir y Mensaje a Artistas
+        if (Objetivo.closest("#BotonSeguirArtista")) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para seguir a los artistas y compositores.");
+                return;
+            }
+            this.ServicioNotificaciones.MostrarMensajeToast("¡Ahora sigues a este artista!", '<i class="fa-solid fa-user-check"></i>');
+            return;
+        }
+
+        if (Objetivo.closest("#BotonMensajeArtista")) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion("Inicia sesión para enviar un mensaje a este artista.");
+                return;
+            }
+            this.ServicioNotificaciones.MostrarMensajeToast("Mensajería directa habilitada para tu cuenta.", '<i class="fa-solid fa-comment-dots"></i>');
+            return;
+        }
+
+        // 16. Eventos de Perfil e Inicio / Cierre de Sesión
+        if (Objetivo.closest("[data-accion='iniciar-sesion']")) {
+            this.AbrirModalIniciarSesion();
+            return;
+        }
+
+        if (Objetivo.closest("[data-accion='cerrar-sesion']")) {
+            this.ProcesarCerrarSesion();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonPerfilUsuario")) {
+            if (!this.ServicioEstado.EstaAutenticado()) {
+                this.AbrirModalIniciarSesion();
+            } else {
+                this.ServicioEstado.EstablecerPestanaActiva("artistas");
+            }
+            return;
+        }
+
+        if (Objetivo.closest("#BotonCerrarModalLogin") || Objetivo.closest("#BotonContinuarComoInvitado")) {
+            this.CerrarModales();
+            return;
+        }
+
+        // Si se hace clic en el fondo del modal de login, no hacer nada (evitar cierre al hacer clic afuera)
+        if (Objetivo.id === "ModalIniciarSesionFondo" || Objetivo.closest("#ModalIniciarSesionFondo") === Objetivo) {
+            return;
+        }
+
+        if (Objetivo.closest("#BotonConfirmarIniciarSesion")) {
+            this.ProcesarIniciarSesionFormulario();
             return;
         }
 
@@ -699,7 +804,13 @@ class ControladorPrincipal {
     }
 
     RegistrarReaccion(IdPublicacion, TipoReaccion) {
-        const PublicacionActualizada = this.ModeloAlmacenamiento.RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion, "Edna Miriam Edgley Cuellar");
+        if (!this.ServicioEstado.EstaAutenticado()) {
+            this.AbrirModalIniciarSesion("Inicia sesión para reaccionar a esta publicación.");
+            return;
+        }
+        const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual();
+        const NombreUsuario = (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : "Edna Miriam Edgley Cuellar";
+        const PublicacionActualizada = this.ModeloAlmacenamiento.RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion, NombreUsuario);
         if (PublicacionActualizada) {
             // 1. Cerrar y forzar desaparición inmediata del menú flotante
             const MenuEmergente = document.getElementById(`MenuReacciones_${IdPublicacion}`);
@@ -777,13 +888,19 @@ class ControladorPrincipal {
     }
 
     AgregarComentarioDesdeEntrada(IdPublicacion) {
+        if (!this.ServicioEstado.EstaAutenticado()) {
+            this.AbrirModalIniciarSesion("Inicia sesión para comentar en las publicaciones.");
+            return;
+        }
+
         const Entrada = document.getElementById(`EntradaComentario_${IdPublicacion}`);
         if (!Entrada || !Entrada.value.trim()) return;
 
+        const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual();
         const Texto = Entrada.value.trim();
         const ObjetoComentario = {
-            NombreUsuario: "Edna Miriam Edgley Cuellar",
-            AvatarUsuario: "Logo1.png",
+            NombreUsuario: (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : "Edna Miriam Edgley Cuellar",
+            AvatarUsuario: (UsuarioActual && UsuarioActual.FotoPerfil) ? UsuarioActual.FotoPerfil : "Logo1.png",
             TextoComentario: Texto
         };
 
@@ -957,6 +1074,17 @@ class ControladorPrincipal {
 
         const Publicacion = this.ModeloAlmacenamiento.ObtenerPublicacionPorId(IdPublicacion);
         if (!Publicacion) return;
+
+        const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
+        const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
+        const EsAutor = EstaAutenticado && Publicacion.NombreAutor && (
+            UsuarioActual.Nombre.trim().toLowerCase() === Publicacion.NombreAutor.trim().toLowerCase() ||
+            Publicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
+        );
+        if (!EsAutor) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Solo el autor de la publicación puede editarla.", '<i class="fa-solid fa-lock"></i>');
+            return;
+        }
 
         let Cancion = null;
         if (Publicacion.IdCancionAsociada) {
@@ -1333,10 +1461,14 @@ class ControladorPrincipal {
                 ]
             });
 
+            const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
+            const NombreAutorFinal = (UsuarioActual && UsuarioActual.Nombre && !UsuarioActual.EsInvitado) ? UsuarioActual.Nombre : Autor;
+            const AvatarFinal = (UsuarioActual && UsuarioActual.FotoPerfil) ? UsuarioActual.FotoPerfil : "Logo1.png";
+
             await this.ModeloAlmacenamiento.GuardarPublicacionNueva({
-                NombreAutor: Autor,
-                AvatarAutor: "Logo1.png",
-                EsVerificado: this.ModeloAlmacenamiento.EsUsuarioVerificado(Autor),
+                NombreAutor: NombreAutorFinal,
+                AvatarAutor: AvatarFinal,
+                EsVerificado: this.ModeloAlmacenamiento.EsUsuarioVerificado(NombreAutorFinal),
                 TextoPublicacion: MensajeMuro,
                 IdCancionAsociada: NuevaCancion.IdCancion
             });
@@ -1369,6 +1501,104 @@ class ControladorPrincipal {
         if (this.ContenedorModales) {
             this.ContenedorModales.innerHTML = "";
         }
+    }
+
+    AbrirModalIniciarSesion(MensajeMotivo = "") {
+        if (!this.ContenedorModales) return;
+        this.ContenedorModales.innerHTML = this.ComponenteModalIniciarSesion.Renderizar(MensajeMotivo);
+
+        // Limpieza estricta de inputs para evitar autollenado por el navegador
+        setTimeout(() => {
+            const InputEmail = document.getElementById("CampoEmailLogin");
+            const InputPass = document.getElementById("CampoPasswordLogin");
+            const Form = document.getElementById("FormularioInicioSesionModal");
+            if (Form) Form.reset();
+            if (InputEmail) {
+                InputEmail.value = "";
+            }
+            if (InputPass) {
+                InputPass.value = "";
+            }
+        }, 50);
+    }
+
+    async ProcesarIniciarSesionFormulario() {
+        const InputEmail = document.getElementById("CampoEmailLogin");
+        const InputPass = document.getElementById("CampoPasswordLogin");
+        const CajaError = document.getElementById("MensajeErrorLoginModal");
+        const BotonSubmit = document.getElementById("BotonConfirmarIniciarSesion");
+
+        const Email = InputEmail ? InputEmail.value.trim() : "";
+        const Password = InputPass ? InputPass.value : "";
+
+        if (CajaError) {
+            CajaError.style.display = "none";
+            CajaError.textContent = "";
+        }
+
+        if (!Email) {
+            if (CajaError) {
+                CajaError.textContent = "Por favor ingresa tu correo electrónico.";
+                CajaError.style.display = "block";
+            }
+            return;
+        }
+
+        if (!Password) {
+            if (CajaError) {
+                CajaError.textContent = "Por favor ingresa tu contraseña.";
+                CajaError.style.display = "block";
+            }
+            return;
+        }
+
+        if (BotonSubmit) {
+            BotonSubmit.disabled = true;
+            BotonSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando credenciales...';
+        }
+
+        try {
+            const Resultado = await this.ModeloAlmacenamiento.AutenticarUsuarioEnBaseDatos(Email, Password);
+
+            if (!Resultado.Exito) {
+                if (CajaError) {
+                    CajaError.textContent = Resultado.Mensaje || "Credenciales incorrectas.";
+                    CajaError.style.display = "block";
+                }
+                if (BotonSubmit) {
+                    BotonSubmit.disabled = false;
+                    BotonSubmit.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 6px;"></i> Iniciar Sesión';
+                }
+                return;
+            }
+
+            // Inicio de sesión exitoso con datos de Firestore
+            this.ServicioEstado.IniciarSesion(Resultado.Usuario);
+            this.CerrarModales();
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `¡Bienvenida/o, ${Resultado.Usuario.NombreCompleto || Resultado.Usuario.Nombre}!`,
+                '<i class="fa-solid fa-circle-check"></i>'
+            );
+        } catch (ErrorAuth) {
+            console.error("[ControladorPrincipal] Error al autenticar:", ErrorAuth);
+            if (CajaError) {
+                CajaError.textContent = "Ocurrió un error al verificar credenciales. Inténtalo de nuevo.";
+                CajaError.style.display = "block";
+            }
+            if (BotonSubmit) {
+                BotonSubmit.disabled = false;
+                BotonSubmit.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 6px;"></i> Iniciar Sesión';
+            }
+        }
+    }
+
+    ProcesarCerrarSesion() {
+        this.ServicioEstado.CerrarSesion();
+        this.CerrarModales();
+        this.ServicioNotificaciones.MostrarMensajeToast(
+            "Has cerrado sesión. Continuando como Invitado.",
+            '<i class="fa-solid fa-arrow-right-from-bracket"></i>'
+        );
     }
 
     AbrirModalListaReacciones(IdPublicacion) {
@@ -1498,6 +1728,17 @@ class ControladorPrincipal {
 
         const Publicacion = this.ModeloAlmacenamiento.ObtenerPublicacionPorId(IdPublicacion);
         if (!Publicacion) return;
+
+        const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
+        const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
+        const EsAutor = EstaAutenticado && Publicacion.NombreAutor && (
+            UsuarioActual.Nombre.trim().toLowerCase() === Publicacion.NombreAutor.trim().toLowerCase() ||
+            Publicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
+        );
+        if (!EsAutor) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Solo el autor de la publicación puede eliminarla.", '<i class="fa-solid fa-lock"></i>');
+            return;
+        }
 
         let NombreCancion = "";
         let Cancion = null;

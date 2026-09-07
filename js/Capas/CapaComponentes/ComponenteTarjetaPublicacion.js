@@ -144,6 +144,13 @@ class ComponenteTarjetaPublicacion {
             EsVerificadoAutor = ObjetoPublicacion.EsVerificado === true;
         }
 
+        const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
+        const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
+        const EsAutorDeLaPublicacion = EstaAutenticado && ObjetoPublicacion.NombreAutor && (
+            UsuarioActual.Nombre.trim().toLowerCase() === ObjetoPublicacion.NombreAutor.trim().toLowerCase() ||
+            ObjetoPublicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
+        );
+
         return `
         <article class="TarjetaPublicacionMuro" id="Publicacion_${ObjetoPublicacion.IdPublicacion}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}">
             <!-- 1. Encabezado de la Publicación -->
@@ -162,6 +169,9 @@ class ComponenteTarjetaPublicacion {
                             <span title="Público"><i class="fa-solid fa-earth-americas" style="font-size: 11px;"></i></span>
                         </div>
                     </div>
+                </div>
+
+                ${EsAutorDeLaPublicacion ? `
                 <div class="ContenedorOpcionesPublicacion">
                     <button class="BotonCircularIcono BotonDesplegarOpcionesPublicacion" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" style="width: 32px; height: 32px; font-size: 13px;" title="Opciones de publicación">
                         <i class="fa-solid fa-ellipsis"></i>
@@ -177,6 +187,7 @@ class ComponenteTarjetaPublicacion {
                         </button>
                     </div>
                 </div>
+                ` : ''}
             </header>
 
             <!-- 2. Cuerpo del Mensaje y Canción -->
@@ -336,7 +347,13 @@ class ComponenteTarjetaPublicacion {
 
                 <!-- Caja de Entrada para Nuevo Comentario -->
                 <div class="FilaEntradaNuevoComentario">
-                    <img src="Logo1.png" alt="Usuario" style="width: 32px; height: 32px; border-radius: 50%;">
+                    ${EstaAutenticado ? `
+                    <img src="${UsuarioActual.FotoPerfil || 'Logo1.png'}" alt="Usuario" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.src='Logo1.png'">
+                    ` : `
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--ColorFondoSecundario); display: flex; align-items: center; justify-content: center; color: var(--ColorTextoSecundario); font-size: 15px; border: 1px solid var(--ColorBordeDivisor); flex-shrink: 0;">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    `}
                     <input 
                         type="text" 
                         class="CampoEntradaComentario" 

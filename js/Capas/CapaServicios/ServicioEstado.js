@@ -5,6 +5,26 @@
 
 class ServicioEstado {
     constructor() {
+        let SesionGuardada = null;
+        try {
+            const SesionStr = localStorage.getItem("LMP_SesionUsuario_v1");
+            if (SesionStr) {
+                SesionGuardada = JSON.parse(SesionStr);
+            }
+        } catch (ErrorSesion) {
+            SesionGuardada = null;
+        }
+
+        const UsuarioPorDefectoInvitado = {
+            EsInvitado: true,
+            Nombre: "Usuario",
+            Rol: "",
+            Carrera: "",
+            Avatar: "AvatarInvitado",
+            FotoPerfil: "",
+            EsVerificado: false
+        };
+
         this.EstadoInterno = {
             PestanaActiva: "muro", // muro | canciones | generos | artistas | ifael
             TerminoBusquedaGlobal: "",
@@ -14,11 +34,7 @@ class ServicioEstado {
             EstaReproduciendoAudio: false,
             ModoOscuro: false,
             MenuLateralMovilAbierto: false,
-            UsuarioActual: {
-                Nombre: "Edna Miriam Edgley Cuellar",
-                Rol: "Investigadora Musical & Compositora",
-                Avatar: "Logo1.png"
-            }
+            UsuarioActual: SesionGuardada || UsuarioPorDefectoInvitado
         };
         this.ListaObservadores = {};
     }
@@ -87,6 +103,90 @@ class ServicioEstado {
             ? EstaAbierto 
             : !this.EstadoInterno.MenuLateralMovilAbierto;
         this.NotificarEvento("CambioMenuMovil", this.EstadoInterno.MenuLateralMovilAbierto);
+    }
+
+    EstaAutenticado() {
+        const Usuario = this.EstadoInterno.UsuarioActual;
+        return !!(Usuario && !Usuario.EsInvitado && Usuario.Nombre && Usuario.Nombre !== "Usuario");
+    }
+
+    ObtenerUsuarioActual() {
+        return this.EstadoInterno.UsuarioActual;
+    }
+
+    IniciarSesion(DatosUsuario) {
+        const UsuarioSesion = {
+            EsInvitado: false,
+            IdUsuario: DatosUsuario.IdUsuario || "",
+            Nombre: DatosUsuario.NombreCompleto || DatosUsuario.Nombre || "Usuario",
+            Rol: DatosUsuario.Rol || "Usuario",
+            Carrera: DatosUsuario.Institucion || DatosUsuario.Rol || "",
+            Institucion: DatosUsuario.Institucion || "",
+            Avatar: DatosUsuario.FotoPerfilUrl || DatosUsuario.FotoPerfil || DatosUsuario.Avatar || "Logo1.png",
+            FotoPerfil: DatosUsuario.FotoPerfilUrl || DatosUsuario.FotoPerfil || DatosUsuario.Avatar || "Logo1.png",
+            FotoPortada: DatosUsuario.FotoPortadaUrl || DatosUsuario.FotoPortada || "Logo1.png",
+            EsVerificado: DatosUsuario.EsVerificado === true,
+            CorreoElectronico: DatosUsuario.CorreoElectronico || ""
+        };
+
+        this.EstadoInterno.UsuarioActual = UsuarioSesion;
+        try {
+            localStorage.setItem("LMP_SesionUsuario_v1", JSON.stringify(UsuarioSesion));
+        } catch (e) {
+            console.warn("[ServicioEstado] Error al guardar sesión:", e);
+        }
+
+        this.NotificarEvento("CambioSesionUsuario", UsuarioSesion);
+    }
+
+    SincronizarUsuarioConBaseDatos(ListaUsuarios) {
+        if (!this.EstaAutenticado() || !Array.isArray(ListaUsuarios) || ListaUsuarios.length === 0) return;
+        const UsuarioActual = this.EstadoInterno.UsuarioActual;
+        const UsuarioFresco = ListaUsuarios.find(U => 
+            (UsuarioActual.IdUsuario && U.IdUsuario === UsuarioActual.IdUsuario) ||
+            (UsuarioActual.CorreoElectronico && U.CorreoElectronico && U.CorreoElectronico.toLowerCase() === UsuarioActual.CorreoElectronico.toLowerCase()) ||
+            (UsuarioActual.Nombre && U.NombreCompleto && U.NombreCompleto.trim().toLowerCase() === UsuarioActual.Nombre.trim().toLowerCase())
+        );
+
+        if (UsuarioFresco) {
+            UsuarioActual.IdUsuario = UsuarioFresco.IdUsuario || UsuarioActual.IdUsuario;
+            UsuarioActual.Nombre = UsuarioFresco.NombreCompleto || UsuarioActual.Nombre;
+            UsuarioActual.FotoPerfil = UsuarioFresco.FotoPerfil || UsuarioFresco.FotoPerfilUrl || UsuarioActual.FotoPerfil;
+            UsuarioActual.Avatar = UsuarioActual.FotoPerfil;
+            UsuarioActual.FotoPortada = UsuarioFresco.FotoPortada || UsuarioFresco.FotoPortadaUrl || UsuarioActual.FotoPortada;
+            UsuarioActual.Institucion = UsuarioFresco.Institucion || UsuarioActual.Institucion;
+            UsuarioActual.Rol = UsuarioFresco.Rol || UsuarioActual.Rol;
+            UsuarioActual.Carrera = UsuarioFresco.Institucion || UsuarioFresco.Rol || UsuarioActual.Carrera;
+            UsuarioActual.EsVerificado = UsuarioFresco.EsVerificado === true;
+            UsuarioActual.CorreoElectronico = UsuarioFresco.CorreoElectronico || UsuarioActual.CorreoElectronico;
+
+            try {
+                localStorage.setItem("LMP_SesionUsuario_v1", JSON.stringify(UsuarioActual));
+            } catch (e) {}
+
+            this.NotificarEvento("CambioSesionUsuario", UsuarioActual);
+        }
+    }
+
+    CerrarSesion() {
+        const UsuarioInvitado = {
+            EsInvitado: true,
+            Nombre: "Usuario",
+            Rol: "",
+            Carrera: "",
+            Avatar: "AvatarInvitado",
+            FotoPerfil: "",
+            EsVerificado: false
+        };
+
+        this.EstadoInterno.UsuarioActual = UsuarioInvitado;
+        try {
+            localStorage.removeItem("LMP_SesionUsuario_v1");
+        } catch (e) {
+            console.warn("[ServicioEstado] Error al limpiar sesión:", e);
+        }
+
+        this.NotificarEvento("CambioSesionUsuario", UsuarioInvitado);
     }
 }
 

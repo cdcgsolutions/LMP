@@ -11,21 +11,39 @@ class ComponenteBarraLateralIzquierda {
 
     Renderizar() {
         const PestanaActiva = this.ServicioEstado.ObtenerEstado("PestanaActiva");
-        const EsVerificado = this.ModeloAlmacenamiento ? this.ModeloAlmacenamiento.EsUsuarioVerificado("Edna Miriam Edgley Cuellar") : false;
+        const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual");
+        const EsInvitado = !UsuarioActual || UsuarioActual.EsInvitado === true || UsuarioActual.Nombre === "Usuario";
+        const EsVerificado = (!EsInvitado && this.ModeloAlmacenamiento) 
+            ? this.ModeloAlmacenamiento.EsUsuarioVerificado(UsuarioActual.Nombre, UsuarioActual.EsVerificado === true) 
+            : false;
 
         return `
         <aside class="ColumnaLateralIzquierda" id="ColumnaLateralIzquierda">
             <!-- Perfil Rápido -->
-            <div class="ElementoAccesoDirecto" data-pestana="artistas" style="margin-bottom: 8px;">
-                <img src="Logo1.png" alt="Perfil" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;">
+            ${EsInvitado ? `
+            <div class="ElementoAccesoDirecto PerfilInvitadoLateral" data-accion="iniciar-sesion" style="margin-bottom: 8px; cursor: pointer;" title="Haz clic para iniciar sesión">
+                <div class="AvatarPerfilLateralInvitado" style="width: 38px; height: 38px; border-radius: 50%; background: var(--ColorFondoSecundario); display: flex; align-items: center; justify-content: center; color: var(--ColorTextoSecundario); font-size: 18px; border: 1px solid var(--ColorBordeDivisor); flex-shrink: 0;">
+                    <i class="fa-solid fa-user"></i>
+                </div>
                 <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 4px;">
-                        <span>Edna Miriam Edgley Cuellar</span>
-                        ${EsVerificado ? '<span class="InsigniaVerificada" style="font-size: 11px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                    <span style="font-weight: 700; font-size: 14.5px; color: var(--ColorTextoPrincipal);">Usuario</span>
+                    <span style="font-size: 11.5px; color: var(--ColorPrimarioAzul); font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Iniciar sesión
                     </span>
-                    <span style="font-size: 12px; color: var(--ColorTextoSecundario);">Téc. Sup. Música Boliviana</span>
                 </div>
             </div>
+            ` : `
+            <div class="ElementoAccesoDirecto" data-pestana="artistas" style="margin-bottom: 8px;">
+                <img src="${UsuarioActual.FotoPerfil || 'Logo1.png'}" alt="Perfil" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;" onerror="this.src='Logo1.png'">
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 4px;">
+                        <span>${UsuarioActual.Nombre}</span>
+                        ${EsVerificado ? '<span class="InsigniaVerificada" style="font-size: 11px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                    </span>
+                    <span style="font-size: 12px; color: var(--ColorTextoSecundario);">${UsuarioActual.Carrera || UsuarioActual.Rol || 'Téc. Sup. Música Boliviana'}</span>
+                </div>
+            </div>
+            `}
 
             <!-- Accesos Directos Principales -->
             <ul class="ListaAccesosDirectos">
@@ -67,6 +85,12 @@ class ComponenteBarraLateralIzquierda {
                     <div class="IconoCirculoColor IconoAzul"><i class="fa-solid fa-pen-nib"></i></div>
                     <span>Aportar Nueva Letra</span>
                 </li>
+                ${!EsInvitado ? `
+                <li class="ElementoAccesoDirecto" data-accion="cerrar-sesion" style="color: var(--ColorPeligroRojo);">
+                    <div class="IconoCirculoColor" style="background-color: rgba(239, 68, 68, 0.12); color: var(--ColorPeligroRojo);"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+                    <span>Cerrar Sesión</span>
+                </li>
+                ` : ''}
             </ul>
 
             <div class="SeparadorBarraLateral"></div>

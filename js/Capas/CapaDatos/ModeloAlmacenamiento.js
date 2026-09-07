@@ -97,12 +97,15 @@ class ModeloAlmacenamiento {
                             NombreCompleto: Data.NombreCompleto || "",
                             EsVerificado: Data.EsVerificado === true,
                             FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
-                            FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "IFAEL.jpg",
+                            FotoPerfilUrl: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
+                            FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
+                            FotoPortadaUrl: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
                             Institucion: Data.Institucion || "",
                             Rol: Data.Rol || "Usuario",
                             Activo: Data.Activo !== undefined ? Data.Activo : true,
                             Ciudad: Data.Ciudad || "Trinidad, Beni",
-                            CorreoElectronico: Data.CorreoElectronico || ""
+                            CorreoElectronico: Data.CorreoElectronico || "",
+                            Contrasena: Data.Contrasena || Data.Password || ""
                         });
                     });
                     this.Usuarios = UsuariosLeidos;
@@ -171,16 +174,31 @@ class ModeloAlmacenamiento {
                 const ArtistasLeidos = [];
                 SnapArtistas.forEach(Doc => {
                     const Data = Doc.data();
+                    const NombreDoc = Data.NombreCompleto || "";
+                    const UsuarioEnBD = (this.Usuarios || []).find(U => 
+                        U.NombreCompleto && NombreDoc &&
+                        (U.NombreCompleto.trim().toLowerCase() === NombreDoc.trim().toLowerCase() ||
+                         NombreDoc.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase()))
+                    );
+
+                    const FotoPerfilFinal = (UsuarioEnBD && UsuarioEnBD.FotoPerfil) 
+                        ? UsuarioEnBD.FotoPerfil 
+                        : (Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png");
+
+                    const FotoPortadaFinal = (UsuarioEnBD && UsuarioEnBD.FotoPortada) 
+                        ? UsuarioEnBD.FotoPortada 
+                        : (Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png");
+
                     ArtistasLeidos.push({
                         IdArtista: Doc.id,
-                        NombreCompleto: Data.NombreCompleto || "",
+                        NombreCompleto: NombreDoc,
                         RolTitulo: Data.RolTitulo || "",
                         Especialidad: Data.Especialidad || "",
                         FechaNacimiento: Data.FechaNacimiento || "",
                         LugarOrigen: Data.LugarOrigen || "",
                         Institucion: Data.Institucion || "",
-                        FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
-                        FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "IFAEL.jpg",
+                        FotoPerfil: FotoPerfilFinal,
+                        FotoPortada: FotoPortadaFinal,
                         Biografia: Data.Biografia || "",
                         ObrasDestacadas: Data.ObrasDestacadas || [],
                         Seguidores: Data.SeguidoresCantidad || Data.Seguidores || "1.4k",
@@ -436,7 +454,22 @@ class ModeloAlmacenamiento {
     }
 
     ObtenerTodosLosArtistas() {
-        return this.Artistas && this.Artistas.length > 0 ? this.Artistas : (window.DatosArtistasColeccion || []);
+        const Lista = this.Artistas && this.Artistas.length > 0 ? this.Artistas : (window.DatosArtistasColeccion || []);
+        if (Array.isArray(this.Usuarios) && this.Usuarios.length > 0) {
+            Lista.forEach(Artista => {
+                const UsuarioBD = this.Usuarios.find(U => 
+                    U.NombreCompleto && Artista.NombreCompleto &&
+                    (U.NombreCompleto.trim().toLowerCase() === Artista.NombreCompleto.trim().toLowerCase() ||
+                     Artista.NombreCompleto.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase()))
+                );
+                if (UsuarioBD) {
+                    if (UsuarioBD.FotoPerfil) Artista.FotoPerfil = UsuarioBD.FotoPerfil;
+                    if (UsuarioBD.FotoPortada) Artista.FotoPortada = UsuarioBD.FotoPortada;
+                    if (UsuarioBD.EsVerificado !== undefined) Artista.EsVerificado = UsuarioBD.EsVerificado;
+                }
+            });
+        }
+        return Lista;
     }
 
     ObtenerDatosIFAEL() {
@@ -474,6 +507,100 @@ class ModeloAlmacenamiento {
             ) || null;
         }
         return null;
+    }
+
+    async AutenticarUsuarioEnBaseDatos(Correo, Contrasena) {
+        if (!Correo || !Contrasena) {
+            return { Exito: false, Mensaje: "Por favor ingresa tu correo y contraseña." };
+        }
+
+        const CorreoLimpio = Correo.trim().toLowerCase();
+
+        // 1. Intentar consultar directamente en Firestore en tiempo real
+        if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
+            try {
+                let Snap = await this.ServicioFirebase.ColeccionUsuarios()
+                    .where("CorreoElectronico", "==", CorreoLimpio)
+                    .get();
+
+                let DocEncontrado = null;
+                if (!Snap.empty) {
+                    DocEncontrado = Snap.docs[0];
+                } else {
+                    const SnapTodos = await this.ServicioFirebase.ColeccionUsuarios().get();
+                    if (!SnapTodos.empty) {
+                        DocEncontrado = SnapTodos.docs.find(D => {
+                            const EmailBD = D.data().CorreoElectronico || "";
+                            return EmailBD.trim().toLowerCase() === CorreoLimpio;
+                        }) || null;
+                    }
+                }
+
+                if (DocEncontrado) {
+                    const Doc = DocEncontrado;
+                    const Data = Doc.data();
+                    const PassBD = Data.Contrasena || Data.Password || "";
+
+                    if (!PassBD) {
+                        return { Exito: false, Mensaje: "El usuario no tiene una contraseña configurada en la base de datos." };
+                    }
+
+                    if (PassBD !== Contrasena) {
+                        return { Exito: false, Mensaje: "Contraseña incorrecta. Verifica tus credenciales." };
+                    }
+
+                    const UsuarioAutenticado = {
+                        IdUsuario: Doc.id,
+                        NombreCompleto: Data.NombreCompleto || "",
+                        Nombre: Data.NombreCompleto || "",
+                        EsVerificado: Data.EsVerificado === true,
+                        FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
+                        FotoPerfilUrl: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
+                        FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
+                        FotoPortadaUrl: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
+                        Institucion: Data.Institucion || "",
+                        Rol: Data.Rol || "Usuario",
+                        Activo: Data.Activo !== undefined ? Data.Activo : true,
+                        Ciudad: Data.Ciudad || "Trinidad, Beni",
+                        CorreoElectronico: Data.CorreoElectronico || "",
+                        Contrasena: PassBD
+                    };
+
+                    // Actualizar cache local
+                    const Indice = this.Usuarios.findIndex(U => U.IdUsuario === Doc.id);
+                    if (Indice !== -1) {
+                        this.Usuarios[Indice] = UsuarioAutenticado;
+                    } else {
+                        this.Usuarios.push(UsuarioAutenticado);
+                    }
+                    localStorage.setItem(this.ClaveAlmacenamientoUsuarios, JSON.stringify(this.Usuarios));
+
+                    return { Exito: true, Usuario: UsuarioAutenticado };
+                }
+            } catch (ErrFirestore) {
+                console.warn("[ModeloAlmacenamiento] Error al consultar usuario en tiempo real:", ErrFirestore);
+            }
+        }
+
+        // 2. Consulta en memoria / localStorage como respaldo
+        const UsuarioLocal = (this.Usuarios || []).find(U => 
+            U.CorreoElectronico && U.CorreoElectronico.toLowerCase() === CorreoLimpio
+        );
+
+        if (!UsuarioLocal) {
+            return { Exito: false, Mensaje: "El correo electrónico no está registrado en el sistema." };
+        }
+
+        const PassLocal = UsuarioLocal.Contrasena || "";
+        if (!PassLocal) {
+            return { Exito: false, Mensaje: "El usuario no tiene una contraseña configurada en la base de datos." };
+        }
+
+        if (PassLocal !== Contrasena) {
+            return { Exito: false, Mensaje: "Contraseña incorrecta. Verifica tus credenciales." };
+        }
+
+        return { Exito: true, Usuario: UsuarioLocal };
     }
 
     ObtenerEstadoTemaOscuro() {

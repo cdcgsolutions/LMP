@@ -9,10 +9,19 @@ class ComponenteCrearPublicacion {
     }
 
     Renderizar() {
+        const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
+        const EsInvitado = !UsuarioActual || UsuarioActual.EsInvitado === true || UsuarioActual.Nombre === "Usuario";
+
         return `
         <div class="TarjetaCrearPublicacion" id="TarjetaCrearPublicacion">
             <div class="FilaSuperiorCrearPublicacion">
-                <img src="Logo1.png" alt="Avatar" class="AvatarAutorPublicacion" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;" onerror="this.src='Logo1.png'">
+                ${EsInvitado ? `
+                <div class="AvatarAutorPublicacion" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background: var(--ColorFondoSecundario); display: flex; align-items: center; justify-content: center; color: var(--ColorTextoSecundario); font-size: 18px; border: 1px solid var(--ColorBordeDivisor);">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                ` : `
+                <img src="${UsuarioActual.FotoPerfil || 'Logo1.png'}" alt="Avatar" class="AvatarAutorPublicacion" style="width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; object-fit: cover;" onerror="this.src='Logo1.png'">
+                `}
                 <div class="BotonDisparadorModalCrear" id="BotonAbrirModalCrearPublicacion">
                     ¿Qué letra del Beni deseas compartir hoy?
                 </div>

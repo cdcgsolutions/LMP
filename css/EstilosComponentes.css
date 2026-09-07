@@ -2171,4 +2171,20 @@ body.ModoOscuroActivo .AcordeMusical {
     width: 100%;
 }
 
+/* ==========================================================================
+   ESTILOS: MODAL DE INICIO DE SESIÓN Y PERFIL DE INVITADO
+   ========================================================================== */
+
+.PerfilInvitadoLateral:hover .AvatarPerfilLateralInvitado {
+    background-color: rgba(24, 119, 242, 0.1);
+    color: var(--ColorPrimarioAzul);
+    border-color: var(--ColorPrimarioAzul);
+}
+
+.PerfilInvitadoEncabezado:hover .AvatarUsuarioMini {
+    background-color: rgba(24, 119, 242, 0.1);
+    color: var(--ColorPrimarioAzul);
+}
+
+
 
