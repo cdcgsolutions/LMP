@@ -612,9 +612,15 @@ body.ModoOscuroActivo .InsigniaTono {
     padding: 12px;
     max-height: 160px;
     overflow-y: auto;
+    overflow-x: auto;
     line-height: 1.6;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
     color: var(--ColorTextoPrincipal);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .AcordeMusical {
@@ -631,11 +637,15 @@ body.ModoOscuroActivo .AcordeMusical {
 .ReproductorEmbebidoTarjeta {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     background: linear-gradient(135deg, var(--ColorPrimarioAzulSuave), rgba(46, 125, 50, 0.08));
     border-radius: var(--RadioMediano);
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 1px solid var(--ColorPrimarioAzulSuave);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .BotonReproducirTarjeta {
@@ -1216,9 +1226,20 @@ body.ModoOscuroActivo .AcordeMusical {
 .CuerpoVentanaModal {
     padding: 20px;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.CuadriculaFormularioDoble {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .PieVentanaModal {

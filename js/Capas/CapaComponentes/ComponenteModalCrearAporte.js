@@ -26,7 +26,7 @@ class ComponenteModalCrearAporte {
                         <input type="text" id="CampoNuevoTitulo" placeholder="Ej: Trinidad del Alma" required>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="CuadriculaFormularioDoble">
                         <div style="display: flex; flex-direction: column; gap: 4px;">
                             <label style="font-weight: 700; font-size: 13px;">Autor / Compositor *</label>
                             <input type="text" id="CampoNuevoAutor" placeholder="Ej: Edna Miriam Edgley" value="Edna Miriam Edgley Cuellar">
@@ -43,7 +43,7 @@ class ComponenteModalCrearAporte {
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="CuadriculaFormularioDoble">
                         <div style="display: flex; flex-direction: column; gap: 4px;">
                             <label style="font-weight: 700; font-size: 13px;">Tono Sugerido</label>
                             <input type="text" id="CampoNuevoTono" placeholder="Ej: Re Mayor (D)">

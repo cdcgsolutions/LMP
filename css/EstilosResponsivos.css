@@ -174,6 +174,18 @@
         --AlturaEncabezado: 50px;
     }
 
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    .ContenedorPrincipalAplicacion {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     .SeccionEncabezadoIzquierda {
         width: auto;
         flex: 1;
@@ -200,27 +212,190 @@
     }
 
     .AreaContenidoCentral {
-        padding: 8px 4px;
+        padding: 8px 0;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    .ContenedorMuroMaximo {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 4px;
+        box-sizing: border-box;
+        overflow-x: hidden;
     }
 
     .TarjetaPublicacionMuro,
     .TarjetaCrearPublicacion {
+        width: 100%;
+        max-width: 100%;
         border-radius: var(--RadioPequeno);
         border-left: none;
         border-right: none;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .FilaBotonesAccionesRapidas .BotonAccionRapidaCrear {
+        padding: 6px 4px;
     }
 
     .FilaBotonesAccionesRapidas .BotonAccionRapidaCrear span {
-        font-size: 12px;
-    }
-
-    .BotonAccionInteraccion span {
         font-size: 11.5px;
     }
 
+    /* Barra de Botones de Interacción en Post (4 Columnas) */
+    .BarraBotonesAccionPublicacion {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2px;
+        padding: 4px 2px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .BotonAccionInteraccion {
+        padding: 6px 2px;
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .BotonAccionInteraccion i {
+        font-size: 14px;
+    }
+
+    .BotonAccionInteraccion span {
+        font-size: 10px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+    }
+
+    .CajaFichaMusical {
+        padding: 10px 8px;
+        margin: 6px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .EncabezadoFichaMusical {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .TituloCancionFicha {
+        font-size: 14.5px;
+        word-break: break-word;
+    }
+
+    .ReproductorEmbebidoTarjeta {
+        padding: 6px 8px;
+        gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        min-width: 0;
+    }
+
+    .TituloPistaTarjeta {
+        font-size: 11.5px;
+    }
+
+    .FilaEstadisticasInteraccion {
+        padding: 6px 8px;
+        font-size: 11.5px;
+    }
+
+    .SeccionComentariosPublicacion {
+        padding: 8px 6px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .BurbujaComentarioTexto {
+        max-width: calc(100% - 36px);
+        padding: 6px 10px;
+        word-break: break-word;
+        box-sizing: border-box;
+    }
+
+    .FilaEntradaNuevoComentario {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .CampoEntradaComentario {
+        min-width: 0;
+        font-size: 12.5px;
+        padding: 8px 10px;
+    }
+
+    /* Modales en Móvil */
+    .CapaFondoModalOscuro {
+        padding: 6px;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
     .ContenedorVentanaModal {
-        max-height: 94vh;
+        width: 100%;
+        max-width: 100%;
+        max-height: 95vh;
         border-radius: var(--RadioMediano);
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .EncabezadoVentanaModal {
+        padding: 12px 14px;
+    }
+
+    .TituloModalTexto {
+        font-size: 15px;
+    }
+
+    .CuerpoVentanaModal {
+        padding: 12px 10px;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .CuadriculaFormularioDoble {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .PieVentanaModal {
+        padding: 10px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: stretch;
+    }
+
+    .PieVentanaModal button {
+        flex: 1;
+        min-width: 110px;
+        padding: 10px 8px;
+        font-size: 12px;
+        justify-content: center;
+        text-align: center;
     }
 
     .CuadriculaTarjetasMusicales,
