@@ -41,4 +41,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const App = new AplicacionLetrasMiPoblau();
     App.Iniciar();
     window.AppLMP = App;
+
+    // Registro de Service Worker para capacidades PWA y soporte offline
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then((registro) => {
+                console.log('Service Worker (LMP PWA) registrado con éxito:', registro.scope);
+            })
+            .catch((error) => {
+                console.warn('Fallo en registro de Service Worker:', error);
+            });
+    }
 });
