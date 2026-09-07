@@ -4,12 +4,13 @@
    ========================================================================== */
 
 class ComponenteSeccionGeneros {
-    constructor(InstanciaServicioEstado) {
+    constructor(InstanciaServicioEstado, InstanciaModeloAlmacenamiento = null) {
         this.ServicioEstado = InstanciaServicioEstado;
+        this.ModeloAlmacenamiento = InstanciaModeloAlmacenamiento;
     }
 
     Renderizar() {
-        const Generos = window.DatosGenerosColeccion || [];
+        const Generos = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || window.DatosGenerosColeccion || [];
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionGeneros">
@@ -25,43 +26,46 @@ class ComponenteSeccionGeneros {
 
             <!-- Cuadrícula de Géneros -->
             <div class="CuadriculaGenerosMusicales">
-                ${Generos.map(Gen => `
-                <div class="TarjetaGeneroBeniano">
-                    <div class="CabeceraGeneroColor" style="background: ${Gen.ColorGradiente};">
-                        <span style="font-size: 32px; margin-bottom: 4px;">${Gen.Icono}</span>
-                        <div style="font-size: 20px; font-weight: 800;">${Gen.Nombre}</div>
-                        <div style="font-size: 12px; opacity: 0.9;">Compás: ${Gen.Compas}</div>
-                    </div>
-
-                    <div class="CuerpoGeneroInfo">
-                        <div style="font-size: 12px; color: var(--ColorTextoSecundario);">
-                            <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i><strong>Origen:</strong> ${Gen.Origen}
+                ${Generos.map(Gen => {
+                    const IconoHtml = Gen.Icono || (Gen.IconoClase ? `<i class="${Gen.IconoClase}"></i>` : '<i class="fa-solid fa-guitar"></i>');
+                    return `
+                    <div class="TarjetaGeneroBeniano">
+                        <div class="CabeceraGeneroColor" style="background: ${Gen.ColorGradiente || 'linear-gradient(135deg, #1877f2, #0d5cb6)'};">
+                            <span style="font-size: 32px; margin-bottom: 4px;">${IconoHtml}</span>
+                            <div style="font-size: 20px; font-weight: 800;">${Gen.Nombre}</div>
+                            <div style="font-size: 12px; opacity: 0.9;">Compás: ${Gen.Compas}</div>
                         </div>
-                        <p style="font-size: 13.5px; color: var(--ColorTextoPrincipal); line-height: 1.4;">
-                            ${Gen.Descripcion}
-                        </p>
 
-                        <div style="margin-top: 6px;">
-                            <div style="font-size: 12px; font-weight: 700; color: var(--ColorTextoSecundario); margin-bottom: 4px;">
-                                <i class="fa-solid fa-music" style="margin-right: 4px;"></i>Instrumentos Típicos:
+                        <div class="CuerpoGeneroInfo">
+                            <div style="font-size: 12px; color: var(--ColorTextoSecundario);">
+                                <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i><strong>Origen:</strong> ${Gen.Origen}
                             </div>
-                            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                ${(Gen.InstrumentosTipicos || []).map(Inst => `
-                                    <span style="font-size: 11px; background-color: var(--ColorFondoSecundario); padding: 3px 8px; border-radius: 4px; font-weight: 600;">
-                                        ${Inst}
-                                    </span>
-                                `).join('')}
+                            <p style="font-size: 13.5px; color: var(--ColorTextoPrincipal); line-height: 1.4;">
+                                ${Gen.Descripcion}
+                            </p>
+
+                            <div style="margin-top: 6px;">
+                                <div style="font-size: 12px; font-weight: 700; color: var(--ColorTextoSecundario); margin-bottom: 4px;">
+                                    <i class="fa-solid fa-music" style="margin-right: 4px;"></i>Instrumentos Típicos:
+                                </div>
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                                    ${(Gen.InstrumentosTipicos || []).map(Inst => `
+                                        <span style="font-size: 11px; background-color: var(--ColorFondoSecundario); padding: 3px 8px; border-radius: 4px; font-weight: 600;">
+                                            ${Inst}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--ColorBordeDivisor);">
+                                <button class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Gen.Nombre}" style="width: 100%; font-size: 13px;">
+                                    <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>Explorar canciones de ${Gen.Nombre}
+                                </button>
                             </div>
                         </div>
-
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--ColorBordeDivisor);">
-                            <button class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Gen.Nombre}" style="width: 100%; font-size: 13px;">
-                                <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>Explorar canciones de ${Gen.Nombre}
-                            </button>
-                        </div>
                     </div>
-                </div>
-                `).join('')}
+                    `;
+                }).join('')}
             </div>
         </div>
         `;

@@ -12,11 +12,16 @@ class ServicioReproductor {
         this.EstaReproduciendo = false;
         this.IndiceNotaActual = 0;
         this.TemporizadorMelodia = null;
+        this.IntervaloReloj = null;
         this.TiempoProgresoSegundos = 0;
         this.DuracionTotalEstimada = 30; // Segundos por defecto
         this.VolumenNivel = 1.0;
         this.EstaEnBucle = false;
         this.AnimacionCanvasId = null;
+
+        // Elemento de audio HTML5 para archivos de audio reales (.mp3, URLs, etc.)
+        this.ElementoAudio = new Audio();
+        this.ConfigurarEventosElementoAudio();
 
         // Frecuencias para notas musicales estándar
         this.FrecuenciasNotas = {
@@ -28,6 +33,35 @@ class ServicioReproductor {
         };
 
         this.CallbacksProgreso = [];
+    }
+
+    ConfigurarEventosElementoAudio() {
+        this.ElementoAudio.addEventListener("loadedmetadata", () => {
+            if (this.ElementoAudio.duration && !isNaN(this.ElementoAudio.duration) && isFinite(this.ElementoAudio.duration)) {
+                this.DuracionTotalEstimada = this.ElementoAudio.duration;
+            }
+            this.NotificarProgreso();
+        });
+
+        this.ElementoAudio.addEventListener("timeupdate", () => {
+            if (this.CancionActual && this.CancionActual.AudioUrl) {
+                this.TiempoProgresoSegundos = this.ElementoAudio.currentTime;
+                this.NotificarProgreso();
+            }
+        });
+
+        this.ElementoAudio.addEventListener("ended", () => {
+            if (this.EstaEnBucle) {
+                this.ElementoAudio.currentTime = 0;
+                this.ElementoAudio.play().catch(e => console.warn(e));
+            } else {
+                this.DetenerReproduccion();
+            }
+        });
+
+        this.ElementoAudio.addEventListener("error", (ErrorAudio) => {
+            console.warn("[ServicioReproductor] Fallo al cargar archivo de audio HTML5:", ErrorAudio);
+        });
     }
 
     InicializarContextoAudio() {
@@ -60,7 +94,24 @@ class ServicioReproductor {
         this.IndiceNotaActual = 0;
         this.TiempoProgresoSegundos = 0;
 
-        // Calcular duración estimada según notas
+        // Caso 1: Archivo de audio real (.mp3, local o en la nube como HimnoAlBeni.mp3)
+        if (ObjetoCancion.AudioUrl && ObjetoCancion.AudioUrl.trim() !== "") {
+            this.ElementoAudio.src = ObjetoCancion.AudioUrl;
+            this.ElementoAudio.volume = this.VolumenNivel;
+            this.ElementoAudio.loop = this.EstaEnBucle;
+            this.DuracionTotalEstimada = 180; // Estimación provisional hasta carga de metadatos
+
+            const PromesaPlay = this.ElementoAudio.play();
+            if (PromesaPlay !== undefined) {
+                PromesaPlay.catch(ErrorAudio => {
+                    console.warn("[ServicioReproductor] Reproducción de audio bloqueada o demorada:", ErrorAudio);
+                });
+            }
+            this.NotificarProgreso();
+            return;
+        }
+
+        // Caso 2: Sintetizador Web Audio API por secuencia de notas
         if (ObjetoCancion.SecuenciaNotasMelodia && ObjetoCancion.SecuenciaNotasMelodia.length > 0) {
             const DuracionSecuencia = ObjetoCancion.SecuenciaNotasMelodia.reduce((Acumulado, Item) => Acumulado + Item.Duracion, 0);
             this.DuracionTotalEstimada = Math.max(15, Math.round(DuracionSecuencia * 4)); // Ciclo de 4 repeticiones
@@ -142,16 +193,20 @@ class ServicioReproductor {
     }
 
     NotificarProgreso() {
+        const DuracionValida = Math.max(1, this.DuracionTotalEstimada || 1);
         this.CallbacksProgreso.forEach(Cb => Cb({
             TiempoActual: this.TiempoProgresoSegundos,
             DuracionTotal: this.DuracionTotalEstimada,
-            Porcentaje: Math.min(100, (this.TiempoProgresoSegundos / this.DuracionTotalEstimada) * 100),
+            Porcentaje: Math.min(100, (this.TiempoProgresoSegundos / DuracionValida) * 100),
             EstaReproduciendo: this.EstaReproduciendo
         }));
     }
 
     PausarReproduccion() {
         this.EstaReproduciendo = false;
+        if (this.ElementoAudio && !this.ElementoAudio.paused) {
+            this.ElementoAudio.pause();
+        }
         if (this.TemporizadorMelodia) clearTimeout(this.TemporizadorMelodia);
         this.NotificarProgreso();
     }
@@ -160,13 +215,22 @@ class ServicioReproductor {
         if (!this.CancionActual) return;
         this.InicializarContextoAudio();
         this.EstaReproduciendo = true;
-        this.ReproducirSecuenciaRecursiva();
-        this.IniciarRelojProgreso();
+
+        if (this.CancionActual.AudioUrl && this.CancionActual.AudioUrl.trim() !== "") {
+            this.ElementoAudio.play().catch(e => console.warn(e));
+        } else {
+            this.ReproducirSecuenciaRecursiva();
+            this.IniciarRelojProgreso();
+        }
         this.NotificarProgreso();
     }
 
     DetenerReproduccion() {
         this.EstaReproduciendo = false;
+        if (this.ElementoAudio) {
+            this.ElementoAudio.pause();
+            this.ElementoAudio.currentTime = 0;
+        }
         if (this.TemporizadorMelodia) clearTimeout(this.TemporizadorMelodia);
         if (this.IntervaloReloj) clearInterval(this.IntervaloReloj);
         this.TiempoProgresoSegundos = 0;
@@ -175,6 +239,9 @@ class ServicioReproductor {
 
     AjustarVolumen(NuevoNivel) {
         this.VolumenNivel = Math.max(0, Math.min(1, NuevoNivel));
+        if (this.ElementoAudio) {
+            this.ElementoAudio.volume = this.VolumenNivel;
+        }
         if (this.NodoGanancia && this.ContextoAudio) {
             this.NodoGanancia.gain.setValueAtTime(this.VolumenNivel, this.ContextoAudio.currentTime);
         }
@@ -182,11 +249,20 @@ class ServicioReproductor {
 
     AlternarBucle() {
         this.EstaEnBucle = !this.EstaEnBucle;
+        if (this.ElementoAudio) {
+            this.ElementoAudio.loop = this.EstaEnBucle;
+        }
         return this.EstaEnBucle;
     }
 
     SaltarProgreso(NuevoPorcentaje) {
-        this.TiempoProgresoSegundos = (NuevoPorcentaje / 100) * this.DuracionTotalEstimada;
+        if (this.CancionActual && this.CancionActual.AudioUrl && this.ElementoAudio && this.ElementoAudio.duration) {
+            const NuevoTiempo = (NuevoPorcentaje / 100) * this.ElementoAudio.duration;
+            this.ElementoAudio.currentTime = NuevoTiempo;
+            this.TiempoProgresoSegundos = NuevoTiempo;
+        } else {
+            this.TiempoProgresoSegundos = (NuevoPorcentaje / 100) * this.DuracionTotalEstimada;
+        }
         this.NotificarProgreso();
     }
 

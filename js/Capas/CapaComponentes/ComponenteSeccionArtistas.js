@@ -10,7 +10,7 @@ class ComponenteSeccionArtistas {
     }
 
     Renderizar() {
-        const Artistas = window.DatosArtistasColeccion || [];
+        const Artistas = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosArtistas()) || window.DatosArtistasColeccion || [];
         const ArtistaPrincipal = Artistas[0] || {};
         const CancionesDelArtista = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones()
             .filter(C => C.Autor && C.Autor.includes(ArtistaPrincipal.NombreCompleto || "Edna Miriam"));

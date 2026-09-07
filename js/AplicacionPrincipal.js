@@ -5,6 +5,7 @@
 
 class AplicacionLetrasMiPoblau {
     constructor() {
+        this.InstanciaServicioFirebase = null;
         this.InstanciaServicioEstado = null;
         this.InstanciaModeloAlmacenamiento = null;
         this.InstanciaServicioReproductor = null;
@@ -12,34 +13,55 @@ class AplicacionLetrasMiPoblau {
         this.InstanciaControladorPrincipal = null;
     }
 
-    Iniciar() {
+    async Iniciar() {
         console.log("Iniciando Letras Mi Poblau (LMP) - Arquitectura N-Capas...");
 
-        // 1. Instanciar Capa de Datos y Servicios
-        this.InstanciaModeloAlmacenamiento = new window.ModeloAlmacenamiento();
+        // 0. Inicializar Firebase y Firestore
+        this.InstanciaServicioFirebase = new window.ServicioFirebase();
+        const FirebaseExitoso = this.InstanciaServicioFirebase.Inicializar();
+        if (FirebaseExitoso) {
+            console.log("[LMP] Firebase/Firestore conectado. Inicializando capa de datos...");
+        } else {
+            console.warn("[LMP] Firebase no se pudo inicializar. La app funcionará con datos locales (localStorage).");
+        }
+
+        // 1. Instanciar Capa de Datos y Servicios vinculando Firebase
+        this.InstanciaModeloAlmacenamiento = new window.ModeloAlmacenamiento(this.InstanciaServicioFirebase);
+
+        // 2. Cargar datos en vivo desde Firestore (con fallback transparente a caché local)
+        if (FirebaseExitoso) {
+            try {
+                await this.InstanciaModeloAlmacenamiento.CargarDatosDesdeFirestore();
+            } catch (ErrorCargaBD) {
+                console.warn("[LMP] Error al cargar datos iniciales de Firestore, operando con caché local:", ErrorCargaBD);
+            }
+        }
+
+        this.InstanciaServicioCloudinary = new window.ServicioCloudinary();
         this.InstanciaServicioEstado = new window.ServicioEstado();
         this.InstanciaServicioReproductor = new window.ServicioReproductor();
         this.InstanciaServicioNotificaciones = new window.ServicioNotificaciones();
 
-        // 2. Instanciar Capa de Controlador
+        // 3. Instanciar Capa de Controlador
         this.InstanciaControladorPrincipal = new window.ControladorPrincipal(
             this.InstanciaServicioEstado,
             this.InstanciaModeloAlmacenamiento,
             this.InstanciaServicioReproductor,
-            this.InstanciaServicioNotificaciones
+            this.InstanciaServicioNotificaciones,
+            this.InstanciaServicioCloudinary
         );
 
-        // 3. Montar y Ejecutar
+        // 4. Montar y Ejecutar la UI
         this.InstanciaControladorPrincipal.Inicializar();
 
-        console.log("Letras Mi Poblau inicializado con éxito.");
+        console.log("Letras Mi Poblau inicializado con éxito con base de datos en vivo.");
     }
 }
 
 // Inicialización automática al cargar el DOM
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const App = new AplicacionLetrasMiPoblau();
-    App.Iniciar();
+    await App.Iniciar();
     window.AppLMP = App;
 
     // Registro de Service Worker para capacidades PWA y soporte offline

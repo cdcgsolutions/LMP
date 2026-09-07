@@ -699,6 +699,8 @@ body.ModoOscuroActivo .AcordeMusical {
 .ReaccionAzul { background-color: var(--ColorPrimarioAzul); color: #fff; }
 .ReaccionRoja { background-color: var(--ColorRojoReaccion); color: #fff; }
 .ReaccionVerde { background-color: var(--ColorVerdeBeni); color: #fff; }
+.ReaccionAmarilla { background-color: #f7b125; color: #fff; }
+.ReaccionPurpura { background-color: #8b5cf6; color: #fff; }
 
 /* Barra de Botones de Acción (Reaccionar, Comentar, Ver Letra, Compartir) */
 .BarraBotonesAccionPublicacion {
@@ -860,11 +862,16 @@ body.ModoOscuroActivo .AcordeMusical {
     object-fit: cover;
 }
 
+.ContenidoComentarioCompleto {
+    display: flex;
+    flex-direction: column;
+    max-width: 88%;
+}
+
 .BurbujaComentarioTexto {
     background-color: var(--ColorFondoSuperficie);
     padding: 8px 12px;
     border-radius: var(--RadioMediano);
-    max-width: 85%;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
@@ -879,12 +886,64 @@ body.ModoOscuroActivo .AcordeMusical {
     color: var(--ColorTextoPrincipal);
     margin-top: 2px;
     line-height: 1.3;
+    word-break: break-word;
+}
+
+.FilaMetaYAccionesComentario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+    padding-left: 4px;
+    font-size: 11.5px;
 }
 
 .MetaComentarioTiempo {
     font-size: 11px;
     color: var(--ColorTextoSecundario);
-    margin-top: 4px;
+}
+
+.BotonLikeComentario {
+    background: none;
+    border: none;
+    color: var(--ColorTextoSecundario);
+    font-weight: 700;
+    font-size: 11.5px;
+    cursor: pointer;
+    padding: 2px 4px;
+    transition: color 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.BotonLikeComentario:hover {
+    text-decoration: underline;
+    color: var(--ColorPrimarioAzul);
+}
+
+.BotonLikeComentario.LikeActivo {
+    color: var(--ColorPrimarioAzul);
+    font-weight: 700;
+}
+
+.InsigniaLikesComentario {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background-color: var(--ColorFondoSuperficie);
+    border: 1px solid var(--ColorBordeSuave);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: var(--RadioBotonPill);
+    padding: 1px 6px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--ColorTextoSecundario);
+}
+
+.InsigniaLikesComentario i {
+    color: var(--ColorPrimarioAzul);
+    font-size: 10px;
 }
 
 .FilaEntradaNuevoComentario {
@@ -1164,14 +1223,16 @@ body.ModoOscuroActivo .AcordeMusical {
 .ContenedorVentanaModal {
     background-color: var(--ColorFondoSuperficie);
     border-radius: var(--RadioGrande);
-    width: 100%;
-    max-width: 620px;
+    width: 95%;
+    max-width: 680px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
     box-shadow: var(--SombraNivelTres);
     border: 1px solid var(--ColorBordeSuave);
     overflow: hidden;
+    margin: auto;
+    box-sizing: border-box;
     animation: AnimacionModalEscala 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -1190,10 +1251,11 @@ body.ModoOscuroActivo .AcordeMusical {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
 }
 
 .TituloModalTexto {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--ColorTextoPrincipal);
 }
@@ -1212,22 +1274,40 @@ body.ModoOscuroActivo .AcordeMusical {
 }
 
 .CuerpoVentanaModal {
-    padding: 20px;
+    padding: 18px 22px;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     width: 100%;
     box-sizing: border-box;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: calc(90vh - 125px);
 }
 
 .CuadriculaFormularioDoble {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 12px;
     width: 100%;
     box-sizing: border-box;
+}
+
+@media (max-width: 680px) {
+    .CuadriculaFormularioDoble {
+        grid-template-columns: 1fr;
+    }
+    .ContenedorVentanaModal {
+        width: 96%;
+        max-height: 94vh;
+    }
+    .CuerpoVentanaModal {
+        padding: 14px 12px;
+        gap: 12px;
+        max-height: calc(94vh - 110px);
+    }
 }
 
 .PieVentanaModal {
@@ -1238,6 +1318,7 @@ body.ModoOscuroActivo .AcordeMusical {
     justify-content: flex-end;
     gap: 10px;
     background-color: var(--ColorFondoSecundario);
+    flex-shrink: 0;
 }
 
 /* Visor de Partitura en Modal */
@@ -1467,3 +1548,627 @@ body.ModoOscuroActivo .AcordeMusical {
     height: 24px;
     border-radius: var(--RadioPequeno);
 }
+
+/* ==========================================================================
+   MENÚ DE OPCIONES DE PUBLICACIÓN (3 PUNTOS) Y MODAL DE ELIMINACIÓN
+   ========================================================================== */
+
+.ContenedorOpcionesPublicacion {
+    position: relative;
+    display: inline-block;
+}
+
+.MenuDesplegableOpciones {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background-color: var(--ColorFondoSuperficie);
+    border: 1px solid var(--ColorBordeSuave);
+    border-radius: var(--RadioMediano);
+    box-shadow: var(--SombraMedia);
+    min-width: 210px;
+    padding: 6px;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    animation: AnimacionAparicionMenu 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.MenuDesplegableOpciones.MenuAbierto {
+    display: flex;
+}
+
+@keyframes AnimacionAparicionMenu {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.ItemMenuOpcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    border-radius: var(--RadioPequeno);
+    color: var(--ColorTextoPrincipal);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ItemMenuOpcion i {
+    font-size: 15px;
+    width: 18px;
+    text-align: center;
+    color: var(--ColorTextoSecundario);
+    transition: color 0.15s ease;
+}
+
+.ItemMenuOpcion:hover {
+    background-color: var(--ColorFondoHover);
+}
+
+.ItemMenuOpcion:hover i {
+    color: var(--ColorPrimarioAzul);
+}
+
+.ItemMenuOpcion.ItemMenuPeligro {
+    color: #e41e3f;
+}
+
+.ItemMenuOpcion.ItemMenuPeligro i {
+    color: #e41e3f;
+}
+
+.ItemMenuOpcion.ItemMenuPeligro:hover {
+    background-color: rgba(228, 30, 63, 0.08);
+    color: #c91734;
+}
+
+.ItemMenuOpcion.ItemMenuPeligro:hover i {
+    color: #c91734;
+}
+
+/* Modal de Confirmación de Eliminación */
+.VentanaModalConfirmarEliminar {
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    padding: 28px 24px;
+}
+
+.IconoAdvertenciaEliminar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background-color: rgba(228, 30, 63, 0.1);
+    color: #e41e3f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 18px auto;
+}
+
+.TituloModalEliminar {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ColorTextoPrincipal);
+    margin-bottom: 8px;
+}
+
+.DescripcionModalEliminar {
+    font-size: 14px;
+    color: var(--ColorTextoSecundario);
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+.FilaBotonesAccionModal {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.BotonAccionPeligro {
+    background-color: #e41e3f;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--RadioPequeno);
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.BotonAccionPeligro:hover {
+    background-color: #c91734;
+}
+
+.BotonAccionPeligro:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   ZONAS DE ARRASTRE Y SUBIDA MULTIMEDIA (DRAG & DROP)
+   ========================================================================== */
+
+.CampoFormularioMultimedia {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.EtiquetaFormularioMultimedia {
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ColorTextoPrincipal);
+}
+
+.ZonaSubidaArchivo {
+    border: 2px dashed var(--ColorBordeSuave);
+    border-radius: var(--RadioMediano);
+    background-color: var(--ColorFondoCuerpo);
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    min-height: 85px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ZonaSubidaArchivo:hover {
+    border-color: var(--ColorPrimarioAzul);
+    background-color: var(--ColorFondoHover);
+}
+
+.ZonaSubidaArchivo.ZonaArrastreActiva {
+    border-color: var(--ColorPrimarioAzul);
+    background-color: rgba(24, 119, 242, 0.08);
+    transform: scale(1.01);
+}
+
+.InputArchivoOculto {
+    display: none !important;
+}
+
+.EstadoVacioSubida {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+    pointer-events: none;
+    width: 100%;
+}
+
+.IconoNubeSubida {
+    font-size: 24px;
+    color: var(--ColorPrimarioAzul);
+    margin-bottom: 2px;
+}
+
+.TextoPrincipalSubida {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ColorTextoPrincipal);
+}
+
+.TextoPrincipalSubida strong {
+    color: var(--ColorPrimarioAzul);
+    text-decoration: underline;
+}
+
+.TextoSecundarioSubida {
+    font-size: 11px;
+    color: var(--ColorTextoSecundario);
+}
+
+.VistaPreviaArchivoCargado {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px 0;
+}
+
+.FilaEncabezadoVistaPrevia {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.IconoYDatosArchivo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.IconoArchivoCargado {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--RadioPequeno);
+    background: linear-gradient(135deg, var(--ColorPrimarioAzul), #0d5cb6);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.MiniaturaPartituraPrevia {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--RadioPequeno);
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid var(--ColorBordeSuave);
+    background-color: #000;
+}
+
+.MiniaturaPartituraPrevia img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.DetallesArchivoCargado {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.NombreArchivoCargado {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ColorTextoPrincipal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.EstadoArchivoTexto {
+    font-size: 11px;
+    color: var(--ColorVerdeBeni);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.BotonCambiarArchivo {
+    background: var(--ColorFondoHover);
+    border: 1px solid var(--ColorBordeSuave);
+    border-radius: var(--RadioPequeno);
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ColorTextoPrincipal);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.BotonCambiarArchivo:hover {
+    background: var(--ColorPrimarioAzul);
+    color: #ffffff;
+    border-color: var(--ColorPrimarioAzul);
+}
+
+/* Reproductor de Muestra Compacto para Modales */
+.ReproductorMuestraModal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--ColorFondoEntrada);
+    padding: 6px 10px;
+    border-radius: var(--RadioPequeno);
+    border: 1px solid var(--ColorBordeSuave);
+}
+
+.BotonReproducirMuestraAudio {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--RadioCircular);
+    background: linear-gradient(135deg, var(--ColorPrimarioAzul), #0d5cb6);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    transition: transform 0.15s ease, background 0.2s ease;
+    box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3);
+}
+
+.BotonReproducirMuestraAudio:hover {
+    transform: scale(1.08);
+    background: linear-gradient(135deg, #166fe5, #0a4b99);
+}
+
+.PistaProgresoMuestra {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.BarraProgresoMuestraContenedor {
+    width: 100%;
+    height: 6px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 999px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.BarraProgresoMuestraRelleno {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--ColorPrimarioAzul), #38bdf8);
+    border-radius: 999px;
+    transition: width 0.1s linear;
+}
+
+.FilaTiempoAudioMuestra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ColorTextoSecundario);
+    user-select: none;
+}
+
+/* ==========================================================================
+   MODAL DE LISTA DE USUARIOS QUE REACCIONARON (ESTILO FACEBOOK)
+   ========================================================================== */
+.ContadorReaccionesPublicacion {
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    user-select: none;
+}
+
+.ContadorReaccionesPublicacion:hover {
+    opacity: 0.85;
+    text-decoration: underline;
+}
+
+.VentanaModalReacciones {
+    max-width: 500px !important;
+    width: 92% !important;
+    max-height: 85vh;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.VentanaModalReacciones .EncabezadoVentanaModal {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--ColorBordeDivisor);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.InsigniaConteoModal {
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoSecundario);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Barra de Filtros / Pestañas de Reacciones */
+.BarraPestanasReaccionesModal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--ColorBordeDivisor);
+    overflow-x: auto;
+    background-color: var(--ColorFondoSuperficie);
+    scrollbar-width: none;
+    flex-shrink: 0;
+}
+
+.BarraPestanasReaccionesModal::-webkit-scrollbar {
+    display: none;
+}
+
+.PestanaFiltroReaccion {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: var(--RadioBordeMedio);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ColorTextoSecundario);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.PestanaFiltroReaccion:hover {
+    background-color: var(--ColorFondoHover);
+    color: var(--ColorTextoPrincipal);
+}
+
+.PestanaFiltroReaccion.PestanaActiva {
+    color: var(--ColorPrimarioAzul);
+    background-color: rgba(24, 119, 242, 0.1);
+    font-weight: 700;
+}
+
+.CuerpoModalReacciones {
+    padding: 10px 16px 16px 16px;
+    max-height: 420px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.ListaPersonasReacciones {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.ItemUsuarioReaccion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: var(--RadioBordeMedio);
+    transition: background-color 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ItemUsuarioReaccion:hover {
+    background-color: var(--ColorFondoHover);
+}
+
+.FilaUsuarioIzquierda {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+}
+
+.ContenedorAvatarConInsigniaReaccion {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.AvatarUsuarioReaccion {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--ColorBordeDivisor);
+}
+
+.MiniInsigniaReaccionUsuario {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 20px;
+    height: 20px;
+    background-color: var(--ColorFondoSuperficie);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    font-size: 11px;
+}
+
+.InfoTextoUsuarioReaccion {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.NombrePersonaReaccion {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ColorTextoPrincipal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+}
+
+.InsigniaTuUsuario {
+    display: inline-block;
+    background-color: rgba(24, 119, 242, 0.12);
+    color: var(--ColorPrimarioAzul);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+}
+
+.TipoReaccionElegida {
+    font-size: 12px;
+    color: var(--ColorTextoSecundario);
+}
+
+.EstadoVacioReacciones {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 36px 16px;
+    color: var(--ColorTextoSecundario);
+    gap: 6px;
+    width: 100%;
+}
+
+

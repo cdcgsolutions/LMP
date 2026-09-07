@@ -432,22 +432,27 @@
 
     /* Modales en Móvil */
     .CapaFondoModalOscuro {
-        padding: 6px;
+        padding: 10px;
         box-sizing: border-box;
         overflow-x: hidden;
+        overflow-y: auto;
     }
 
     .ContenedorVentanaModal {
         width: 100%;
         max-width: 100%;
-        max-height: 95vh;
+        max-height: 94vh;
         border-radius: var(--RadioMediano);
-        margin: 0;
+        margin: auto;
         box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .EncabezadoVentanaModal {
         padding: 12px 14px;
+        flex-shrink: 0;
     }
 
     .TituloModalTexto {
@@ -455,11 +460,15 @@
     }
 
     .CuerpoVentanaModal {
-        padding: 12px 10px;
-        gap: 10px;
+        padding: 14px 12px;
+        gap: 11px;
         width: 100%;
         box-sizing: border-box;
         overflow-x: hidden;
+        overflow-y: auto;
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: calc(94vh - 110px);
     }
 
     .CuadriculaFormularioDoble {
@@ -470,19 +479,20 @@
     }
 
     .PieVentanaModal {
-        padding: 10px 12px;
-        flex-wrap: wrap;
+        padding: 10px 14px;
+        flex-wrap: nowrap;
         gap: 8px;
         width: 100%;
         box-sizing: border-box;
-        justify-content: stretch;
+        justify-content: flex-end;
+        flex-shrink: 0;
     }
 
     .PieVentanaModal button {
-        flex: 1;
-        min-width: 110px;
-        padding: 10px 8px;
-        font-size: 12px;
+        min-width: 0;
+        flex: 0 1 auto;
+        padding: 9px 14px;
+        font-size: 13px;
         justify-content: center;
         text-align: center;
     }

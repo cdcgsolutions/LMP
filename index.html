@@ -59,7 +59,14 @@
     <!-- Contenedor Dinámico para Modales y Ventanas Emergentes -->
     <div id="ContenedorModalesDinamicos"></div>
 
+    <!-- 0. Firebase SDK (versión compat para scripts clásicos) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+
     <!-- 1. Capa de Datos y Modelos -->
+    <script src="js/Capas/CapaDatos/ServicioFirebase.js"></script>
     <script src="js/Capas/CapaDatos/DatosCanciones.js"></script>
     <script src="js/Capas/CapaDatos/DatosGeneros.js"></script>
     <script src="js/Capas/CapaDatos/DatosArtistas.js"></script>
@@ -67,6 +74,7 @@
     <script src="js/Capas/CapaDatos/ModeloAlmacenamiento.js"></script>
 
     <!-- 2. Capa de Servicios -->
+    <script src="js/Capas/CapaServicios/ServicioCloudinary.js"></script>
     <script src="js/Capas/CapaServicios/ServicioEstado.js"></script>
     <script src="js/Capas/CapaServicios/ServicioReproductor.js"></script>
     <script src="js/Capas/CapaServicios/ServicioNotificaciones.js"></script>

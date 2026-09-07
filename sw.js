@@ -2,7 +2,7 @@
    SERVICE WORKER: LETRAS MI POBLAU (LMP) - PWA
    ========================================================================== */
 
-const CACHE_NAME = 'lmp-pwa-cache-v1';
+const CACHE_NAME = 'lmp-pwa-cache-v5';
 const RECURSOS_PRECACHE = [
   './',
   './index.html',
@@ -13,17 +13,20 @@ const RECURSOS_PRECACHE = [
   './LogoInicialesSinFondoBlanco.png',
   './LogoInicialesSinFondoNegro.png',
   './IFAEL.jpg',
+  './HimnoAlBeni.mp3',
   './css/VariablesEstilos.css',
   './css/EstilosBase.css',
   './css/EstilosComponentes.css',
   './css/EstilosTemaOscuro.css',
   './css/EstilosResponsivos.css',
   './js/AplicacionPrincipal.js',
+  './js/Capas/CapaDatos/ServicioFirebase.js',
   './js/Capas/CapaDatos/DatosCanciones.js',
   './js/Capas/CapaDatos/DatosGeneros.js',
   './js/Capas/CapaDatos/DatosArtistas.js',
   './js/Capas/CapaDatos/DatosPublicaciones.js',
   './js/Capas/CapaDatos/ModeloAlmacenamiento.js',
+  './js/Capas/CapaServicios/ServicioCloudinary.js',
   './js/Capas/CapaServicios/ServicioEstado.js',
   './js/Capas/CapaServicios/ServicioReproductor.js',
   './js/Capas/CapaServicios/ServicioNotificaciones.js',

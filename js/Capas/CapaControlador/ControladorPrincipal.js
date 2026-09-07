@@ -8,12 +8,14 @@ class ControladorPrincipal {
         InstanciaServicioEstado,
         InstanciaModeloAlmacenamiento,
         InstanciaServicioReproductor,
-        InstanciaServicioNotificaciones
+        InstanciaServicioNotificaciones,
+        InstanciaServicioCloudinary = null
     ) {
         this.ServicioEstado = InstanciaServicioEstado;
         this.ModeloAlmacenamiento = InstanciaModeloAlmacenamiento;
         this.ServicioReproductor = InstanciaServicioReproductor;
         this.ServicioNotificaciones = InstanciaServicioNotificaciones;
+        this.ServicioCloudinary = InstanciaServicioCloudinary;
 
         // Instancias de Componentes
         this.ComponenteEncabezado = new ComponenteEncabezado(this.ServicioEstado);
@@ -21,9 +23,9 @@ class ControladorPrincipal {
         this.ComponenteBarraLateralDerecha = new ComponenteBarraLateralDerecha(this.ServicioEstado);
         this.ComponenteMuroPrincipal = new ComponenteMuroPrincipal(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionCanciones = new ComponenteSeccionCanciones(this.ServicioEstado, this.ModeloAlmacenamiento);
-        this.ComponenteSeccionGeneros = new ComponenteSeccionGeneros(this.ServicioEstado);
+        this.ComponenteSeccionGeneros = new ComponenteSeccionGeneros(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionArtistas = new ComponenteSeccionArtistas(this.ServicioEstado, this.ModeloAlmacenamiento);
-        this.ComponenteSeccionIFAEL = new ComponenteSeccionIFAEL(this.ServicioEstado);
+        this.ComponenteSeccionIFAEL = new ComponenteSeccionIFAEL(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalLetra = new ComponenteModalLetra(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalPartitura = new ComponenteModalPartitura(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalCrearAporte = new ComponenteModalCrearAporte(this.ServicioEstado, this.ModeloAlmacenamiento);
@@ -32,9 +34,13 @@ class ControladorPrincipal {
 
         this.ContenedorRaizApp = null;
         this.ContenedorModales = null;
+        this.PublicacionEnEdicion = null;
+        this.CancionEnEdicion = null;
+        this.AudioModal = null;
     }
 
     Inicializar() {
+        window.InstanciaControladorPrincipal = this;
         this.ContenedorRaizApp = document.getElementById("AppRaiz");
         this.ContenedorModales = document.getElementById("ContenedorModalesDinamicos");
 
@@ -169,6 +175,24 @@ class ControladorPrincipal {
         document.addEventListener("change", (Evento) => {
             this.ManejarCambiosSelects(Evento);
         });
+
+        document.addEventListener("keydown", (Evento) => {
+            if (Evento.key === "Escape") {
+                this.CerrarModales();
+                return;
+            }
+            if (Evento.key === "Enter") {
+                const InputComentario = Evento.target.closest(".CampoEntradaComentario");
+                if (InputComentario && InputComentario.id) {
+                    const Partes = InputComentario.id.split("_");
+                    const IdPublicacion = Partes[1];
+                    if (IdPublicacion) {
+                        Evento.preventDefault();
+                        this.AgregarComentarioDesdeEntrada(IdPublicacion);
+                    }
+                }
+            }
+        });
     }
 
     ManejarClicksGlobales(Evento) {
@@ -278,6 +302,13 @@ class ControladorPrincipal {
             });
         }
 
+        // Cerrar menús de opciones de publicación si se hace clic fuera
+        if (!Objetivo.closest(".ContenedorOpcionesPublicacion")) {
+            document.querySelectorAll(".MenuDesplegableOpciones.MenuAbierto").forEach(Menu => {
+                Menu.classList.remove("MenuAbierto");
+            });
+        }
+
         // 7. Reacciones Estilo Facebook
         const BotonEmoji = Objetivo.closest(".BotonReaccionEmoji");
         if (BotonEmoji) {
@@ -303,11 +334,28 @@ class ControladorPrincipal {
             return;
         }
 
+        // 7.1 Abrir Modal de Lista de Reacciones al hacer clic en el contador de reacciones
+        const BotonContadorReacciones = Objetivo.closest(".ContadorReaccionesPublicacion");
+        if (BotonContadorReacciones) {
+            const IdPublicacion = BotonContadorReacciones.dataset.publicacionId || BotonContadorReacciones.id.replace("ContenedorContadorLikes_", "");
+            this.AbrirModalListaReacciones(IdPublicacion);
+            return;
+        }
+
         // 8. Enviar Comentario
         const BotonEnviarComentario = Objetivo.closest(".BotonEnviarComentario");
         if (BotonEnviarComentario) {
             const IdPublicacion = BotonEnviarComentario.dataset.publicacionId;
             this.AgregarComentarioDesdeEntrada(IdPublicacion);
+            return;
+        }
+
+        // 8.1 Dar Like a un Comentario
+        const BotonLikeComentario = Objetivo.closest(".BotonLikeComentario");
+        if (BotonLikeComentario) {
+            const IdPublicacion = BotonLikeComentario.dataset.publicacionId;
+            const IdComentario = BotonLikeComentario.dataset.comentarioId;
+            this.AlternarLikeComentario(IdPublicacion, IdComentario);
             return;
         }
 
@@ -324,6 +372,71 @@ class ControladorPrincipal {
         const BotonCompartir = Objetivo.closest(".BotonCompartirPublicacion");
         if (BotonCompartir) {
             this.ServicioNotificaciones.MostrarMensajeToast("¡Enlace de publicación copiado para compartir!", '<i class="fa-solid fa-share-nodes"></i>');
+            return;
+        }
+
+        // 11. Menú de Opciones de Publicación (3 Puntos), Editar y Eliminar
+        const BotonDesplegarOpciones = Objetivo.closest(".BotonDesplegarOpcionesPublicacion");
+        if (BotonDesplegarOpciones) {
+            const IdPublicacion = BotonDesplegarOpciones.dataset.publicacionId;
+            const MenuOpciones = document.getElementById(`MenuOpciones_${IdPublicacion}`);
+            if (MenuOpciones) {
+                const YaAbierto = MenuOpciones.classList.contains("MenuAbierto");
+                document.querySelectorAll(".MenuDesplegableOpciones.MenuAbierto").forEach(M => M.classList.remove("MenuAbierto"));
+                if (!YaAbierto) {
+                    MenuOpciones.classList.add("MenuAbierto");
+                }
+            }
+            return;
+        }
+
+        const BotonEliminarPub = Objetivo.closest(".BotonEliminarPublicacion");
+        if (BotonEliminarPub) {
+            const IdPublicacion = BotonEliminarPub.dataset.publicacionId;
+            document.querySelectorAll(".MenuDesplegableOpciones.MenuAbierto").forEach(M => M.classList.remove("MenuAbierto"));
+            this.AbrirModalConfirmarEliminarPublicacion(IdPublicacion);
+            return;
+        }
+
+        const BotonEditarPub = Objetivo.closest(".BotonEditarPublicacion");
+        if (BotonEditarPub) {
+            const IdPublicacion = BotonEditarPub.dataset.publicacionId;
+            document.querySelectorAll(".MenuDesplegableOpciones.MenuAbierto").forEach(M => M.classList.remove("MenuAbierto"));
+            this.AbrirModalEditarAporte(IdPublicacion);
+            return;
+        }
+
+        const BotonConfirmarEliminar = Objetivo.closest("#BotonConfirmarEliminarPublicacion");
+        if (BotonConfirmarEliminar) {
+            const IdPublicacion = BotonConfirmarEliminar.dataset.publicacionId;
+            this.ProcesarEliminarPublicacion(IdPublicacion);
+            return;
+        }
+
+        if (Objetivo.closest("#BotonCancelarEliminarModal") || Objetivo.closest("#ModalConfirmarEliminarFondo") === Objetivo) {
+            this.CerrarModales();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonCerrarModalReacciones") || Objetivo.id === "ModalReaccionesFondo" || Objetivo.closest("#ModalReaccionesFondo") === Objetivo) {
+            this.CerrarModales();
+            return;
+        }
+
+        const BotonPestanaReaccion = Objetivo.closest(".PestanaFiltroReaccion");
+        if (BotonPestanaReaccion) {
+            const Filtro = BotonPestanaReaccion.dataset.filtro;
+            document.querySelectorAll(".PestanaFiltroReaccion").forEach(B => B.classList.remove("PestanaActiva"));
+            BotonPestanaReaccion.classList.add("PestanaActiva");
+
+            document.querySelectorAll("#ListaUsuariosReaccionesModal .ItemUsuarioReaccion").forEach(Item => {
+                const Tipo = Item.dataset.tipoReaccion;
+                if (!Filtro || Filtro === "todas" || Tipo === Filtro) {
+                    Item.style.display = "flex";
+                } else {
+                    Item.style.display = "none";
+                }
+            });
             return;
         }
 
@@ -401,6 +514,12 @@ class ControladorPrincipal {
         }
         if (Objetivo.closest("#BotonDescargarPartitura")) {
             this.ServicioNotificaciones.MostrarMensajeToast("Descargando partitura digital del IFAEL...", '<i class="fa-solid fa-download"></i>');
+            return;
+        }
+
+        // 13.5 Reproducir Himno al Beni desde accesos directos
+        if (Objetivo.closest("[data-accion='ver-himno']")) {
+            this.ReproducirHimnoAlBeni();
             return;
         }
 
@@ -489,6 +608,17 @@ class ControladorPrincipal {
         }
     }
 
+    ReproducirHimnoAlBeni() {
+        const CancionHimno = this.ModeloAlmacenamiento.ObtenerHimnoAlBeni();
+        this.ServicioReproductor.CargarYReproducirCancion(CancionHimno);
+        this.ServicioEstado.EstablecerCancionReproduciendo(CancionHimno, true);
+        this.ActualizarBarraReproductorFlotante(CancionHimno);
+        this.ServicioNotificaciones.MostrarMensajeToast("¡Reproduciendo Himno al Beni!", '<i class="fa-solid fa-flag" style="color: #2e7d32;"></i>');
+        if (window.innerWidth <= 768) {
+            this.CerrarMenuLateralMovil();
+        }
+    }
+
     ActualizarBarraReproductorFlotante(Cancion) {
         const BarraReproductor = document.getElementById("BarraReproductorInferiorFlotante");
         if (BarraReproductor) {
@@ -569,7 +699,7 @@ class ControladorPrincipal {
     }
 
     RegistrarReaccion(IdPublicacion, TipoReaccion) {
-        const PublicacionActualizada = this.ModeloAlmacenamiento.RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion);
+        const PublicacionActualizada = this.ModeloAlmacenamiento.RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion, "Edna Miriam Edgley Cuellar");
         if (PublicacionActualizada) {
             // 1. Cerrar y forzar desaparición inmediata del menú flotante
             const MenuEmergente = document.getElementById(`MenuReacciones_${IdPublicacion}`);
@@ -584,6 +714,20 @@ class ControladorPrincipal {
             // 2. Actualizar contador total de likes / reacciones
             const Contador = document.getElementById(`ContadorLikes_${IdPublicacion}`);
             if (Contador) Contador.textContent = PublicacionActualizada.CantidadMeGusta;
+
+            // 2.1 Actualizar visibilidad del contenedor y burbujas dinámicas de reacciones
+            const ContenedorContador = document.getElementById(`ContenedorContadorLikes_${IdPublicacion}`);
+            const BurbujasElem = document.getElementById(`BurbujasLikes_${IdPublicacion}`);
+
+            if (ContenedorContador) {
+                ContenedorContador.style.display = (PublicacionActualizada.CantidadMeGusta > 0) ? "flex" : "none";
+                if (this.ComponenteMuroPrincipal && this.ComponenteMuroPrincipal.ComponenteTarjetaPublicacion) {
+                    ContenedorContador.title = this.ComponenteMuroPrincipal.ComponenteTarjetaPublicacion.ObtenerTextoTooltipReacciones(PublicacionActualizada);
+                }
+            }
+            if (BurbujasElem && this.ComponenteMuroPrincipal && this.ComponenteMuroPrincipal.ComponenteTarjetaPublicacion) {
+                BurbujasElem.innerHTML = this.ComponenteMuroPrincipal.ComponenteTarjetaPublicacion.GenerarBurbujasReaccionesHtml(PublicacionActualizada);
+            }
 
             // 3. Obtener diccionario y reacción activa del usuario
             const Diccionario = window.DiccionarioReaccionesLMP || {
@@ -649,12 +793,28 @@ class ControladorPrincipal {
             const ListaContenedor = document.getElementById(`ListaComentarios_${IdPublicacion}`);
             if (ListaContenedor) {
                 const NuevoHtml = `
-                    <div class="ElementoComentarioIndividual" style="animation: AnimacionAparecerSuave 0.2s ease;">
-                        <img src="${ObjetoComentario.AvatarUsuario}" alt="${ObjetoComentario.NombreUsuario}" class="AvatarComentarista">
-                        <div class="BurbujaComentarioTexto">
-                            <div class="NombreComentarista">${ObjetoComentario.NombreUsuario}</div>
-                            <div class="CuerpoComentario">${ObjetoComentario.TextoComentario}</div>
-                            <div class="MetaComentarioTiempo">Hace un momento</div>
+                    <div class="ElementoComentarioIndividual" id="Comentario_${ObjetoComentario.IdComentario}" style="animation: AnimacionAparecerSuave 0.2s ease;">
+                        <img src="${ObjetoComentario.AvatarUsuario}" alt="${ObjetoComentario.NombreUsuario}" class="AvatarComentarista" onerror="this.src='Logo1.png'">
+                        <div class="ContenidoComentarioCompleto">
+                            <div class="BurbujaComentarioTexto">
+                                <div class="NombreComentarista">${ObjetoComentario.NombreUsuario}</div>
+                                <div class="CuerpoComentario">${ObjetoComentario.TextoComentario}</div>
+                            </div>
+                            <div class="FilaMetaYAccionesComentario">
+                                <span class="MetaComentarioTiempo">Hace un momento</span>
+                                <button class="BotonLikeComentario" 
+                                        data-publicacion-id="${IdPublicacion}" 
+                                        data-comentario-id="${ObjetoComentario.IdComentario}"
+                                        id="BotonLikeCom_${ObjetoComentario.IdComentario}">
+                                    <i class="fa-solid fa-thumbs-up"></i> Me gusta
+                                </button>
+                                <span class="InsigniaLikesComentario" 
+                                      id="InsigniaLikesCom_${ObjetoComentario.IdComentario}" 
+                                      style="display: none;">
+                                    <i class="fa-solid fa-thumbs-up"></i>
+                                    <span id="NumLikesCom_${ObjetoComentario.IdComentario}">0</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -666,6 +826,32 @@ class ControladorPrincipal {
                 Contador.textContent = `${PublicacionActualizada.Comentarios.length} comentarios`;
             }
             this.ServicioNotificaciones.MostrarMensajeToast("¡Comentario publicado!", '<i class="fa-solid fa-comment"></i>');
+        }
+    }
+
+    AlternarLikeComentario(IdPublicacion, IdComentario) {
+        const Resultado = this.ModeloAlmacenamiento.AlternarLikeEnComentario(IdPublicacion, IdComentario);
+        if (Resultado && Resultado.Comentario) {
+            const Comentario = Resultado.Comentario;
+            const Boton = document.getElementById(`BotonLikeCom_${IdComentario}`);
+            const Insignia = document.getElementById(`InsigniaLikesCom_${IdComentario}`);
+            const NumLikes = document.getElementById(`NumLikesCom_${IdComentario}`);
+
+            if (Boton) {
+                if (Comentario.DioLikeUsuario) {
+                    Boton.classList.add("LikeActivo");
+                } else {
+                    Boton.classList.remove("LikeActivo");
+                }
+            }
+
+            if (NumLikes) {
+                NumLikes.textContent = Comentario.CantidadLikes || 0;
+            }
+
+            if (Insignia) {
+                Insignia.style.display = (Comentario.CantidadLikes > 0) ? "inline-flex" : "none";
+            }
         }
     }
 
@@ -748,10 +934,288 @@ class ControladorPrincipal {
 
     AbrirModalCrearAporte() {
         if (!this.ContenedorModales) return;
-        this.ContenedorModales.innerHTML = this.ComponenteModalCrearAporte.Renderizar();
+        if (this.AudioModal) {
+            this.AudioModal.pause();
+            this.AudioModal = null;
+        }
+        // Limpiar de forma estricta cualquier residuo de edición previa
+        this.PublicacionEnEdicion = null;
+        this.CancionEnEdicion = null;
+        this.ContenedorModales.innerHTML = this.ComponenteModalCrearAporte.Renderizar(null);
+        this.VincularEventosSubidaMultimediaModal();
     }
 
-    ProcesarGuardarNuevoAporte() {
+    AbrirModalEditarAporte(IdPublicacion) {
+        if (!this.ContenedorModales) return;
+        if (this.AudioModal) {
+            this.AudioModal.pause();
+            this.AudioModal = null;
+        }
+
+        const Publicacion = this.ModeloAlmacenamiento.ObtenerPublicacionPorId(IdPublicacion);
+        if (!Publicacion) return;
+
+        let Cancion = null;
+        if (Publicacion.IdCancionAsociada) {
+            Cancion = this.ModeloAlmacenamiento.ObtenerCancionPorId(Publicacion.IdCancionAsociada);
+        }
+        if (!Cancion && Publicacion.TextoPublicacion) {
+            Cancion = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones().find(C =>
+                C.Titulo && Publicacion.TextoPublicacion.toLowerCase().includes(C.Titulo.toLowerCase())
+            );
+        }
+
+        this.PublicacionEnEdicion = Publicacion;
+        this.CancionEnEdicion = Cancion;
+
+        const DatosEdicion = {
+            IdPublicacion: Publicacion.IdPublicacion,
+            TextoPublicacion: Publicacion.TextoPublicacion || "",
+            IdCancion: Cancion ? Cancion.IdCancion : (Publicacion.IdCancionAsociada || null),
+            Titulo: Cancion ? Cancion.Titulo : "",
+            Autor: Cancion ? Cancion.Autor : (Publicacion.NombreAutor || "Edna Miriam Edgley Cuellar"),
+            Genero: Cancion ? Cancion.Genero : "Taquirari",
+            TonoOriginal: Cancion ? Cancion.TonoOriginal : "Re Mayor (D)",
+            TempoBPM: Cancion ? Cancion.TempoBPM : 108,
+            LetraConAcordes: Cancion ? (Cancion.LetraConAcordes || Cancion.LetraLimpia || "") : "",
+            LetraLimpia: Cancion ? Cancion.LetraLimpia : "",
+            AudioUrl: Cancion ? Cancion.AudioUrl : "",
+            ImagenPartitura: Cancion ? Cancion.ImagenPartitura : ""
+        };
+
+        this.ContenedorModales.innerHTML = this.ComponenteModalCrearAporte.Renderizar(DatosEdicion);
+        this.VincularEventosSubidaMultimediaModal();
+
+        if (DatosEdicion.AudioUrl) {
+            this.ConfigurarAudioModal(DatosEdicion.AudioUrl);
+        }
+    }
+
+    ConfigurarAudioModal(UrlAudio) {
+        if (this.AudioModal) {
+            this.AudioModal.pause();
+            this.AudioModal = null;
+        }
+
+        const IconoPlay = document.getElementById("IconoPlayMuestraAudio");
+        const BarraProgreso = document.getElementById("ProgresoMuestraAudio");
+        const TextoTiempoActual = document.getElementById("TiempoActualMuestraAudio");
+        const TextoTiempoTotal = document.getElementById("TiempoTotalMuestraAudio");
+
+        if (BarraProgreso) BarraProgreso.style.width = "0%";
+        if (TextoTiempoActual) TextoTiempoActual.textContent = "0:00";
+        if (TextoTiempoTotal) TextoTiempoTotal.textContent = "--:--";
+        if (IconoPlay) IconoPlay.className = "fa-solid fa-play";
+
+        if (!UrlAudio || UrlAudio.trim() === "") return;
+
+        this.AudioModal = new Audio(UrlAudio);
+
+        const FormatearSegundos = (Segundos) => {
+            if (isNaN(Segundos) || Segundos < 0) return "0:00";
+            const Min = Math.floor(Segundos / 60);
+            const Seg = Math.floor(Segundos % 60);
+            return `${Min}:${Seg < 10 ? '0' : ''}${Seg}`;
+        };
+
+        this.AudioModal.addEventListener("loadedmetadata", () => {
+            if (TextoTiempoTotal && this.AudioModal && !isNaN(this.AudioModal.duration)) {
+                TextoTiempoTotal.textContent = FormatearSegundos(this.AudioModal.duration);
+            }
+        });
+
+        this.AudioModal.addEventListener("timeupdate", () => {
+            if (!this.AudioModal) return;
+            const Actual = this.AudioModal.currentTime || 0;
+            const Duracion = this.AudioModal.duration || 1;
+            const Porcentaje = Math.min(100, (Actual / Duracion) * 100);
+
+            if (BarraProgreso) BarraProgreso.style.width = `${Porcentaje}%`;
+            if (TextoTiempoActual) TextoTiempoActual.textContent = FormatearSegundos(Actual);
+        });
+
+        this.AudioModal.addEventListener("ended", () => {
+            if (IconoPlay) IconoPlay.className = "fa-solid fa-play";
+            if (BarraProgreso) BarraProgreso.style.width = "0%";
+            if (TextoTiempoActual) TextoTiempoActual.textContent = "0:00";
+        });
+
+        this.AudioModal.addEventListener("error", (e) => {
+            console.warn("[ModalAudio] Error al cargar recurso de audio:", e);
+            if (IconoPlay) IconoPlay.className = "fa-solid fa-triangle-exclamation";
+            if (TextoTiempoTotal) TextoTiempoTotal.textContent = "Error";
+        });
+    }
+
+    VincularEventosSubidaMultimediaModal() {
+        const ZonaAudio = document.getElementById("ZonaSoltarAudio");
+        const InputAudio = document.getElementById("CampoNuevoArchivoAudio");
+        const VistaPreviaAudio = document.getElementById("VistaPreviaAudioCargado");
+        const EstadoVacioAudio = document.getElementById("EstadoVacioAudio");
+        const EtiquetaNombreAudio = document.getElementById("EtiquetaNombreAudio");
+        const EtiquetaEstadoAudio = document.getElementById("EtiquetaEstadoAudio");
+        const BotonCambiarAudio = document.getElementById("BotonCambiarAudio");
+        const ContenedorReproductorMuestra = document.getElementById("ContenedorReproductorMuestra");
+        const BotonPlayMuestraAudio = document.getElementById("BotonPlayMuestraAudio");
+        const IconoPlayMuestraAudio = document.getElementById("IconoPlayMuestraAudio");
+        const BarraClickeable = document.getElementById("BarraProgresoMuestraClickeable");
+
+        const ZonaPartitura = document.getElementById("ZonaSoltarPartitura");
+        const InputPartitura = document.getElementById("CampoNuevoArchivoPartitura");
+        const VistaPreviaPartitura = document.getElementById("VistaPreviaPartituraCargada");
+        const EstadoVacioPartitura = document.getElementById("EstadoVacioPartitura");
+        const EtiquetaNombrePartitura = document.getElementById("EtiquetaNombrePartitura");
+        const EtiquetaEstadoPartitura = document.getElementById("EtiquetaEstadoPartitura");
+        const ImgMiniaturaPartitura = document.getElementById("ImgMiniaturaPartitura");
+        const BotonCambiarPartitura = document.getElementById("BotonCambiarPartitura");
+
+        // Control Interactivo de Audio
+        if (ZonaAudio && InputAudio) {
+            ZonaAudio.addEventListener("click", (e) => {
+                if (e.target.closest(".ReproductorMuestraModal") || e.target.closest(".BotonCambiarArchivo")) return;
+                InputAudio.click();
+            });
+
+            if (BotonCambiarAudio) {
+                BotonCambiarAudio.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    InputAudio.click();
+                });
+            }
+
+            if (BotonPlayMuestraAudio) {
+                BotonPlayMuestraAudio.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    if (!this.AudioModal) return;
+
+                    if (this.AudioModal.paused) {
+                        this.AudioModal.play().then(() => {
+                            if (IconoPlayMuestraAudio) IconoPlayMuestraAudio.className = "fa-solid fa-pause";
+                        }).catch(err => {
+                            console.warn("[ModalAudio] Reproducción bloqueada por navegador:", err);
+                        });
+                    } else {
+                        this.AudioModal.pause();
+                        if (IconoPlayMuestraAudio) IconoPlayMuestraAudio.className = "fa-solid fa-play";
+                    }
+                });
+            }
+
+            if (BarraClickeable) {
+                BarraClickeable.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    if (!this.AudioModal || !this.AudioModal.duration) return;
+                    const Rect = BarraClickeable.getBoundingClientRect();
+                    const PosX = Math.max(0, Math.min(e.clientX - Rect.left, Rect.width));
+                    const Ratio = PosX / Rect.width;
+                    this.AudioModal.currentTime = Ratio * this.AudioModal.duration;
+                });
+            }
+
+            ["dragenter", "dragover"].forEach(TipoEvento => {
+                ZonaAudio.addEventListener(TipoEvento, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ZonaAudio.classList.add("ZonaArrastreActiva");
+                });
+            });
+
+            ["dragleave", "drop"].forEach(TipoEvento => {
+                ZonaAudio.addEventListener(TipoEvento, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ZonaAudio.classList.remove("ZonaArrastreActiva");
+                });
+            });
+
+            ZonaAudio.addEventListener("drop", (e) => {
+                if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+                    InputAudio.files = e.dataTransfer.files;
+                    InputAudio.dispatchEvent(new Event("change"));
+                }
+            });
+
+            InputAudio.addEventListener("change", () => {
+                if (InputAudio.files && InputAudio.files.length > 0) {
+                    const Archivo = InputAudio.files[0];
+                    const TamanoMB = (Archivo.size / (1024 * 1024)).toFixed(2);
+                    if (EtiquetaNombreAudio) {
+                        EtiquetaNombreAudio.textContent = `${Archivo.name} (${TamanoMB} MB)`;
+                        EtiquetaNombreAudio.title = Archivo.name;
+                    }
+                    if (EtiquetaEstadoAudio) {
+                        EtiquetaEstadoAudio.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--ColorVerdeBeni);"></i> Listo para subir a Cloudinary';
+                    }
+
+                    if (VistaPreviaAudio) VistaPreviaAudio.style.display = "flex";
+                    if (EstadoVacioAudio) EstadoVacioAudio.style.display = "none";
+                    if (ContenedorReproductorMuestra) ContenedorReproductorMuestra.style.display = "flex";
+
+                    const BlobUrl = URL.createObjectURL(Archivo);
+                    this.ConfigurarAudioModal(BlobUrl);
+                }
+            });
+        }
+
+        // Control Interactivo de Partitura
+        if (ZonaPartitura && InputPartitura) {
+            ZonaPartitura.addEventListener("click", (e) => {
+                if (e.target.closest(".BotonCambiarArchivo")) return;
+                InputPartitura.click();
+            });
+
+            if (BotonCambiarPartitura) {
+                BotonCambiarPartitura.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    InputPartitura.click();
+                });
+            }
+
+            ["dragenter", "dragover"].forEach(TipoEvento => {
+                ZonaPartitura.addEventListener(TipoEvento, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ZonaPartitura.classList.add("ZonaArrastreActiva");
+                });
+            });
+
+            ["dragleave", "drop"].forEach(TipoEvento => {
+                ZonaPartitura.addEventListener(TipoEvento, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    ZonaPartitura.classList.remove("ZonaArrastreActiva");
+                });
+            });
+
+            ZonaPartitura.addEventListener("drop", (e) => {
+                if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+                    InputPartitura.files = e.dataTransfer.files;
+                    InputPartitura.dispatchEvent(new Event("change"));
+                }
+            });
+
+            InputPartitura.addEventListener("change", () => {
+                if (InputPartitura.files && InputPartitura.files.length > 0) {
+                    const Archivo = InputPartitura.files[0];
+                    const TamanoMB = (Archivo.size / (1024 * 1024)).toFixed(2);
+                    if (EtiquetaNombrePartitura) {
+                        EtiquetaNombrePartitura.textContent = `${Archivo.name} (${TamanoMB} MB)`;
+                        EtiquetaNombrePartitura.title = Archivo.name;
+                    }
+                    if (EtiquetaEstadoPartitura) {
+                        EtiquetaEstadoPartitura.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--ColorVerdeBeni);"></i> Listo para subir a Cloudinary';
+                    }
+                    if (ImgMiniaturaPartitura && Archivo.type.startsWith("image/")) {
+                        ImgMiniaturaPartitura.src = URL.createObjectURL(Archivo);
+                    }
+                    if (VistaPreviaPartitura) VistaPreviaPartitura.style.display = "flex";
+                    if (EstadoVacioPartitura) EstadoVacioPartitura.style.display = "none";
+                }
+            });
+        }
+    }
+
+    async ProcesarGuardarNuevoAporte() {
         const Titulo = document.getElementById("CampoNuevoTitulo")?.value.trim();
         const Autor = document.getElementById("CampoNuevoAutor")?.value.trim() || "Compositor Anónimo";
         const Genero = document.getElementById("CampoNuevoGenero")?.value || "Taquirari";
@@ -760,52 +1224,349 @@ class ControladorPrincipal {
         const Letra = document.getElementById("CampoNuevaLetra")?.value.trim();
         const MensajeMuro = document.getElementById("CampoNuevoMensajeMuro")?.value.trim() || `¡Nueva letra y acordes registrados para '${Titulo}'!`;
 
+        const InputAudio = document.getElementById("CampoNuevoArchivoAudio");
+        const InputPartitura = document.getElementById("CampoNuevoArchivoPartitura");
+        const BotonGuardar = document.getElementById("BotonGuardarPublicarNuevoAporte");
+        const IndicadorCloudinary = document.getElementById("IndicadorSubidaCloudinary");
+
         if (!Titulo || !Letra) {
             alert("Por favor ingresa al menos el Título y la Letra de la canción.");
             return;
         }
 
-        // Crear Canción
+        const EsModoEdicion = Boolean(this.PublicacionEnEdicion);
+
+        let UrlAudioSubido = EsModoEdicion && this.CancionEnEdicion ? (this.CancionEnEdicion.AudioUrl || "") : "";
+        let UrlPartituraSubida = EsModoEdicion && this.CancionEnEdicion ? (this.CancionEnEdicion.ImagenPartitura || "IFAEL.jpg") : "IFAEL.jpg";
+
+        // Subir a Cloudinary si se seleccionaron archivos nuevos
+        const HayArchivos = (InputAudio?.files?.length > 0) || (InputPartitura?.files?.length > 0);
+        if (HayArchivos && this.ServicioCloudinary) {
+            if (BotonGuardar) {
+                BotonGuardar.disabled = true;
+                BotonGuardar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subiendo a Cloudinary...';
+            }
+            if (IndicadorCloudinary) {
+                IndicadorCloudinary.style.display = "block";
+            }
+
+            try {
+                if (InputAudio?.files?.length > 0) {
+                    const ResAudio = await this.ServicioCloudinary.SubirAudio(InputAudio.files[0]);
+                    if (ResAudio) UrlAudioSubido = ResAudio;
+                }
+                if (InputPartitura?.files?.length > 0) {
+                    const ResPartitura = await this.ServicioCloudinary.SubirPartitura(InputPartitura.files[0]);
+                    if (ResPartitura) UrlPartituraSubida = ResPartitura;
+                }
+            } catch (ErrorSubida) {
+                console.warn("[ControladorPrincipal] Error al subir a Cloudinary:", ErrorSubida);
+                this.ServicioNotificaciones.MostrarMensajeToast("Aviso: Falló la subida multimedia a Cloudinary, guardando datos.", '<i class="fa-solid fa-triangle-exclamation"></i>');
+            }
+        }
+
+        if (BotonGuardar) {
+            BotonGuardar.disabled = true;
+            BotonGuardar.innerHTML = EsModoEdicion
+                ? '<i class="fa-solid fa-spinner fa-spin"></i> Actualizando en base de datos...'
+                : '<i class="fa-solid fa-spinner fa-spin"></i> Registrando en base de datos...';
+        }
+
         const LetraLimpia = Letra.replace(/\[([^\]]+)\]/g, '');
-        const NuevaCancion = this.ModeloAlmacenamiento.GuardarCancionNueva({
-            Titulo: Titulo,
-            Autor: Autor,
-            Genero: Genero,
-            TonoOriginal: Tono,
-            TempoBPM: Tempo,
-            EsEstudianteIFAEL: true,
-            Descripcion: `Composición beniana registrada en Letras Mi Poblau en ritmo de ${Genero}.`,
-            Caratula: "Logo1.png",
-            ImagenPartitura: "IFAEL.jpg",
-            LetraConAcordes: Letra,
-            LetraLimpia: LetraLimpia,
-            SecuenciaNotasMelodia: [
-                { Nota: "D4", Duracion: 0.4 }, { Nota: "G4", Duracion: 0.4 }, { Nota: "A4", Duracion: 0.6 }
-            ]
-        });
 
-        // Crear Publicación en Feed
-        this.ModeloAlmacenamiento.GuardarPublicacionNueva({
-            NombreAutor: Autor,
-            AvatarAutor: "Logo1.png",
-            EsVerificado: true,
-            TextoPublicacion: MensajeMuro,
-            IdCancionAsociada: NuevaCancion.IdCancion
-        });
+        if (EsModoEdicion) {
+            const IdPublicacion = this.PublicacionEnEdicion.IdPublicacion;
+            const IdCancion = this.CancionEnEdicion ? this.CancionEnEdicion.IdCancion : this.PublicacionEnEdicion.IdCancionAsociada;
 
-        this.CerrarModales();
-        this.ServicioEstado.EstablecerPestanaActiva("muro");
-        this.ActualizarVistaCentral();
-        this.ServicioNotificaciones.MostrarMensajeToast(`¡'${Titulo}' publicado con éxito en Letras Mi Poblau!`, '<i class="fa-solid fa-circle-check"></i>');
+            // 1. Actualizar Canción si existe
+            if (IdCancion) {
+                await this.ModeloAlmacenamiento.ActualizarCancion(IdCancion, {
+                    Titulo: Titulo,
+                    Autor: Autor,
+                    Genero: Genero,
+                    TonoOriginal: Tono,
+                    TempoBPM: Tempo,
+                    AudioUrl: UrlAudioSubido,
+                    ImagenPartitura: UrlPartituraSubida,
+                    LetraConAcordes: Letra,
+                    LetraLimpia: LetraLimpia
+                });
+            }
+
+            // 2. Actualizar Publicación
+            await this.ModeloAlmacenamiento.ActualizarPublicacion(IdPublicacion, {
+                TextoPublicacion: MensajeMuro,
+                NombreAutor: Autor,
+                EsEditada: true
+            });
+
+            // Limpieza estricta del estado de edición
+            this.PublicacionEnEdicion = null;
+            this.CancionEnEdicion = null;
+
+            this.CerrarModales();
+            this.ActualizarVistaCentral();
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `¡'${Titulo}' y su publicación actualizados con éxito!`,
+                '<i class="fa-solid fa-circle-check"></i>'
+            );
+        } else {
+            // Modo Creación
+            const NuevaCancion = await this.ModeloAlmacenamiento.GuardarCancionNueva({
+                Titulo: Titulo,
+                Autor: Autor,
+                Genero: Genero,
+                TonoOriginal: Tono,
+                TempoBPM: Tempo,
+                EsEstudianteIFAEL: true,
+                Descripcion: `Composición beniana registrada en Letras Mi Poblau en ritmo de ${Genero}.`,
+                Caratula: "Logo1.png",
+                ImagenPartitura: UrlPartituraSubida,
+                AudioUrl: UrlAudioSubido,
+                LetraConAcordes: Letra,
+                LetraLimpia: LetraLimpia,
+                SecuenciaNotasMelodia: [
+                    { Nota: "D4", Duracion: 0.4 }, { Nota: "G4", Duracion: 0.4 }, { Nota: "A4", Duracion: 0.6 }
+                ]
+            });
+
+            await this.ModeloAlmacenamiento.GuardarPublicacionNueva({
+                NombreAutor: Autor,
+                AvatarAutor: "Logo1.png",
+                EsVerificado: true,
+                TextoPublicacion: MensajeMuro,
+                IdCancionAsociada: NuevaCancion.IdCancion
+            });
+
+            // Limpieza estricta del estado de edición
+            this.PublicacionEnEdicion = null;
+            this.CancionEnEdicion = null;
+
+            this.CerrarModales();
+            this.ServicioEstado.EstablecerPestanaActiva("muro");
+            this.ActualizarVistaCentral();
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `¡'${Titulo}' publicado con éxito en Letras Mi Poblau!`,
+                '<i class="fa-solid fa-circle-check"></i>'
+            );
+        }
     }
 
     CerrarModales() {
-        if (this.ComponenteModalLetra.IntervaloKaraoke) {
+        if (this.ComponenteModalLetra && this.ComponenteModalLetra.IntervaloKaraoke) {
             clearInterval(this.ComponenteModalLetra.IntervaloKaraoke);
         }
+        if (this.AudioModal) {
+            this.AudioModal.pause();
+            this.AudioModal = null;
+        }
+        // Limpiar residuos de edición
+        this.PublicacionEnEdicion = null;
+        this.CancionEnEdicion = null;
         if (this.ContenedorModales) {
             this.ContenedorModales.innerHTML = "";
         }
+    }
+
+    AbrirModalListaReacciones(IdPublicacion) {
+        if (!this.ContenedorModales) return;
+
+        const Publicacion = this.ModeloAlmacenamiento.ObtenerPublicacionPorId(IdPublicacion);
+        if (!Publicacion) return;
+
+        const Total = Publicacion.CantidadMeGusta || 0;
+        const Usuarios = Publicacion.UsuariosReacciones || [];
+        const ReaccionesDetalle = Publicacion.ReaccionesDetalle || {};
+
+        const MapaReacciones = window.DiccionarioReaccionesLMP || {
+            MeGusta: { TituloCorto: "Me gusta", Icono: '<i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i>', Color: "#1877f2" },
+            MeEncanta: { TituloCorto: "Me encanta", Icono: '<i class="fa-solid fa-heart" style="color: #f3425f;"></i>', Color: "#f3425f" },
+            VivaBeni: { TituloCorto: "¡Viva Beni!", Icono: '<i class="fa-solid fa-guitar" style="color: #2e7d32;"></i>', Color: "#2e7d32" },
+            Aplausos: { TituloCorto: "Aplausos", Icono: '<i class="fa-solid fa-hands-clapping" style="color: #f7b125;"></i>', Color: "#f7b125" },
+            BuenRitmo: { TituloCorto: "Buen ritmo", Icono: '<i class="fa-solid fa-music" style="color: #8b5cf6;"></i>', Color: "#8b5cf6" }
+        };
+
+        // Generar pestañas de filtros por tipo de reacción
+        let PestanasHtml = `<button class="PestanaFiltroReaccion PestanaActiva" data-filtro="todas">Todas <span style="opacity: 0.85;">${Total}</span></button>`;
+        for (const [Tipo, Conf] of Object.entries(MapaReacciones)) {
+            const Cant = ReaccionesDetalle[Tipo] || (Usuarios.filter(u => u.TipoReaccion === Tipo).length);
+            if (Cant > 0) {
+                PestanasHtml += `<button class="PestanaFiltroReaccion" data-filtro="${Tipo}">${Conf.Icono} ${Cant}</button>`;
+            }
+        }
+
+        let FilasUsuariosHtml = "";
+        if (Usuarios.length > 0) {
+            FilasUsuariosHtml = Usuarios.map(User => {
+                const Conf = MapaReacciones[User.TipoReaccion] || MapaReacciones.MeGusta;
+                const IconoReac = Conf ? Conf.Icono : '<i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i>';
+                const NombreReac = Conf ? Conf.TituloCorto : 'Reacción';
+                const EsTuUsuario = User.NombreUsuario === "Edna Miriam Edgley Cuellar";
+
+                return `
+                <div class="ItemUsuarioReaccion" data-tipo-reaccion="${User.TipoReaccion}">
+                    <div class="FilaUsuarioIzquierda">
+                        <div class="ContenedorAvatarConInsigniaReaccion">
+                            <img src="Logo1.png" alt="${User.NombreUsuario}" class="AvatarUsuarioReaccion" onerror="this.src='Logo1.png'">
+                            <span class="MiniInsigniaReaccionUsuario">${IconoReac}</span>
+                        </div>
+                        <div class="InfoTextoUsuarioReaccion">
+                            <span class="NombrePersonaReaccion">
+                                ${User.NombreUsuario}
+                                ${EsTuUsuario ? '<span class="InsigniaTuUsuario">Tú</span>' : ''}
+                            </span>
+                            <span class="TipoReaccionElegida">${NombreReac}</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join("");
+
+            if (Total > Usuarios.length) {
+                const Resto = Total - Usuarios.length;
+                FilasUsuariosHtml += `
+                <div class="ItemUsuarioReaccion ItemRestoReacciones" data-tipo-reaccion="todas" style="opacity: 0.85; font-size: 13px; color: var(--ColorTextoSecundario); justify-content: center; padding: 12px;">
+                    <i class="fa-solid fa-users" style="margin-right: 8px;"></i>
+                    <span>Y <strong>${Resto}</strong> ${Resto === 1 ? 'persona más reaccionó' : 'personas más reaccionaron'} en la comunidad</span>
+                </div>`;
+            }
+        } else if (Total > 0) {
+            FilasUsuariosHtml = `
+            <div class="EstadoVacioReacciones">
+                <i class="fa-solid fa-heart" style="font-size: 34px; color: #f3425f; margin-bottom: 6px;"></i>
+                <p style="font-size: 15px; font-weight: 600; color: var(--ColorTextoPrincipal); margin: 0;">Esta publicación tiene ${Total} ${Total === 1 ? 'reacción' : 'reacciones'}</p>
+                <span style="font-size: 13px;">Registradas por la comunidad en Letras Mi Poblau.</span>
+            </div>`;
+        } else {
+            FilasUsuariosHtml = `
+            <div class="EstadoVacioReacciones">
+                <i class="fa-regular fa-thumbs-up" style="font-size: 34px; color: var(--ColorTextoSecundario); margin-bottom: 6px;"></i>
+                <p style="font-size: 15px; font-weight: 600; color: var(--ColorTextoPrincipal); margin: 0;">Sin reacciones aún</p>
+                <span style="font-size: 13px;">¡Sé el primero en reaccionar con tu música y corazón!</span>
+            </div>`;
+        }
+
+        this.ContenedorModales.innerHTML = `
+        <div class="CapaFondoModalOscuro" id="ModalReaccionesFondo">
+            <div class="ContenedorVentanaModal VentanaModalReacciones">
+                <div class="EncabezadoVentanaModal">
+                    <div class="TituloModalTexto" style="display: flex; align-items: center;">
+                        <i class="fa-solid fa-heart" style="color: #f3425f; margin-right: 8px;"></i>
+                        <span>Personas que reaccionaron</span>
+                        <span class="InsigniaConteoModal">${Total}</span>
+                    </div>
+                    <button class="BotonCerrarModal" id="BotonCerrarModalReacciones" title="Cerrar ventana">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                ${Total > 0 ? `
+                <div class="BarraPestanasReaccionesModal">
+                    ${PestanasHtml}
+                </div>` : ''}
+                <div class="CuerpoVentanaModal CuerpoModalReacciones">
+                    <div class="ListaPersonasReacciones" id="ListaUsuariosReaccionesModal">
+                        ${FilasUsuariosHtml}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        const BotonCerrarReac = document.getElementById("BotonCerrarModalReacciones");
+        if (BotonCerrarReac) {
+            BotonCerrarReac.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.CerrarModales();
+            };
+        }
+
+        const FondoModalReac = document.getElementById("ModalReaccionesFondo");
+        if (FondoModalReac) {
+            FondoModalReac.onclick = (e) => {
+                if (e.target === FondoModalReac) {
+                    this.CerrarModales();
+                }
+            };
+        }
+    }
+
+    AbrirModalConfirmarEliminarPublicacion(IdPublicacion) {
+        if (!this.ContenedorModales) return;
+
+        const Publicacion = this.ModeloAlmacenamiento.ObtenerPublicacionPorId(IdPublicacion);
+        if (!Publicacion) return;
+
+        let NombreCancion = "";
+        let Cancion = null;
+        if (Publicacion.IdCancionAsociada) {
+            Cancion = this.ModeloAlmacenamiento.ObtenerCancionPorId(Publicacion.IdCancionAsociada);
+        }
+        if (!Cancion && Publicacion.TextoPublicacion) {
+            Cancion = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones().find(C =>
+                C.Titulo && Publicacion.TextoPublicacion.toLowerCase().includes(C.Titulo.toLowerCase())
+            );
+        }
+        if (Cancion && Cancion.Titulo) {
+            NombreCancion = Cancion.Titulo;
+        }
+
+        const MensajeDetalle = NombreCancion
+            ? `Se eliminará la publicación y su composición asociada <strong>'${NombreCancion}'</strong> permanentemente de la base de datos de Firestore y de la aplicación.`
+            : `Se eliminará esta publicación de forma permanente de la base de datos de Firestore.`;
+
+        this.ContenedorModales.innerHTML = `
+        <div class="CapaFondoModalOscuro" id="ModalConfirmarEliminarFondo">
+            <div class="ContenedorVentanaModal VentanaModalConfirmarEliminar" id="VentanaModalConfirmarEliminar">
+                <div class="IconoAdvertenciaEliminar">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <div class="TituloModalEliminar">¿Eliminar publicación?</div>
+                <p class="DescripcionModalEliminar">${MensajeDetalle} Esta acción no se puede deshacer.</p>
+                <div class="FilaBotonesAccionModal">
+                    <button class="BotonAccionSecundario" id="BotonCancelarEliminarModal" style="padding: 10px 20px;">
+                        Cancelar
+                    </button>
+                    <button class="BotonAccionPeligro" id="BotonConfirmarEliminarPublicacion" data-publicacion-id="${IdPublicacion}">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Sí, eliminar definitivamente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    async ProcesarEliminarPublicacion(IdPublicacion) {
+        const BotonConfirmar = document.getElementById("BotonConfirmarEliminarPublicacion");
+        const BotonCancelar = document.getElementById("BotonCancelarEliminarModal");
+
+        if (BotonConfirmar) {
+            BotonConfirmar.disabled = true;
+            BotonConfirmar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando de Firestore...';
+        }
+        if (BotonCancelar) {
+            BotonCancelar.disabled = true;
+        }
+
+        const Publicacion = this.ModeloAlmacenamiento.ObtenerPublicacionPorId(IdPublicacion);
+        const IdCancion = Publicacion ? Publicacion.IdCancionAsociada : null;
+
+        // Si el reproductor estaba reproduciendo esta canción, detenerlo
+        if (IdCancion && this.ServicioReproductor && this.ServicioReproductor.CancionActual) {
+            if (String(this.ServicioReproductor.CancionActual.IdCancion) === String(IdCancion)) {
+                this.ServicioReproductor.DetenerReproduccion();
+                this.CerrarReproductorFlotante();
+            }
+        }
+
+        // Eliminar en cascada en Firestore y Modelo
+        await this.ModeloAlmacenamiento.EliminarPublicacion(IdPublicacion, true);
+
+        this.CerrarModales();
+        this.ActualizarVistaCentral();
+        this.ServicioNotificaciones.MostrarMensajeToast(
+            "Publicación y canción eliminadas correctamente de la base de datos",
+            '<i class="fa-solid fa-trash-can"></i>'
+        );
     }
 
     AlternarMenuLateralMovil() {

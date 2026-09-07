@@ -20,6 +20,10 @@ const DatosPublicacionesIniciales = [
             VivaBeni: 35,
             Aplausos: 5
         },
+        UsuariosReacciones: [
+            { NombreUsuario: "Franklin Santander Colque", TipoReaccion: "MeEncanta" },
+            { NombreUsuario: "IFAEL Oficial", TipoReaccion: "VivaBeni" }
+        ],
         CantidadCompartidos: 28,
         Comentarios: [
             {
@@ -56,6 +60,9 @@ const DatosPublicacionesIniciales = [
             VivaBeni: 18,
             Aplausos: 5
         },
+        UsuariosReacciones: [
+            { NombreUsuario: "Estudiante de Cuerdas IFAEL", TipoReaccion: "MeEncanta" }
+        ],
         CantidadCompartidos: 19,
         Comentarios: [
             {
@@ -84,6 +91,9 @@ const DatosPublicacionesIniciales = [
             VivaBeni: 85,
             Aplausos: 10
         },
+        UsuariosReacciones: [
+            { NombreUsuario: "Músico de Cabildo", TipoReaccion: "VivaBeni" }
+        ],
         CantidadCompartidos: 44,
         Comentarios: [
             {

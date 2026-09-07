@@ -4,32 +4,43 @@
    ========================================================================== */
 
 class ComponenteSeccionIFAEL {
-    constructor(InstanciaServicioEstado) {
+    constructor(InstanciaServicioEstado, InstanciaModeloAlmacenamiento = null) {
         this.ServicioEstado = InstanciaServicioEstado;
+        this.ModeloAlmacenamiento = InstanciaModeloAlmacenamiento;
     }
 
     Renderizar() {
+        const DatosIFAEL = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerDatosIFAEL()) || {};
+
+        const NombreInstitucion = DatosIFAEL.Nombre || 'Instituto de Formación Artística "Edelmira Limpias" (IFAEL)';
+        const Descripcion = DatosIFAEL.Descripcion || 'El IFAEL es la institución emblemática de educación musical en el departamento del Beni. Dedicada a la formación técnica y profesional de artistas, compositores e instrumentistas con profunda identidad nacional y rescate de la música mojeño-trinitaria.';
+        const Ciudad = DatosIFAEL.Ciudad || 'Trinidad, Beni - Bolivia';
+        const Carrera = DatosIFAEL.CarreraPrincipal || 'Técnico Superior en Música Boliviana';
+        const Modalidad = DatosIFAEL.Modalidad || 'Formación Artística Fiscal (3 Años)';
+        const LogoUrl = DatosIFAEL.LogoUrl || 'LogoInicialesSinFondoNegro.png';
+        const PortadaUrl = DatosIFAEL.FotoPortadaUrl || 'IFAEL.jpg';
+
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionIFAEL">
             <!-- Portada Institucional Estilo Página de Facebook -->
             <div class="TarjetaPerfilIFAEL">
                 <div class="PortadaInstitucionIFAEL">
-                    <img src="IFAEL.jpg" alt="Instituto IFAEL Trinidad" class="ImagenPortadaInstitucion">
+                    <img src="${PortadaUrl}" alt="Instituto IFAEL Trinidad" class="ImagenPortadaInstitucion">
                 </div>
 
                 <div class="CuerpoPerfilInstitucion">
                     <div class="FilaAvatarYDatosPrincipales">
                         <div class="ContenedorAvatarFlotantePerfil">
-                            <img src="LogoInicialesSinFondoNegro.png" alt="Logo IFAEL" class="AvatarInstitucionGrande" onerror="this.src='Logo1.png'">
+                            <img src="${LogoUrl}" alt="Logo IFAEL" class="AvatarInstitucionGrande" onerror="this.src='Logo1.png'">
                         </div>
                         <div class="DatosTextoInstitucion">
                             <h1 class="NombreInstitucionGrande">
-                                <span>Instituto de Formación Artística "Edelmira Limpias" (IFAEL)</span>
+                                <span>${NombreInstitucion}</span>
                                 <span class="InsigniaVerificada" title="Institución Educativa Oficial"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>
                             </h1>
-                            <div class="SubtituloInstitucion">Educación Musical Superior • Trinidad, Beni, Bolivia</div>
+                            <div class="SubtituloInstitucion">Educación Musical Superior • ${Ciudad}</div>
                             <div class="MetaDetalleInstitucion">
-                                <i class="fa-solid fa-graduation-cap" style="margin-right: 4px;"></i>Carrera: Técnico Superior en Música Boliviana • Formación Artística Fiscal
+                                <i class="fa-solid fa-graduation-cap" style="margin-right: 4px;"></i>Carrera: ${Carrera} • ${Modalidad}
                             </div>
                         </div>
 
@@ -50,7 +61,7 @@ class ComponenteSeccionIFAEL {
                                 <i class="fa-solid fa-building-columns" style="color: var(--ColorPrimarioAzul); margin-right: 6px;"></i>Sobre el Instituto IFAEL:
                             </div>
                             <p style="font-size: 13.5px; color: var(--ColorTextoPrincipal); line-height: 1.5;">
-                                El IFAEL es la institución emblemática de educación musical en el departamento del Beni. Dedicada a la formación técnica y profesional de artistas, compositores e instrumentistas con profunda identidad nacional y rescate de la música mojeño-trinitaria.
+                                ${Descripcion}
                             </p>
                         </div>
 
@@ -70,9 +81,9 @@ class ComponenteSeccionIFAEL {
                             <i class="fa-solid fa-location-dot" style="color: var(--ColorPrimarioAzul); margin-right: 6px;"></i>Ubicación e Informaciones:
                         </div>
                         <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ColorTextoPrincipal);">
-                            <div><i class="fa-solid fa-city" style="margin-right: 4px;"></i><strong>Ciudad:</strong> Trinidad, Beni - Bolivia</div>
-                            <div><i class="fa-solid fa-award" style="margin-right: 4px;"></i><strong>Carrera:</strong> Música Boliviana</div>
-                            <div><i class="fa-solid fa-music" style="margin-right: 4px;"></i><strong>Modalidad:</strong> Técnico Superior (3 Años)</div>
+                            <div><i class="fa-solid fa-city" style="margin-right: 4px;"></i><strong>Ciudad:</strong> ${Ciudad}</div>
+                            <div><i class="fa-solid fa-award" style="margin-right: 4px;"></i><strong>Carrera:</strong> ${Carrera}</div>
+                            <div><i class="fa-solid fa-music" style="margin-right: 4px;"></i><strong>Modalidad:</strong> ${Modalidad}</div>
                         </div>
                     </div>
                 </div>

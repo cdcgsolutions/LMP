@@ -21,13 +21,16 @@ class ComponenteMuroPrincipal {
                 const CoincideAutor = Pub.NombreAutor && Pub.NombreAutor.toLowerCase().includes(TerminoBusqueda);
                 
                 let CoincideCancion = false;
-                if (Pub.IdCancionAsociada) {
-                    const Cancion = this.ModeloAlmacenamiento.ObtenerCancionPorId(Pub.IdCancionAsociada);
-                    if (Cancion) {
-                        CoincideCancion = (Cancion.Titulo && Cancion.Titulo.toLowerCase().includes(TerminoBusqueda)) ||
-                                          (Cancion.Genero && Cancion.Genero.toLowerCase().includes(TerminoBusqueda)) ||
-                                          (Cancion.LetraLimpia && Cancion.LetraLimpia.toLowerCase().includes(TerminoBusqueda));
-                    }
+                let Cancion = Pub.IdCancionAsociada ? this.ModeloAlmacenamiento.ObtenerCancionPorId(Pub.IdCancionAsociada) : null;
+                if (!Cancion && Pub.TextoPublicacion) {
+                    Cancion = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones().find(C =>
+                        C.Titulo && Pub.TextoPublicacion.toLowerCase().includes(C.Titulo.toLowerCase())
+                    ) || null;
+                }
+                if (Cancion) {
+                    CoincideCancion = (Cancion.Titulo && Cancion.Titulo.toLowerCase().includes(TerminoBusqueda)) ||
+                                      (Cancion.Genero && Cancion.Genero.toLowerCase().includes(TerminoBusqueda)) ||
+                                      (Cancion.LetraLimpia && Cancion.LetraLimpia.toLowerCase().includes(TerminoBusqueda));
                 }
                 return CoincideTexto || CoincideAutor || CoincideCancion;
             });
