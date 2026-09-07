@@ -1,0 +1,93 @@
+/* ==========================================================================
+   VARIABLES DE ESTILOS Y SISTEMA DE DISEÑO (ESTILO FACEBOOK / META)
+   Nombres en PascalCase - Letras Mi Poblau (LMP)
+   ========================================================================== */
+
+:root {
+    /* Paleta Principal Meta / Facebook */
+    --ColorPrimarioAzul: #1877f2;
+    --ColorPrimarioAzulHover: #166fe5;
+    --ColorPrimarioAzulClaro: #e7f3ff;
+    --ColorPrimarioAzulSuave: rgba(24, 119, 242, 0.12);
+
+    /* Acentos Tradicionales Benianos / Bolivianos */
+    --ColorVerdeBeni: #2e7d32;
+    --ColorVerdeBeniClaro: #e8f5e9;
+    --ColorDoradoFolklore: #f59e0b;
+    --ColorRojoReaccion: #f02849;
+    --ColorAmarilloReaccion: #f7b125;
+
+    /* Superficies y Fondos Modo Claro */
+    --ColorFondoPrincipal: #f0f2f5;
+    --ColorFondoSuperficie: #ffffff;
+    --ColorFondoSecundario: #f0f2f5;
+    --ColorFondoHover: #f2f2f2;
+    --ColorFondoActivo: #e4e6eb;
+    --ColorFondoEntrada: #f0f2f5;
+
+    /* Colores de Texto Modo Claro */
+    --ColorTextoPrincipal: #050505;
+    --ColorTextoSecundario: #65676b;
+    --ColorTextoAtenuado: #8a8d91;
+    --ColorTextoEnlace: #1877f2;
+    --ColorTextoBlanco: #ffffff;
+
+    /* Bordes y Divisores */
+    --ColorBordeDivisor: #ced0d4;
+    --ColorBordeSuave: #e4e6eb;
+    --ColorBordeTarjeta: #dadee3;
+
+    /* Sombras Elevación Facebook */
+    --SombraNivelUno: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --SombraNivelDos: 0 2px 8px rgba(0, 0, 0, 0.12);
+    --SombraNivelTres: 0 8px 24px rgba(0, 0, 0, 0.16);
+    --SombraTarjetaHover: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --SombraReacciones: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+
+    /* Radios de Bordes */
+    --RadioPequeno: 6px;
+    --RadioMediano: 10px;
+    --RadioGrande: 16px;
+    --RadioCircular: 50%;
+    --RadioBotonPill: 9999px;
+
+    /* Dimensiones de Maquetación */
+    --AlturaEncabezado: 56px;
+    --AnchoBarraLateralIzquierda: 340px;
+    --AnchoBarraLateralDerecha: 340px;
+    --AnchoMaximoMuroCentral: 680px;
+    --AlturaReproductorInferior: 64px;
+
+    /* Tipografías */
+    --FuentePrincipal: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --FuenteMusical: 'Courier New', Courier, monospace;
+
+    /* Transiciones */
+    --TransicionRapida: 0.15s ease;
+    --TransicionMedia: 0.25s ease;
+    --TransicionSuave: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modo Oscuro (Estilo Facebook Dark Mode) */
+body.ModoOscuroActivo {
+    --ColorFondoPrincipal: #18191a;
+    --ColorFondoSuperficie: #242526;
+    --ColorFondoSecundario: #3a3b3c;
+    --ColorFondoHover: #3a3b3c;
+    --ColorFondoActivo: #4e4f50;
+    --ColorFondoEntrada: #3a3b3c;
+
+    --ColorTextoPrincipal: #e4e6eb;
+    --ColorTextoSecundario: #b0b3b8;
+    --ColorTextoAtenuado: #8a8d91;
+    --ColorTextoEnlace: #4599ff;
+
+    --ColorBordeDivisor: #393a3b;
+    --ColorBordeSuave: #2f3031;
+    --ColorBordeTarjeta: #3e4042;
+
+    --ColorPrimarioAzulClaro: rgba(24, 119, 242, 0.2);
+    --SombraNivelUno: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --SombraNivelDos: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --SombraNivelTres: 0 12px 28px rgba(0, 0, 0, 0.6);
+}

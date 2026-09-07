@@ -1,0 +1,245 @@
+/* ==========================================================================
+   ESTILOS BASE Y MAQUETACIÓN PRINCIPAL (N-CAPAS)
+   Nombres en PascalCase - Letras Mi Poblau
+   ========================================================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 15px;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: var(--FuentePrincipal);
+    background-color: var(--ColorFondoPrincipal);
+    color: var(--ColorTextoPrincipal);
+    line-height: 1.34;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollbars personalizadas estilo Facebook */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ColorTextoAtenuado);
+    border-radius: var(--RadioBotonPill);
+    opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ColorTextoSecundario);
+}
+
+/* Enlaces y Botones Generales */
+a {
+    color: var(--ColorTextoEnlace);
+    text-decoration: none;
+    transition: color var(--TransicionRapida);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color var(--TransicionRapida), transform var(--TransicionRapida);
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+input, textarea, select {
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ColorTextoPrincipal);
+    background-color: var(--ColorFondoEntrada);
+    border: 1px solid transparent;
+    border-radius: var(--RadioPequeno);
+    padding: 10px 14px;
+    outline: none;
+    transition: all var(--TransicionRapida);
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--ColorPrimarioAzul);
+    background-color: var(--ColorFondoSuperficie);
+    box-shadow: 0 0 0 2px var(--ColorPrimarioAzulSuave);
+}
+
+/* Contenedor Maestro de 3 Columnas */
+.ContenedorPrincipalAplicacion {
+    display: flex;
+    margin-top: var(--AlturaEncabezado);
+    width: 100%;
+    min-height: calc(100vh - var(--AlturaEncabezado));
+    position: relative;
+    padding-bottom: 24px;
+    transition: padding-bottom var(--TransicionMedia);
+}
+
+body.ConReproductorActivo .ContenedorPrincipalAplicacion {
+    padding-bottom: var(--AlturaReproductorInferior);
+}
+
+/* Columnas Laterales */
+.ColumnaLateralIzquierda {
+    width: var(--AnchoBarraLateralIzquierda);
+    position: fixed;
+    top: var(--AlturaEncabezado);
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 16px 8px;
+    background-color: transparent;
+    z-index: 10;
+    transition: bottom var(--TransicionMedia);
+}
+
+body.ConReproductorActivo .ColumnaLateralIzquierda {
+    bottom: var(--AlturaReproductorInferior);
+}
+
+.ColumnaLateralDerecha {
+    width: var(--AnchoBarraLateralDerecha);
+    position: fixed;
+    top: var(--AlturaEncabezado);
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 16px 8px;
+    background-color: transparent;
+    z-index: 10;
+    transition: bottom var(--TransicionMedia);
+}
+
+body.ConReproductorActivo .ColumnaLateralDerecha {
+    bottom: var(--AlturaReproductorInferior);
+}
+
+/* Muro Central y Área de Contenido */
+.AreaContenidoCentral {
+    flex: 1;
+    margin-left: var(--AnchoBarraLateralIzquierda);
+    margin-right: var(--AnchoBarraLateralDerecha);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px;
+    min-height: calc(100vh - var(--AlturaEncabezado));
+}
+
+.ContenedorMuroMaximo {
+    width: 100%;
+    max-width: var(--AnchoMaximoMuroCentral);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Clases Utilitarias */
+.OcultoElemento {
+    display: none !important;
+}
+
+.TextoNegrita {
+    font-weight: 600;
+}
+
+.TextoSecundario {
+    color: var(--ColorTextoSecundario);
+    font-size: 13px;
+}
+
+.InsigniaVerificada {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ColorPrimarioAzul);
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.InsigniaRitmo {
+    display: inline-block;
+    background-color: var(--ColorVerdeBeniClaro);
+    color: var(--ColorVerdeBeni);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--RadioBotonPill);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+body.ModoOscuroActivo .InsigniaRitmo {
+    background-color: rgba(46, 125, 50, 0.25);
+    color: #81c784;
+}
+
+.BotonAccionPrimario {
+    background-color: var(--ColorPrimarioAzul);
+    color: var(--ColorTextoBlanco);
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: var(--RadioPequeno);
+}
+
+.BotonAccionPrimario:hover {
+    background-color: var(--ColorPrimarioAzulHover);
+}
+
+.BotonAccionSecundario {
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoPrincipal);
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: var(--RadioPequeno);
+}
+
+.BotonAccionSecundario:hover {
+    background-color: var(--ColorFondoActivo);
+}
+
+.BotonCircularIcono {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--RadioCircular);
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoPrincipal);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background-color var(--TransicionRapida);
+}
+
+.BotonCircularIcono:hover {
+    background-color: var(--ColorFondoActivo);
+}

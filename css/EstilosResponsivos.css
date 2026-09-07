@@ -1,0 +1,272 @@
+/* ==========================================================================
+   ESTILOS RESPONSIVOS PARA MÓVILES Y TABLETS (N-CAPAS)
+   Nombres en PascalCase - Letras Mi Poblau
+   ========================================================================== */
+
+/* Barra de Navegación Inferior para Móviles (Estilo Facebook App) */
+.BarraNavegacionMovilInferior {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background-color: var(--ColorFondoSuperficie);
+    border-top: 1px solid var(--ColorBordeDivisor);
+    z-index: 1001;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ElementoNavegacionMovil {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--ColorTextoSecundario);
+    font-size: 19px;
+    position: relative;
+    cursor: pointer;
+    transition: color var(--TransicionRapida);
+}
+
+.ElementoNavegacionMovil.MovilActivo {
+    color: var(--ColorPrimarioAzul);
+}
+
+.ElementoNavegacionMovil span {
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* Menú Lateral Deslizable (Off-Canvas Drawer) para Móvil */
+.CapaFondoMenuDeslizable {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1500;
+}
+
+.CapaFondoMenuDeslizable.MenuAbierto {
+    display: block;
+}
+
+/* Pantallas Medianas (Laptops y Tablets: < 1200px) */
+@media (max-width: 1200px) {
+    :root {
+        --AnchoBarraLateralIzquierda: 280px;
+        --AnchoBarraLateralDerecha: 280px;
+    }
+
+    .ColumnaLateralDerecha {
+        display: none;
+    }
+
+    .AreaContenidoCentral {
+        margin-right: 0;
+    }
+}
+
+/* Tablets y Pantallas Pequeñas (< 900px) */
+@media (max-width: 900px) {
+    .ColumnaLateralIzquierda {
+        display: none;
+    }
+
+    .ColumnaLateralIzquierda.MenuDeslizableActivo {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 300px;
+        background-color: var(--ColorFondoSuperficie);
+        z-index: 1600;
+        box-shadow: var(--SombraNivelTres);
+        padding-top: 20px;
+        animation: AnimacionDeslizarIzquierda 0.25s ease-out;
+    }
+
+    @keyframes AnimacionDeslizarIzquierda {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(0); }
+    }
+
+    .AreaContenidoCentral {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 12px 8px;
+    }
+
+    .SeccionEncabezadoCentro {
+        display: none;
+    }
+
+    .SeccionEncabezadoIzquierda {
+        width: auto;
+        gap: 8px;
+    }
+
+    .BotonMenuMovilEncabezado {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ImagenLogoPrincipal {
+        display: none !important;
+    }
+
+    .TextoMarcaLMPCompleto {
+        display: none !important;
+    }
+
+    .TextoMarcaLMPCorto {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 1px;
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+    }
+
+    .BarraNavegacionMovilInferior {
+        display: flex;
+    }
+
+    .ContenedorPrincipalAplicacion {
+        padding-bottom: 70px;
+    }
+
+    body.ConReproductorActivo .ContenedorPrincipalAplicacion {
+        padding-bottom: 125px;
+    }
+
+    .BarraReproductorInferiorFlotante {
+        bottom: 56px;
+        height: 54px;
+        padding: 0 12px;
+    }
+
+    .BarraReproductorInferiorFlotante.ReproductorVisible {
+        display: flex;
+    }
+
+    .SeccionVolumenYOpcionesReproductor,
+    .LienzoVisualizadorAudio {
+        display: none;
+    }
+
+    .SeccionPistaReproductor {
+        width: 160px;
+    }
+}
+
+/* Teléfonos Móviles (< 600px) */
+@media (max-width: 600px) {
+    :root {
+        --AlturaEncabezado: 50px;
+    }
+
+    .SeccionEncabezadoIzquierda {
+        width: auto;
+        flex: 1;
+        gap: 6px;
+    }
+
+    .ContenedorBuscadorSuperior {
+        width: auto;
+        flex: 1;
+        max-width: 160px;
+    }
+
+    .ContenedorBuscadorSuperior:focus-within {
+        width: 100%;
+        max-width: 220px;
+    }
+
+    .TextoMarcaLMPCorto {
+        font-size: 18px !important;
+    }
+
+    .PerfilUsuarioBoton span {
+        display: none;
+    }
+
+    .AreaContenidoCentral {
+        padding: 8px 4px;
+    }
+
+    .TarjetaPublicacionMuro,
+    .TarjetaCrearPublicacion {
+        border-radius: var(--RadioPequeno);
+        border-left: none;
+        border-right: none;
+    }
+
+    .FilaBotonesAccionesRapidas .BotonAccionRapidaCrear span {
+        font-size: 12px;
+    }
+
+    .BotonAccionInteraccion span {
+        font-size: 11.5px;
+    }
+
+    .ContenedorVentanaModal {
+        max-height: 94vh;
+        border-radius: var(--RadioMediano);
+    }
+
+    .CuadriculaTarjetasMusicales,
+    .CuadriculaGenerosMusicales {
+        grid-template-columns: 1fr;
+    }
+
+    .FilaAvatarYDatosPrincipales {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .ContenedorAvatarFlotantePerfil {
+        margin-top: -50px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .AvatarInstitucionGrande {
+        width: 100px;
+        height: 100px;
+    }
+
+    .DatosTextoInstitucion {
+        padding-top: 0;
+        align-items: center;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .NombreInstitucionGrande {
+        justify-content: center;
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .SubtituloInstitucion,
+    .MetaDetalleInstitucion {
+        text-align: center;
+    }
+
+    .BotonesAccionPerfilInstitucion {
+        padding-top: 4px;
+        justify-content: center;
+        width: 100%;
+    }
+}

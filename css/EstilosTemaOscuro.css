@@ -1,0 +1,70 @@
+/* ==========================================================================
+   ESTILOS ESPECÍFICOS PARA MODO OSCURO (FACEBOOK DARK THEME)
+   Nombres en PascalCase - Letras Mi Poblau
+   ========================================================================== */
+
+body.ModoOscuroActivo {
+    color-scheme: dark;
+}
+
+body.ModoOscuroActivo .ImagenLogoPrincipal {
+    filter: brightness(1.1);
+}
+
+body.ModoOscuroActivo .ContenedorLetraAcordes {
+    background-color: #121212;
+    border-color: #333333;
+    color: #e4e6eb;
+}
+
+body.ModoOscuroActivo .BurbujaComentarioTexto {
+    background-color: #3a3b3c;
+}
+
+body.ModoOscuroActivo .BarraReproductorInferiorFlotante {
+    background-color: #242526;
+    border-top-color: #393a3b;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.4);
+}
+
+body.ModoOscuroActivo .ContenedorReaccionesEmergentes {
+    background-color: #242526;
+    border-color: #3e4042;
+}
+
+body.ModoOscuroActivo .ContenedorVentanaModal {
+    background-color: #242526;
+    border-color: #393a3b;
+}
+
+body.ModoOscuroActivo .PieVentanaModal {
+    background-color: #18191a;
+    border-top-color: #393a3b;
+}
+
+body.ModoOscuroActivo .TarjetaLateralDerecha,
+body.ModoOscuroActivo .TarjetaCrearPublicacion,
+body.ModoOscuroActivo .TarjetaPublicacionMuro,
+body.ModoOscuroActivo .TarjetaMusicalItem,
+body.ModoOscuroActivo .TarjetaGeneroBeniano,
+body.ModoOscuroActivo .CabeceraSeccionPrincipal,
+body.ModoOscuroActivo .BarraFiltrosCanciones,
+body.ModoOscuroActivo .TarjetaPerfilIFAEL {
+    background-color: #242526;
+    border-color: #393a3b;
+}
+
+body.ModoOscuroActivo .CajaFichaMusical {
+    background-color: #1f2021;
+}
+
+body.ModoOscuroActivo .PuntoEstadoVerde {
+    border-color: #242526;
+}
+
+body.ModoOscuroActivo .DeslizadorProgresoAudio::-webkit-slider-thumb,
+body.ModoOscuroActivo .DeslizadorVolumenAudio::-webkit-slider-thumb,
+body.ModoOscuroActivo .DeslizadorProgresoAudio::-moz-range-thumb,
+body.ModoOscuroActivo .DeslizadorVolumenAudio::-moz-range-thumb {
+    border-color: #242526;
+}
