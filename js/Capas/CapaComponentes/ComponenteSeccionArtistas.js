@@ -31,7 +31,7 @@ class ComponenteSeccionArtistas {
                         <div class="DatosTextoInstitucion">
                             <h1 class="NombreInstitucionGrande">
                                 <span>${ArtistaPrincipal.NombreCompleto}</span>
-                                <span class="InsigniaVerificada" title="Artista e Investigadora Destacada"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>
+                                ${(this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EsUsuarioVerificado(ArtistaPrincipal.NombreCompleto, ArtistaPrincipal.EsVerificado === true)) ? '<span class="InsigniaVerificada" title="Artista e Investigadora Destacada"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                             </h1>
                             <div class="SubtituloInstitucion">${ArtistaPrincipal.RolTitulo} • ${ArtistaPrincipal.Institucion}</div>
                             <div class="MetaDetalleInstitucion">

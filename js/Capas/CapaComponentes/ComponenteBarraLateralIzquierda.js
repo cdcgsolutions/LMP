@@ -4,12 +4,14 @@
    ========================================================================== */
 
 class ComponenteBarraLateralIzquierda {
-    constructor(InstanciaServicioEstado) {
+    constructor(InstanciaServicioEstado, InstanciaModeloAlmacenamiento = null) {
         this.ServicioEstado = InstanciaServicioEstado;
+        this.ModeloAlmacenamiento = InstanciaModeloAlmacenamiento;
     }
 
     Renderizar() {
         const PestanaActiva = this.ServicioEstado.ObtenerEstado("PestanaActiva");
+        const EsVerificado = this.ModeloAlmacenamiento ? this.ModeloAlmacenamiento.EsUsuarioVerificado("Edna Miriam Edgley Cuellar") : false;
 
         return `
         <aside class="ColumnaLateralIzquierda" id="ColumnaLateralIzquierda">
@@ -17,7 +19,10 @@ class ComponenteBarraLateralIzquierda {
             <div class="ElementoAccesoDirecto" data-pestana="artistas" style="margin-bottom: 8px;">
                 <img src="Logo1.png" alt="Perfil" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;">
                 <div style="display: flex; flex-direction: column;">
-                    <span style="font-weight: 700; font-size: 14.5px;">Edna Miriam Edgley Cuellar</span>
+                    <span style="font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 4px;">
+                        <span>Edna Miriam Edgley Cuellar</span>
+                        ${EsVerificado ? '<span class="InsigniaVerificada" style="font-size: 11px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                    </span>
                     <span style="font-size: 12px; color: var(--ColorTextoSecundario);">Téc. Sup. Música Boliviana</span>
                 </div>
             </div>

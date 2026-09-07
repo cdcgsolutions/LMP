@@ -14,11 +14,13 @@ class ModeloAlmacenamiento {
         this.ClaveAlmacenamientoArtistas = "LMP_Artistas_v1";
         this.ClaveAlmacenamientoIFAEL = "LMP_IFAEL_v1";
         this.ClaveAlmacenamientoTemaOscuro = "LMP_ModoOscuro_v1";
+        this.ClaveAlmacenamientoUsuarios = "LMP_Usuarios_v1";
 
         this.Canciones = [];
         this.Publicaciones = [];
         this.Generos = [];
         this.Artistas = [];
+        this.Usuarios = [];
         this.DatosIFAEL = null;
         this.DatosCargadosDesdeFirestore = false;
 
@@ -63,6 +65,13 @@ class ModeloAlmacenamiento {
         }
 
         try {
+            const UsuEnBruto = localStorage.getItem(this.ClaveAlmacenamientoUsuarios);
+            this.Usuarios = UsuEnBruto ? JSON.parse(UsuEnBruto) : [];
+        } catch (Error) {
+            this.Usuarios = [];
+        }
+
+        try {
             const IFAELEnBruto = localStorage.getItem(this.ClaveAlmacenamientoIFAEL);
             this.DatosIFAEL = IFAELEnBruto ? JSON.parse(IFAELEnBruto) : null;
         } catch (Error) {
@@ -76,6 +85,33 @@ class ModeloAlmacenamiento {
         if (!db) return false;
 
         try {
+            // 0. Usuarios (para perfiles y verificación)
+            try {
+                const SnapUsuarios = await this.ServicioFirebase.ColeccionUsuarios().get();
+                if (!SnapUsuarios.empty) {
+                    const UsuariosLeidos = [];
+                    SnapUsuarios.forEach(Doc => {
+                        const Data = Doc.data();
+                        UsuariosLeidos.push({
+                            IdUsuario: Doc.id,
+                            NombreCompleto: Data.NombreCompleto || "",
+                            EsVerificado: Data.EsVerificado === true,
+                            FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
+                            FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "IFAEL.jpg",
+                            Institucion: Data.Institucion || "",
+                            Rol: Data.Rol || "Usuario",
+                            Activo: Data.Activo !== undefined ? Data.Activo : true,
+                            Ciudad: Data.Ciudad || "Trinidad, Beni",
+                            CorreoElectronico: Data.CorreoElectronico || ""
+                        });
+                    });
+                    this.Usuarios = UsuariosLeidos;
+                    localStorage.setItem(this.ClaveAlmacenamientoUsuarios, JSON.stringify(this.Usuarios));
+                }
+            } catch (ErrUsuarios) {
+                console.warn("[ModeloAlmacenamiento] Error al cargar colección Usuarios:", ErrUsuarios);
+            }
+
             // 1. Canciones
             const SnapCanciones = await this.ServicioFirebase.ColeccionCanciones().get();
             if (!SnapCanciones.empty) {
@@ -251,12 +287,26 @@ class ModeloAlmacenamiento {
                         }
                     }
 
+                    const NombreAutorPub = Data.NombreAutor || "Edna Miriam Edgley Cuellar";
+                    let EsVerificadoAutor = false;
+                    const UsuarioAutor = this.Usuarios.find(U => 
+                        U.NombreCompleto && (
+                            U.NombreCompleto.trim().toLowerCase() === NombreAutorPub.trim().toLowerCase() ||
+                            NombreAutorPub.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase())
+                        )
+                    );
+                    if (UsuarioAutor && UsuarioAutor.EsVerificado !== undefined) {
+                        EsVerificadoAutor = UsuarioAutor.EsVerificado === true;
+                    } else if (Data.EsVerificado !== undefined) {
+                        EsVerificadoAutor = Data.EsVerificado === true;
+                    }
+
                     PublicacionesLeidas.push({
                         IdPublicacion: IdPublicacion,
-                        NombreAutor: Data.NombreAutor || "Edna Miriam Edgley Cuellar",
+                        NombreAutor: NombreAutorPub,
                         AvatarAutor: Data.AvatarAutor || "Logo1.png",
                         TiempoTranscurrido: this.FormatearTiempoRelativo(Data.FechaCreacion),
-                        EsVerificado: Data.EsVerificado !== undefined ? Data.EsVerificado : true,
+                        EsVerificado: EsVerificadoAutor,
                         TextoPublicacion: Data.TextoPublicacion || "",
                         IdCancionAsociada: IdCancionAsociada,
                         CantidadMeGusta: TotalReacciones,
@@ -320,6 +370,11 @@ class ModeloAlmacenamiento {
         return Publicaciones.map(Pub => {
             if (Pub.NombreAutor && (Pub.NombreAutor.includes("Luci") || Pub.NombreAutor.includes("Xiomi") || Pub.NombreAutor.includes("Camacho"))) {
                 Pub.NombreAutor = "Edna Miriam Edgley Cuellar";
+            }
+            if (this.Usuarios && this.Usuarios.length > 0) {
+                Pub.EsVerificado = this.EsUsuarioVerificado(Pub.NombreAutor, Pub.EsVerificado === true);
+            } else {
+                Pub.EsVerificado = Pub.EsVerificado === true;
             }
             if (Array.isArray(Pub.Comentarios)) {
                 Pub.Comentarios.forEach(C => {
@@ -388,6 +443,39 @@ class ModeloAlmacenamiento {
         return this.DatosIFAEL;
     }
 
+    ObtenerTodosLosUsuarios() {
+        return this.Usuarios || [];
+    }
+
+    EsUsuarioVerificado(NombreUsuario, Fallback = null) {
+        if (!NombreUsuario) return false;
+        if (Array.isArray(this.Usuarios) && this.Usuarios.length > 0) {
+            const Usuario = this.Usuarios.find(U => 
+                U.NombreCompleto && (
+                    U.NombreCompleto.trim().toLowerCase() === NombreUsuario.trim().toLowerCase() ||
+                    NombreUsuario.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase())
+                )
+            );
+            if (Usuario && Usuario.EsVerificado !== undefined) {
+                return Usuario.EsVerificado === true;
+            }
+        }
+        if (Fallback !== null && Fallback !== undefined) {
+            return Fallback === true;
+        }
+        return false;
+    }
+
+    ObtenerUsuarioPorNombre(NombreUsuario) {
+        if (!NombreUsuario) return null;
+        if (Array.isArray(this.Usuarios) && this.Usuarios.length > 0) {
+            return this.Usuarios.find(U => 
+                U.NombreCompleto && U.NombreCompleto.trim().toLowerCase() === NombreUsuario.trim().toLowerCase()
+            ) || null;
+        }
+        return null;
+    }
+
     ObtenerEstadoTemaOscuro() {
         return localStorage.getItem(this.ClaveAlmacenamientoTemaOscuro) === "true";
     }
@@ -450,12 +538,16 @@ class ModeloAlmacenamiento {
         ObjetoPublicacion.CantidadCompartidos = 0;
         ObjetoPublicacion.Comentarios = [];
 
+        const AutorActual = ObjetoPublicacion.NombreAutor || "Edna Miriam Edgley Cuellar";
+        const EsVerificadoActual = this.EsUsuarioVerificado(AutorActual, ObjetoPublicacion.EsVerificado === true);
+        ObjetoPublicacion.EsVerificado = EsVerificadoActual;
+
         if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
             const DocFirestore = {
-                NombreAutor: ObjetoPublicacion.NombreAutor || "Edna Miriam Edgley Cuellar",
+                NombreAutor: AutorActual,
                 AvatarAutor: ObjetoPublicacion.AvatarAutor || "Logo1.png",
                 TextoPublicacion: ObjetoPublicacion.TextoPublicacion || "",
-                EsVerificado: ObjetoPublicacion.EsVerificado !== undefined ? ObjetoPublicacion.EsVerificado : true,
+                EsVerificado: EsVerificadoActual,
                 IdCancionAsociada: ObjetoPublicacion.IdCancionAsociada || null,
                 CantidadMeGusta: 0,
                 CantidadCompartidos: 0,

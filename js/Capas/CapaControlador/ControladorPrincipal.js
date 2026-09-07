@@ -19,7 +19,7 @@ class ControladorPrincipal {
 
         // Instancias de Componentes
         this.ComponenteEncabezado = new ComponenteEncabezado(this.ServicioEstado);
-        this.ComponenteBarraLateralIzquierda = new ComponenteBarraLateralIzquierda(this.ServicioEstado);
+        this.ComponenteBarraLateralIzquierda = new ComponenteBarraLateralIzquierda(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteBarraLateralDerecha = new ComponenteBarraLateralDerecha(this.ServicioEstado);
         this.ComponenteMuroPrincipal = new ComponenteMuroPrincipal(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionCanciones = new ComponenteSeccionCanciones(this.ServicioEstado, this.ModeloAlmacenamiento);
@@ -797,7 +797,10 @@ class ControladorPrincipal {
                         <img src="${ObjetoComentario.AvatarUsuario}" alt="${ObjetoComentario.NombreUsuario}" class="AvatarComentarista" onerror="this.src='Logo1.png'">
                         <div class="ContenidoComentarioCompleto">
                             <div class="BurbujaComentarioTexto">
-                                <div class="NombreComentarista">${ObjetoComentario.NombreUsuario}</div>
+                                <div class="NombreComentarista">
+                                    ${ObjetoComentario.NombreUsuario}
+                                    ${(this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EsUsuarioVerificado(ObjetoComentario.NombreUsuario)) ? '<span class="InsigniaVerificada" style="font-size: 11px; margin-left: 4px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                                </div>
                                 <div class="CuerpoComentario">${ObjetoComentario.TextoComentario}</div>
                             </div>
                             <div class="FilaMetaYAccionesComentario">
@@ -1333,7 +1336,7 @@ class ControladorPrincipal {
             await this.ModeloAlmacenamiento.GuardarPublicacionNueva({
                 NombreAutor: Autor,
                 AvatarAutor: "Logo1.png",
-                EsVerificado: true,
+                EsVerificado: this.ModeloAlmacenamiento.EsUsuarioVerificado(Autor),
                 TextoPublicacion: MensajeMuro,
                 IdCancionAsociada: NuevaCancion.IdCancion
             });
@@ -1413,6 +1416,7 @@ class ControladorPrincipal {
                         <div class="InfoTextoUsuarioReaccion">
                             <span class="NombrePersonaReaccion">
                                 ${User.NombreUsuario}
+                                ${this.ModeloAlmacenamiento.EsUsuarioVerificado(User.NombreUsuario) ? '<span class="InsigniaVerificada" style="font-size: 11px; margin-left: 4px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                                 ${EsTuUsuario ? '<span class="InsigniaTuUsuario">Tú</span>' : ''}
                             </span>
                             <span class="TipoReaccionElegida">${NombreReac}</span>

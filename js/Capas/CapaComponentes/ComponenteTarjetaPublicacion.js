@@ -137,6 +137,13 @@ class ComponenteTarjetaPublicacion {
             ? `color: ${InfoReaccionActiva.Color}; font-weight: 700;` 
             : '';
 
+        let EsVerificadoAutor = false;
+        if (this.ModeloAlmacenamiento && typeof this.ModeloAlmacenamiento.EsUsuarioVerificado === "function") {
+            EsVerificadoAutor = this.ModeloAlmacenamiento.EsUsuarioVerificado(ObjetoPublicacion.NombreAutor, ObjetoPublicacion.EsVerificado === true);
+        } else {
+            EsVerificadoAutor = ObjetoPublicacion.EsVerificado === true;
+        }
+
         return `
         <article class="TarjetaPublicacionMuro" id="Publicacion_${ObjetoPublicacion.IdPublicacion}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}">
             <!-- 1. Encabezado de la Publicación -->
@@ -146,7 +153,7 @@ class ComponenteTarjetaPublicacion {
                     <div class="DetallesAutorTexto">
                         <div class="NombreAutorTexto">
                             ${ObjetoPublicacion.NombreAutor}
-                            ${ObjetoPublicacion.EsVerificado ? '<span class="InsigniaVerificada" title="Autor Verificado LMP"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                            ${EsVerificadoAutor ? '<span class="InsigniaVerificada" title="Autor Verificado LMP"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                         </div>
                         <div class="MetaTiempoPublicacion">
                             <span>${ObjetoPublicacion.TiempoTranscurrido || 'Reciente'}</span>
@@ -301,7 +308,10 @@ class ComponenteTarjetaPublicacion {
                         <img src="${ComentarioItem.AvatarUsuario || 'Logo1.png'}" alt="${ComentarioItem.NombreUsuario}" class="AvatarComentarista" onerror="this.src='Logo1.png'">
                         <div class="ContenidoComentarioCompleto">
                             <div class="BurbujaComentarioTexto">
-                                <div class="NombreComentarista">${ComentarioItem.NombreUsuario}</div>
+                                <div class="NombreComentarista">
+                                    ${ComentarioItem.NombreUsuario}
+                                    ${(this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EsUsuarioVerificado(ComentarioItem.NombreUsuario)) ? '<span class="InsigniaVerificada" style="font-size: 11px; margin-left: 4px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                                </div>
                                 <div class="CuerpoComentario">${ComentarioItem.TextoComentario}</div>
                             </div>
                             <div class="FilaMetaYAccionesComentario">

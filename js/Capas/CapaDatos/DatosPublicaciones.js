@@ -9,7 +9,7 @@ const DatosPublicacionesIniciales = [
         NombreAutor: "Edna Miriam Edgley Cuellar",
         AvatarAutor: "Logo1.png",
         TiempoTranscurrido: "Hace 2 horas",
-        EsVerificado: true,
+        EsVerificado: false,
         TextoPublicacion: "¡Querida comunidad de Letras Mi Poblau y compañeros del IFAEL! 🌿 Comparto con ustedes la letra completa y acordes de mi nueva composición 'Viva el Beni (Tierra Hermosa)'. Espero que todos en Trinidad la cantemos con el corazón bien en alto. ¡Viva el Beni!",
         IdCancionAsociada: 1,
         CantidadMeGusta: 142,
