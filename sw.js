@@ -2,7 +2,7 @@
    SERVICE WORKER: LETRAS MI POBLAU (LMP) - PWA
    ========================================================================== */
 
-const CACHE_NAME = 'lmp-pwa-cache-v5';
+const CACHE_NAME = 'lmp-pwa-cache-v14';
 const RECURSOS_PRECACHE = [
   './',
   './index.html',
@@ -21,10 +21,6 @@ const RECURSOS_PRECACHE = [
   './css/EstilosResponsivos.css',
   './js/AplicacionPrincipal.js',
   './js/Capas/CapaDatos/ServicioFirebase.js',
-  './js/Capas/CapaDatos/DatosCanciones.js',
-  './js/Capas/CapaDatos/DatosGeneros.js',
-  './js/Capas/CapaDatos/DatosArtistas.js',
-  './js/Capas/CapaDatos/DatosPublicaciones.js',
   './js/Capas/CapaDatos/ModeloAlmacenamiento.js',
   './js/Capas/CapaServicios/ServicioCloudinary.js',
   './js/Capas/CapaServicios/ServicioEstado.js',
@@ -43,6 +39,7 @@ const RECURSOS_PRECACHE = [
   './js/Capas/CapaComponentes/ComponenteModalLetra.js',
   './js/Capas/CapaComponentes/ComponenteModalPartitura.js',
   './js/Capas/CapaComponentes/ComponenteModalCrearAporte.js',
+  './js/Capas/CapaComponentes/ComponenteModalIniciarSesion.js',
   './js/Capas/CapaComponentes/ComponenteBarraNavegacionMovil.js',
   './js/Capas/CapaComponentes/ComponenteReproductorFlotante.js',
   './js/Capas/CapaControlador/ControladorPrincipal.js'

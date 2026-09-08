@@ -94,7 +94,24 @@ class ComponenteTarjetaPublicacion {
             return "";
         }
 
-        const Nombres = Usuarios.map(u => u.NombreUsuario).filter(Boolean);
+        const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
+        const NombreUsuarioActivo = (UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario") 
+            ? UsuarioActual.Nombre.trim().toLowerCase() 
+            : null;
+
+        const Nombres = Usuarios.map(u => {
+            if (NombreUsuarioActivo && u.NombreUsuario && u.NombreUsuario.trim().toLowerCase() === NombreUsuarioActivo) {
+                return "Tú";
+            }
+            return u.NombreUsuario;
+        }).filter(Boolean);
+
+        const IndiceTu = Nombres.indexOf("Tú");
+        if (IndiceTu > 0) {
+            Nombres.splice(IndiceTu, 1);
+            Nombres.unshift("Tú");
+        }
+
         if (Nombres.length === 1) {
             return Nombres[0];
         } else if (Nombres.length === 2) {
@@ -120,11 +137,33 @@ class ComponenteTarjetaPublicacion {
             ) || null;
         }
 
-        const TotalReacciones = ObjetoPublicacion.CantidadMeGusta || 0;
+        const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
+        const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
+
+        const TiposValidos = ["MeGusta", "MeEncanta", "VivaBeni", "Aplausos", "BuenRitmo"];
+        const UsuariosReaccionesValidos = Array.isArray(ObjetoPublicacion.UsuariosReacciones)
+            ? ObjetoPublicacion.UsuariosReacciones.filter(u => u && u.TipoReaccion && TiposValidos.includes(u.TipoReaccion) && u.NombreUsuario)
+            : [];
+
+        const TotalReacciones = UsuariosReaccionesValidos.length > 0 
+            ? UsuariosReaccionesValidos.length 
+            : (Number(ObjetoPublicacion.CantidadMeGusta) || 0);
+
         const TotalComentarios = (ObjetoPublicacion.Comentarios && ObjetoPublicacion.Comentarios.length) || 0;
         const TotalCompartidos = ObjetoPublicacion.CantidadCompartidos || 0;
 
-        const MiReaccionActual = ObjetoPublicacion.MiReaccionUsuario;
+        // La reacción persiste SI Y SOLO SI el usuario actual está autenticado y coincide con el registro
+        let MiReaccionActual = null;
+        if (EstaAutenticado) {
+            const NombreUsuarioActivo = UsuarioActual.Nombre.trim().toLowerCase();
+            const ReaccionUsuario = UsuariosReaccionesValidos.find(u => 
+                u.NombreUsuario && u.NombreUsuario.trim().toLowerCase() === NombreUsuarioActivo
+            );
+            if (ReaccionUsuario && DiccionarioReaccionesLMP[ReaccionUsuario.TipoReaccion]) {
+                MiReaccionActual = ReaccionUsuario.TipoReaccion;
+            }
+        }
+
         const InfoReaccionActiva = MiReaccionActual ? DiccionarioReaccionesLMP[MiReaccionActual] : null;
 
         const IconoBotonPrincipal = InfoReaccionActiva 
@@ -143,13 +182,17 @@ class ComponenteTarjetaPublicacion {
         } else {
             EsVerificadoAutor = ObjetoPublicacion.EsVerificado === true;
         }
-
-        const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
-        const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
         const EsAutorDeLaPublicacion = EstaAutenticado && ObjetoPublicacion.NombreAutor && (
             UsuarioActual.Nombre.trim().toLowerCase() === ObjetoPublicacion.NombreAutor.trim().toLowerCase() ||
             ObjetoPublicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
         );
+
+        const TiempoPublicacion = (this.ModeloAlmacenamiento && ObjetoPublicacion.FechaCreacion)
+            ? this.ModeloAlmacenamiento.FormatearTiempoRelativo(ObjetoPublicacion.FechaCreacion)
+            : (ObjetoPublicacion.TiempoTranscurrido || 'Hace un momento');
+        const TituloFechaPublicacion = (this.ModeloAlmacenamiento && ObjetoPublicacion.FechaCreacion)
+            ? this.ModeloAlmacenamiento.FormatearFechaCompleta(ObjetoPublicacion.FechaCreacion)
+            : '';
 
         return `
         <article class="TarjetaPublicacionMuro" id="Publicacion_${ObjetoPublicacion.IdPublicacion}" data-publicacion-id="${ObjetoPublicacion.IdPublicacion}">
@@ -163,7 +206,7 @@ class ComponenteTarjetaPublicacion {
                             ${EsVerificadoAutor ? '<span class="InsigniaVerificada" title="Autor Verificado LMP"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                         </div>
                         <div class="MetaTiempoPublicacion">
-                            <span>${ObjetoPublicacion.TiempoTranscurrido || 'Reciente'}</span>
+                            <span ${TituloFechaPublicacion ? `title="${TituloFechaPublicacion}"` : ''}>${TiempoPublicacion}</span>
                             ${ObjetoPublicacion.EsEditada ? '<span>•</span> <span title="Publicación editada" style="font-size: 11px; opacity: 0.85;">(Editado)</span>' : ''}
                             <span>•</span>
                             <span title="Público"><i class="fa-solid fa-earth-americas" style="font-size: 11px;"></i></span>
@@ -314,7 +357,27 @@ class ComponenteTarjetaPublicacion {
             <div class="SeccionComentariosPublicacion" id="SeccionComentarios_${ObjetoPublicacion.IdPublicacion}">
                 <!-- Lista de Comentarios -->
                 <div class="ListaComentariosExistentes" id="ListaComentarios_${ObjetoPublicacion.IdPublicacion}">
-                    ${(ObjetoPublicacion.Comentarios || []).map(ComentarioItem => `
+                    ${(ObjetoPublicacion.Comentarios || []).map(ComentarioItem => {
+                        const TiempoComentario = (this.ModeloAlmacenamiento && ComentarioItem.FechaCreacion)
+                            ? this.ModeloAlmacenamiento.FormatearTiempoRelativo(ComentarioItem.FechaCreacion)
+                            : (ComentarioItem.Tiempo || 'Hace un momento');
+                        const TituloFechaCom = (this.ModeloAlmacenamiento && ComentarioItem.FechaCreacion)
+                            ? this.ModeloAlmacenamiento.FormatearFechaCompleta(ComentarioItem.FechaCreacion)
+                            : '';
+
+                        let DioLikeComentario = false;
+                        if (EstaAutenticado && UsuarioActual && UsuarioActual.Nombre && Array.isArray(ComentarioItem.UsuariosLikes)) {
+                            const NombreUsuarioActivo = UsuarioActual.Nombre.trim().toLowerCase();
+                            DioLikeComentario = ComentarioItem.UsuariosLikes.some(n => 
+                                typeof n === "string" && n.trim().toLowerCase() === NombreUsuarioActivo
+                            );
+                        }
+
+                        const CantidadLikesCom = Array.isArray(ComentarioItem.UsuariosLikes) && ComentarioItem.UsuariosLikes.length > 0
+                            ? ComentarioItem.UsuariosLikes.length
+                            : (Number(ComentarioItem.CantidadLikes) || 0);
+
+                        return `
                     <div class="ElementoComentarioIndividual" id="Comentario_${ComentarioItem.IdComentario}">
                         <img src="${ComentarioItem.AvatarUsuario || 'Logo1.png'}" alt="${ComentarioItem.NombreUsuario}" class="AvatarComentarista" onerror="this.src='Logo1.png'">
                         <div class="ContenidoComentarioCompleto">
@@ -326,8 +389,8 @@ class ComponenteTarjetaPublicacion {
                                 <div class="CuerpoComentario">${ComentarioItem.TextoComentario}</div>
                             </div>
                             <div class="FilaMetaYAccionesComentario">
-                                <span class="MetaComentarioTiempo">${ComentarioItem.Tiempo || 'Hace un momento'}</span>
-                                <button class="BotonLikeComentario ${ComentarioItem.DioLikeUsuario ? 'LikeActivo' : ''}" 
+                                <span class="MetaComentarioTiempo" ${TituloFechaCom ? `title="${TituloFechaCom}"` : ''}>${TiempoComentario}</span>
+                                <button class="BotonLikeComentario ${DioLikeComentario ? 'LikeActivo' : ''}" 
                                         data-publicacion-id="${ObjetoPublicacion.IdPublicacion}" 
                                         data-comentario-id="${ComentarioItem.IdComentario}"
                                         id="BotonLikeCom_${ComentarioItem.IdComentario}">
@@ -335,14 +398,15 @@ class ComponenteTarjetaPublicacion {
                                 </button>
                                 <span class="InsigniaLikesComentario" 
                                       id="InsigniaLikesCom_${ComentarioItem.IdComentario}" 
-                                      style="${(ComentarioItem.CantidadLikes || 0) > 0 ? 'display: inline-flex;' : 'display: none;'}">
+                                      style="${CantidadLikesCom > 0 ? 'display: inline-flex;' : 'display: none;'}">
                                     <i class="fa-solid fa-thumbs-up"></i>
-                                    <span id="NumLikesCom_${ComentarioItem.IdComentario}">${ComentarioItem.CantidadLikes || 0}</span>
+                                    <span id="NumLikesCom_${ComentarioItem.IdComentario}">${CantidadLikesCom}</span>
                                 </span>
                             </div>
                         </div>
                     </div>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 </div>
 
                 <!-- Caja de Entrada para Nuevo Comentario -->

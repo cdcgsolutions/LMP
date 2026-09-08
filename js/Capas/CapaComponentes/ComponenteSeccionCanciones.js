@@ -33,6 +33,18 @@ class ComponenteSeccionCanciones {
             );
         }
 
+        const TodosLosGenerosBD = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || [];
+        const OpcionesGenerosHtml = TodosLosGenerosBD.map(G => {
+            const NombreGen = G.Nombre || G;
+            return `<option value="${NombreGen}" ${FiltroGenero === NombreGen ? 'selected' : ''}>${NombreGen}</option>`;
+        }).join('');
+
+        const TodasLasCancionesBD = this.ModeloAlmacenamiento ? this.ModeloAlmacenamiento.ObtenerTodasLasCanciones() : [];
+        const TonosUnicos = Array.from(new Set(TodasLasCancionesBD.map(C => C.TonoOriginal).filter(Boolean)));
+        const OpcionesTonosHtml = TonosUnicos.map(T => 
+            `<option value="${T}" ${FiltroTono === T ? 'selected' : ''}>${T}</option>`
+        ).join('');
+
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionCanciones">
             <!-- Encabezado de la Sección -->
@@ -50,16 +62,13 @@ class ComponenteSeccionCanciones {
                 </button>
             </div>
 
-            <!-- Barra de Filtros Rápidos -->
+            <!-- Barra de Filtros Rápidos Dinámicos -->
             <div class="BarraFiltrosCanciones">
                 <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
                     <span style="font-weight: 600; font-size: 13.5px;">Género:</span>
                     <select id="SelectorFiltroGenero" style="flex: 1;">
                         <option value="Todos" ${FiltroGenero === 'Todos' ? 'selected' : ''}>Todos los Ritmos</option>
-                        <option value="Taquirari" ${FiltroGenero === 'Taquirari' ? 'selected' : ''}>Taquirari</option>
-                        <option value="Chovena" ${FiltroGenero === 'Chovena' ? 'selected' : ''}>Chovena</option>
-                        <option value="Carnavalito" ${FiltroGenero === 'Carnavalito' ? 'selected' : ''}>Carnavalito</option>
-                        <option value="Danza Ritual / Sarao" ${FiltroGenero === 'Danza Ritual / Sarao' ? 'selected' : ''}>Macheteros / Sarao</option>
+                        ${OpcionesGenerosHtml}
                     </select>
                 </div>
 
@@ -67,15 +76,13 @@ class ComponenteSeccionCanciones {
                     <span style="font-weight: 600; font-size: 13.5px;">Tono:</span>
                     <select id="SelectorFiltroTono" style="flex: 1;">
                         <option value="Todos" ${FiltroTono === 'Todos' ? 'selected' : ''}>Todos los Tonos</option>
-                        <option value="Re Mayor" ${FiltroTono === 'Re Mayor' ? 'selected' : ''}>Re Mayor (D)</option>
-                        <option value="La Menor" ${FiltroTono === 'La Menor' ? 'selected' : ''}>La Menor (Am)</option>
-                        <option value="Sol Mayor" ${FiltroTono === 'Sol Mayor' ? 'selected' : ''}>Sol Mayor (G)</option>
-                        <option value="Mi Menor" ${FiltroTono === 'Mi Menor' ? 'selected' : ''}>Mi Menor (Em)</option>
+                        ${OpcionesTonosHtml}
                     </select>
                 </div>
             </div>
 
-            <!-- Cuadrícula de Canciones -->
+            <!-- Cuadrícula de Canciones o Estado Vacío -->
+            ${Canciones.length > 0 ? `
             <div class="CuadriculaTarjetasMusicales">
                 ${Canciones.map(Cancion => `
                 <div class="TarjetaMusicalItem">
@@ -117,6 +124,13 @@ class ComponenteSeccionCanciones {
                 </div>
                 `).join('')}
             </div>
+            ` : `
+            <div style="background-color: var(--ColorFondoSuperficie); padding: 40px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 18px;">
+                <i class="fa-solid fa-music" style="font-size: 36px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
+                <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay canciones disponibles</div>
+                <p style="font-size: 13px; margin-top: 4px;">Aún no se han registrado canciones en la base de datos o ninguna coincide con los filtros aplicados.</p>
+            </div>
+            `}
         </div>
         `;
     }

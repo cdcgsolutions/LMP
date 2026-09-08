@@ -12,13 +12,13 @@ class ComponenteSeccionIFAEL {
     Renderizar() {
         const DatosIFAEL = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerDatosIFAEL()) || {};
 
-        const NombreInstitucion = DatosIFAEL.Nombre || 'Instituto de Formación Artística "Edelmira Limpias" (IFAEL)';
-        const Descripcion = DatosIFAEL.Descripcion || 'El IFAEL es la institución emblemática de educación musical en el departamento del Beni. Dedicada a la formación técnica y profesional de artistas, compositores e instrumentistas con profunda identidad nacional y rescate de la música mojeño-trinitaria.';
-        const Ciudad = DatosIFAEL.Ciudad || 'Trinidad, Beni - Bolivia';
-        const Carrera = DatosIFAEL.CarreraPrincipal || 'Técnico Superior en Música Boliviana';
-        const Modalidad = DatosIFAEL.Modalidad || 'Formación Artística Fiscal (3 Años)';
-        const LogoUrl = DatosIFAEL.LogoUrl || 'LogoInicialesSinFondoNegro.png';
-        const PortadaUrl = DatosIFAEL.FotoPortadaUrl || 'IFAEL.jpg';
+        const NombreInstitucion = DatosIFAEL.Nombre || 'Instituto IFAEL';
+        const Descripcion = DatosIFAEL.Descripcion || '';
+        const Ciudad = DatosIFAEL.Ciudad || '';
+        const Carrera = DatosIFAEL.CarreraPrincipal || '';
+        const Modalidad = DatosIFAEL.Modalidad || '';
+        const LogoUrl = DatosIFAEL.LogoUrl || 'Logo1.png';
+        const PortadaUrl = DatosIFAEL.FotoPortadaUrl || 'Logo1.png';
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionIFAEL">

@@ -36,32 +36,48 @@ class ModeloAlmacenamiento {
     CargarDesdeCacheLocal() {
         try {
             const CancionesEnBruto = localStorage.getItem(this.ClaveAlmacenamientoCanciones);
-            this.Canciones = CancionesEnBruto ? JSON.parse(CancionesEnBruto) : (window.DatosCancionesColeccion || []);
-            this.Canciones = this.SanitizarCanciones(this.Canciones);
+            this.Canciones = CancionesEnBruto ? JSON.parse(CancionesEnBruto) : [];
         } catch (Error) {
-            this.Canciones = this.SanitizarCanciones(window.DatosCancionesColeccion || []);
+            this.Canciones = [];
         }
 
         try {
             const PubEnBruto = localStorage.getItem(this.ClaveAlmacenamientoPublicaciones);
-            this.Publicaciones = PubEnBruto ? JSON.parse(PubEnBruto) : (window.DatosPublicacionesIniciales || []);
-            this.Publicaciones = this.SanitizarPublicaciones(this.Publicaciones);
+            this.Publicaciones = PubEnBruto ? JSON.parse(PubEnBruto) : [];
+            if (Array.isArray(this.Publicaciones)) {
+                this.Publicaciones.forEach(Pub => {
+                    if (Pub.FechaCreacion) {
+                        Pub.TiempoTranscurrido = this.FormatearTiempoRelativo(Pub.FechaCreacion);
+                    }
+                    if (Array.isArray(Pub.Comentarios)) {
+                        Pub.Comentarios.forEach(Com => {
+                            if (Com.FechaCreacion) {
+                                Com.Tiempo = this.FormatearTiempoRelativo(Com.FechaCreacion);
+                            }
+                            if (!Array.isArray(Com.UsuariosLikes)) {
+                                Com.UsuariosLikes = [];
+                            }
+                            delete Com.DioLikeUsuario;
+                        });
+                    }
+                });
+            }
         } catch (Error) {
-            this.Publicaciones = this.SanitizarPublicaciones(window.DatosPublicacionesIniciales || []);
+            this.Publicaciones = [];
         }
 
         try {
             const GenEnBruto = localStorage.getItem(this.ClaveAlmacenamientoGeneros);
-            this.Generos = GenEnBruto ? JSON.parse(GenEnBruto) : (window.DatosGenerosColeccion || []);
+            this.Generos = GenEnBruto ? JSON.parse(GenEnBruto) : [];
         } catch (Error) {
-            this.Generos = window.DatosGenerosColeccion || [];
+            this.Generos = [];
         }
 
         try {
             const ArtEnBruto = localStorage.getItem(this.ClaveAlmacenamientoArtistas);
-            this.Artistas = ArtEnBruto ? JSON.parse(ArtEnBruto) : (window.DatosArtistasColeccion || []);
+            this.Artistas = ArtEnBruto ? JSON.parse(ArtEnBruto) : [];
         } catch (Error) {
-            this.Artistas = window.DatosArtistasColeccion || [];
+            this.Artistas = [];
         }
 
         try {
@@ -140,7 +156,7 @@ class ModeloAlmacenamiento {
                         Activa: Data.Activa !== undefined ? Data.Activa : true
                     });
                 });
-                this.Canciones = this.SanitizarCanciones(CancionesLeidas);
+                this.Canciones = CancionesLeidas;
                 localStorage.setItem(this.ClaveAlmacenamientoCanciones, JSON.stringify(this.Canciones));
             }
 
@@ -164,7 +180,6 @@ class ModeloAlmacenamiento {
                     });
                 });
                 this.Generos = GenerosLeidos;
-                window.DatosGenerosColeccion = this.Generos;
                 localStorage.setItem(this.ClaveAlmacenamientoGeneros, JSON.stringify(this.Generos));
             }
 
@@ -206,7 +221,6 @@ class ModeloAlmacenamiento {
                     });
                 });
                 this.Artistas = ArtistasLeidos;
-                window.DatosArtistasColeccion = this.Artistas;
                 localStorage.setItem(this.ClaveAlmacenamientoArtistas, JSON.stringify(this.Artistas));
             }
 
@@ -235,17 +249,27 @@ class ModeloAlmacenamiento {
                     let Comentarios = [];
                     try {
                         const SnapComentarios = await this.ServicioFirebase.SubcoleccionComentarios(IdPublicacion).get();
-                        SnapComentarios.forEach(DocCom => {
-                            const ComData = DocCom.data();
-                            Comentarios.push({
-                                IdComentario: DocCom.id,
-                                NombreUsuario: ComData.NombreUsuario || "Usuario LMP",
-                                AvatarUsuario: ComData.AvatarUsuario || "Logo1.png",
-                                TextoComentario: ComData.TextoComentario || "",
-                                Tiempo: this.FormatearTiempoRelativo(ComData.FechaCreacion),
-                                CantidadLikes: ComData.CantidadLikes || 0
+                        const DocsCom = SnapComentarios.docs || SnapComentarios;
+                        if (DocsCom && typeof DocsCom.forEach === "function") {
+                            DocsCom.forEach(DocCom => {
+                                const ComData = DocCom.data();
+                                const FechaComentario = ComData.FechaCreacion || ComData.createTime || null;
+                                const UsuariosLikes = Array.isArray(ComData.UsuariosLikes) ? ComData.UsuariosLikes : [];
+                                const CantidadLikes = (typeof ComData.CantidadLikes === "number")
+                                    ? Math.max(ComData.CantidadLikes, UsuariosLikes.length)
+                                    : UsuariosLikes.length;
+                                Comentarios.push({
+                                    IdComentario: DocCom.id,
+                                    NombreUsuario: ComData.NombreUsuario || "Usuario LMP",
+                                    AvatarUsuario: ComData.AvatarUsuario || "Logo1.png",
+                                    TextoComentario: ComData.TextoComentario || "",
+                                    FechaCreacion: FechaComentario,
+                                    Tiempo: this.FormatearTiempoRelativo(FechaComentario),
+                                    CantidadLikes: CantidadLikes,
+                                    UsuariosLikes: UsuariosLikes
+                                });
                             });
-                        });
+                        }
                     } catch (ErrCom) {
                         console.warn(ErrCom);
                     }
@@ -253,33 +277,34 @@ class ModeloAlmacenamiento {
                     let ReaccionesDetalle = { MeGusta: 0, MeEncanta: 0, VivaBeni: 0, Aplausos: 0, BuenRitmo: 0 };
                     let TotalReacciones = 0;
                     let UsuariosReacciones = [];
-                    let MiReaccionUsuario = null;
-                    const UsuarioActualLocal = "Edna Miriam Edgley Cuellar";
 
                     try {
                         const SnapReacciones = await this.ServicioFirebase.SubcoleccionReacciones(IdPublicacion).get();
-                        SnapReacciones.forEach(DocReac => {
-                            const ReacData = DocReac.data();
-                            const Tipo = ReacData.TipoReaccion;
-                            const Cantidad = Number(ReacData.CantidadTotal) || 1;
-                            const NombreUsuarioReac = ReacData.NombreUsuario || "Usuario de la Comunidad";
-                            if (Cantidad > 0 && Tipo) {
-                                if (ReaccionesDetalle[Tipo] !== undefined) {
-                                    ReaccionesDetalle[Tipo] += Cantidad;
-                                } else {
-                                    ReaccionesDetalle[Tipo] = Cantidad;
+                        const DocsReac = SnapReacciones.docs || SnapReacciones;
+                        if (DocsReac && typeof DocsReac.forEach === "function") {
+                            const TiposValidos = ["MeGusta", "MeEncanta", "VivaBeni", "Aplausos", "BuenRitmo"];
+                            DocsReac.forEach(DocReac => {
+                                const ReacData = DocReac.data();
+                                const Tipo = ReacData.TipoReaccion;
+                                const Cantidad = Number(ReacData.CantidadTotal) || 1;
+                                const NombreUsuarioReac = (ReacData.NombreUsuario || "").trim();
+
+                                if (Cantidad > 0 && Tipo && TiposValidos.includes(Tipo) && NombreUsuarioReac) {
+                                    const YaExiste = UsuariosReacciones.some(u => 
+                                        u.NombreUsuario && u.NombreUsuario.trim().toLowerCase() === NombreUsuarioReac.toLowerCase()
+                                    );
+                                    if (!YaExiste) {
+                                        ReaccionesDetalle[Tipo] = (ReaccionesDetalle[Tipo] || 0) + 1;
+                                        TotalReacciones++;
+                                        UsuariosReacciones.push({
+                                            IdReaccion: DocReac.id,
+                                            NombreUsuario: NombreUsuarioReac,
+                                            TipoReaccion: Tipo
+                                        });
+                                    }
                                 }
-                                TotalReacciones += Cantidad;
-                                UsuariosReacciones.push({
-                                    IdReaccion: DocReac.id,
-                                    NombreUsuario: NombreUsuarioReac,
-                                    TipoReaccion: Tipo
-                                });
-                                if (NombreUsuarioReac === UsuarioActualLocal) {
-                                    MiReaccionUsuario = Tipo;
-                                }
-                            }
-                        });
+                            });
+                        }
                     } catch (ErrReac) {
                         console.warn(ErrReac);
                     }
@@ -305,7 +330,7 @@ class ModeloAlmacenamiento {
                         }
                     }
 
-                    const NombreAutorPub = Data.NombreAutor || "Edna Miriam Edgley Cuellar";
+                    const NombreAutorPub = Data.NombreAutor || "Usuario LMP";
                     let EsVerificadoAutor = false;
                     const UsuarioAutor = this.Usuarios.find(U => 
                         U.NombreCompleto && (
@@ -319,17 +344,19 @@ class ModeloAlmacenamiento {
                         EsVerificadoAutor = Data.EsVerificado === true;
                     }
 
+                    const FechaPublicacion = Data.FechaCreacion || Data.createTime || null;
                     PublicacionesLeidas.push({
                         IdPublicacion: IdPublicacion,
                         NombreAutor: NombreAutorPub,
                         AvatarAutor: Data.AvatarAutor || "Logo1.png",
-                        TiempoTranscurrido: this.FormatearTiempoRelativo(Data.FechaCreacion),
+                        FechaCreacion: FechaPublicacion,
+                        TiempoTranscurrido: this.FormatearTiempoRelativo(FechaPublicacion),
                         EsVerificado: EsVerificadoAutor,
                         TextoPublicacion: Data.TextoPublicacion || "",
                         IdCancionAsociada: IdCancionAsociada,
                         CantidadMeGusta: TotalReacciones,
                         TipoReaccionPredominante: TipoPredominante,
-                        MiReaccionUsuario: MiReaccionUsuario,
+                        MiReaccionUsuario: null,
                         UsuariosReacciones: UsuariosReacciones,
                         ReaccionesDetalle: ReaccionesDetalle,
                         CantidadCompartidos: Data.CantidadCompartidos || 0,
@@ -337,7 +364,7 @@ class ModeloAlmacenamiento {
                     });
                 }
 
-                this.Publicaciones = this.SanitizarPublicaciones(PublicacionesLeidas);
+                this.Publicaciones = PublicacionesLeidas;
                 localStorage.setItem(this.ClaveAlmacenamientoPublicaciones, JSON.stringify(this.Publicaciones));
             }
 
@@ -352,61 +379,102 @@ class ModeloAlmacenamiento {
     FormatearTiempoRelativo(Fecha) {
         if (!Fecha) return "Hace un momento";
         try {
-            let FechaObj = Fecha;
-            if (Fecha.toDate && typeof Fecha.toDate === "function") {
+            let FechaObj = null;
+            if (Fecha instanceof Date) {
+                FechaObj = isNaN(Fecha.getTime()) ? null : Fecha;
+            } else if (typeof Fecha.toDate === "function") {
                 FechaObj = Fecha.toDate();
-            } else if (Fecha.seconds) {
-                FechaObj = new Date(Fecha.seconds * 1000);
-            } else if (!(Fecha instanceof Date)) {
-                FechaObj = new Date(Fecha);
+            } else if (typeof Fecha === "object") {
+                if (Fecha.seconds !== undefined) {
+                    FechaObj = new Date(Fecha.seconds * 1000);
+                } else if (Fecha._seconds !== undefined) {
+                    FechaObj = new Date(Fecha._seconds * 1000);
+                } else if (Fecha.timestampValue) {
+                    FechaObj = new Date(Fecha.timestampValue);
+                }
+            } else if (typeof Fecha === "number") {
+                FechaObj = new Date(Fecha < 1e11 ? Fecha * 1000 : Fecha);
+            } else if (typeof Fecha === "string") {
+                const Parseado = new Date(Fecha);
+                if (!isNaN(Parseado.getTime())) {
+                    FechaObj = Parseado;
+                } else {
+                    return Fecha;
+                }
             }
-            const Segundos = Math.floor((Date.now() - FechaObj.getTime()) / 1000);
+
+            if (!FechaObj || isNaN(FechaObj.getTime())) {
+                return typeof Fecha === "string" ? Fecha : "Hace un momento";
+            }
+
+            const Ahora = Date.now();
+            const Segundos = Math.floor((Ahora - FechaObj.getTime()) / 1000);
+
             if (Segundos < 60) return "Hace un momento";
+
             const Minutos = Math.floor(Segundos / 60);
-            if (Minutos < 60) return `Hace ${Minutos} min`;
+            if (Minutos < 60) {
+                return Minutos === 1 ? "Hace 1 minuto" : `Hace ${Minutos} minutos`;
+            }
+
             const Horas = Math.floor(Minutos / 60);
-            if (Horas < 24) return `Hace ${Horas} h`;
+            if (Horas < 24) {
+                return Horas === 1 ? "Hace 1 hora" : `Hace ${Horas} horas`;
+            }
+
             const Dias = Math.floor(Horas / 24);
-            return `Hace ${Dias} d`;
-        } catch (e) {
+            if (Dias < 7) {
+                return Dias === 1 ? "Hace 1 día" : `Hace ${Dias} días`;
+            }
+
+            const Semanas = Math.floor(Dias / 7);
+            if (Semanas < 4) {
+                return Semanas === 1 ? "Hace 1 semana" : `Hace ${Semanas} semanas`;
+            }
+
+            const Meses = Math.floor(Dias / 30);
+            if (Meses < 12) {
+                return Meses === 1 ? "Hace 1 mes" : `Hace ${Meses} meses`;
+            }
+
+            const Anios = Math.floor(Dias / 365);
+            return Anios === 1 ? "Hace 1 año" : `Hace ${Anios} años`;
+        } catch (ErrorCapturado) {
             return "Hace un momento";
         }
     }
 
-    SanitizarCanciones(Canciones) {
-        if (!Array.isArray(Canciones)) return [];
-        return Canciones.map(Cancion => {
-            if (Cancion.Autor && (Cancion.Autor.includes("Luci") || Cancion.Autor.includes("Xiomi") || Cancion.Autor.includes("Camacho"))) {
-                Cancion.Autor = "Edna Miriam Edgley Cuellar";
+    FormatearFechaCompleta(Fecha) {
+        if (!Fecha) return "";
+        try {
+            let FechaObj = null;
+            if (Fecha instanceof Date) {
+                FechaObj = isNaN(Fecha.getTime()) ? null : Fecha;
+            } else if (typeof Fecha.toDate === "function") {
+                FechaObj = Fecha.toDate();
+            } else if (typeof Fecha === "object") {
+                if (Fecha.seconds !== undefined) FechaObj = new Date(Fecha.seconds * 1000);
+                else if (Fecha._seconds !== undefined) FechaObj = new Date(Fecha._seconds * 1000);
+                else if (Fecha.timestampValue) FechaObj = new Date(Fecha.timestampValue);
+            } else if (typeof Fecha === "number") {
+                FechaObj = new Date(Fecha < 1e11 ? Fecha * 1000 : Fecha);
+            } else if (typeof Fecha === "string") {
+                const Parseado = new Date(Fecha);
+                if (!isNaN(Parseado.getTime())) FechaObj = Parseado;
             }
-            return Cancion;
-        });
+            if (!FechaObj || isNaN(FechaObj.getTime())) return "";
+            return FechaObj.toLocaleString("es-ES", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        } catch (ErrorCapturado) {
+            return "";
+        }
     }
 
-    SanitizarPublicaciones(Publicaciones) {
-        if (!Array.isArray(Publicaciones)) return [];
-        return Publicaciones.map(Pub => {
-            if (Pub.NombreAutor && (Pub.NombreAutor.includes("Luci") || Pub.NombreAutor.includes("Xiomi") || Pub.NombreAutor.includes("Camacho"))) {
-                Pub.NombreAutor = "Edna Miriam Edgley Cuellar";
-            }
-            if (this.Usuarios && this.Usuarios.length > 0) {
-                Pub.EsVerificado = this.EsUsuarioVerificado(Pub.NombreAutor, Pub.EsVerificado === true);
-            } else {
-                Pub.EsVerificado = Pub.EsVerificado === true;
-            }
-            if (Array.isArray(Pub.Comentarios)) {
-                Pub.Comentarios.forEach(C => {
-                    if (C.TextoComentario) {
-                        C.TextoComentario = C.TextoComentario.replace(/Xiomi/gi, "Edna Miriam").replace(/Luci/gi, "Edna");
-                    }
-                });
-            }
-            if (!Array.isArray(Pub.UsuariosReacciones)) {
-                Pub.UsuariosReacciones = [];
-            }
-            return Pub;
-        });
-    }
     // #endregion
 
     // #region Metodos GET (Lectura)
@@ -423,21 +491,14 @@ class ModeloAlmacenamiento {
     }
 
     ObtenerHimnoAlBeni() {
-        return {
-            IdCancion: "HimnoAlBeni",
-            Titulo: "Himno al Beni",
-            Autor: "Letra: Alfredo Pereyra L. • Música: Rafael Seghers",
-            Genero: "Himno Cívico y Patriótico",
-            TonoOriginal: "Mi Bemol Mayor (Eb)",
-            TempoBPM: 112,
-            EsEstudianteIFAEL: false,
-            Descripcion: "Himno oficial del Departamento del Beni. Símbolo cívico y memoria histórica que ensalza el valor y la libertad de los pueblos benianos.",
-            Caratula: "Logo1.png",
-            ImagenPartitura: "IFAEL.jpg",
-            AudioUrl: "HimnoAlBeni.mp3",
-            LetraConAcordes: "[Eb]Canten victoriosos[Bb7]\nbolivianos con orgullo[Eb]\nla bendita tierra[Ab]\nde este suelo oriental[Eb].\n\n[Bb7]Donde el sol derrama lumbre[Eb]\nen sus pampas sin rival[Ab],\n[Eb]donde el río majestuoso[Bb7]\n[Eb]canta al Beni sin cesar.\n\n[Coro]\n[Ab]¡Viva el Beni, altivo y soberano![Eb]\n[Bb7]¡Viva el pueblo que sabe luchar![Eb]\n[Ab]¡Viva el Beni, el corazón de la patria,[Eb]\n[Bb7]reducto sagrado de la libertad![Eb]",
-            LetraLimpia: "Canten victoriosos\nbolivianos con orgullo\nla bendita tierra\nde este suelo oriental.\n\nDonde el sol derrama lumbre\nen sus pampas sin rival,\ndonde el río majestuoso\ncanta al Beni sin cesar.\n\n[Coro]\n¡Viva el Beni, altivo y soberano!\n¡Viva el pueblo que sabe luchar!\n¡Viva el Beni, el corazón de la patria,\nreducto sagrado de la libertad!"
-        };
+        if (!Array.isArray(this.Canciones)) return null;
+        return this.Canciones.find(C => 
+            C.Titulo && (
+                C.Titulo.toLowerCase().includes("himno al beni") ||
+                C.Titulo.toLowerCase().includes("himno del beni") ||
+                String(C.IdCancion).toLowerCase() === "himnoalbeni"
+            )
+        ) || null;
     }
 
     ObtenerTodasLasPublicaciones() {
@@ -450,11 +511,11 @@ class ModeloAlmacenamiento {
     }
 
     ObtenerTodosLosGeneros() {
-        return this.Generos && this.Generos.length > 0 ? this.Generos : (window.DatosGenerosColeccion || []);
+        return this.Generos || [];
     }
 
     ObtenerTodosLosArtistas() {
-        const Lista = this.Artistas && this.Artistas.length > 0 ? this.Artistas : (window.DatosArtistasColeccion || []);
+        const Lista = this.Artistas || [];
         if (Array.isArray(this.Usuarios) && this.Usuarios.length > 0) {
             Lista.forEach(Artista => {
                 const UsuarioBD = this.Usuarios.find(U => 
@@ -650,6 +711,8 @@ class ModeloAlmacenamiento {
 
     async GuardarPublicacionNueva(ObjetoPublicacion) {
         let IdFinal = Date.now().toString();
+        const AhoraIso = new Date().toISOString();
+        ObjetoPublicacion.FechaCreacion = ObjetoPublicacion.FechaCreacion || AhoraIso;
         ObjetoPublicacion.TiempoTranscurrido = "Hace un momento";
         ObjetoPublicacion.CantidadMeGusta = 0;
         ObjetoPublicacion.TipoReaccionPredominante = null;
@@ -704,20 +767,24 @@ class ModeloAlmacenamiento {
         const Publicacion = this.Publicaciones.find(Pub => String(Pub.IdPublicacion) === String(IdPublicacion));
 
         if (Publicacion) {
+            const AhoraIso = new Date().toISOString();
             ObjetoComentario.IdComentario = Date.now().toString();
+            ObjetoComentario.FechaCreacion = ObjetoComentario.FechaCreacion || AhoraIso;
             ObjetoComentario.Tiempo = "Hace un momento";
             ObjetoComentario.CantidadLikes = 0;
-            ObjetoComentario.DioLikeUsuario = false;
+            ObjetoComentario.UsuariosLikes = [];
+            delete ObjetoComentario.DioLikeUsuario;
             if (!Publicacion.Comentarios) Publicacion.Comentarios = [];
             Publicacion.Comentarios.push(ObjetoComentario);
             localStorage.setItem(this.ClaveAlmacenamientoPublicaciones, JSON.stringify(this.Publicaciones));
 
             if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
                 this.ServicioFirebase.SubcoleccionComentarios(String(IdPublicacion)).add({
-                    NombreUsuario: ObjetoComentario.NombreUsuario || "Edna Miriam Edgley Cuellar",
+                    NombreUsuario: ObjetoComentario.NombreUsuario || "Usuario LMP",
                     AvatarUsuario: ObjetoComentario.AvatarUsuario || "Logo1.png",
                     TextoComentario: ObjetoComentario.TextoComentario || "",
                     CantidadLikes: 0,
+                    UsuariosLikes: [],
                     FechaCreacion: this.ServicioFirebase.MarcaDeTiempoServidor(),
                     Activo: true
                 }).then(DocRef => {
@@ -732,20 +799,34 @@ class ModeloAlmacenamiento {
         return null;
     }
 
-    AlternarLikeEnComentario(IdPublicacion, IdComentario) {
+    AlternarLikeEnComentario(IdPublicacion, IdComentario, NombreUsuario) {
+        if (!NombreUsuario) return null;
         const Publicacion = this.Publicaciones.find(Pub => String(Pub.IdPublicacion) === String(IdPublicacion));
         if (!Publicacion || !Publicacion.Comentarios) return null;
 
         const Comentario = Publicacion.Comentarios.find(Com => String(Com.IdComentario) === String(IdComentario));
         if (!Comentario) return null;
 
-        if (Comentario.DioLikeUsuario) {
-            Comentario.DioLikeUsuario = false;
-            Comentario.CantidadLikes = Math.max(0, (Number(Comentario.CantidadLikes) || 1) - 1);
-        } else {
-            Comentario.DioLikeUsuario = true;
-            Comentario.CantidadLikes = (Number(Comentario.CantidadLikes) || 0) + 1;
+        if (!Array.isArray(Comentario.UsuariosLikes)) {
+            Comentario.UsuariosLikes = [];
         }
+
+        const NombreNorm = NombreUsuario.trim().toLowerCase();
+        const Indice = Comentario.UsuariosLikes.findIndex(n => 
+            typeof n === "string" && n.trim().toLowerCase() === NombreNorm
+        );
+
+        let DioLike = false;
+        if (Indice !== -1) {
+            Comentario.UsuariosLikes.splice(Indice, 1);
+            DioLike = false;
+        } else {
+            Comentario.UsuariosLikes.push(NombreUsuario.trim());
+            DioLike = true;
+        }
+
+        Comentario.CantidadLikes = Comentario.UsuariosLikes.length;
+        delete Comentario.DioLikeUsuario;
 
         localStorage.setItem(this.ClaveAlmacenamientoPublicaciones, JSON.stringify(this.Publicaciones));
 
@@ -753,17 +834,22 @@ class ModeloAlmacenamiento {
             this.ServicioFirebase.SubcoleccionComentarios(String(IdPublicacion))
                 .doc(String(IdComentario))
                 .update({
-                    CantidadLikes: Comentario.CantidadLikes
+                    CantidadLikes: Comentario.CantidadLikes,
+                    UsuariosLikes: Comentario.UsuariosLikes
                 })
                 .catch(Error => {
                     console.warn("[ModeloAlmacenamiento] Error actualizando CantidadLikes en comentario:", Error);
                 });
         }
 
-        return { Publicacion, Comentario };
+        return { Publicacion, Comentario, DioLike };
     }
 
-    RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion, NombreUsuario = "Edna Miriam Edgley Cuellar") {
+    RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion, NombreUsuario) {
+        if (!NombreUsuario || !IdPublicacion) return null;
+        const TiposValidos = ["MeGusta", "MeEncanta", "VivaBeni", "Aplausos", "BuenRitmo"];
+        if (!TiposValidos.includes(TipoReaccion)) return null;
+
         const PublicacionObjetivo = this.Publicaciones.find(Pub => String(Pub.IdPublicacion) === String(IdPublicacion));
 
         if (PublicacionObjetivo) {
@@ -774,21 +860,22 @@ class ModeloAlmacenamiento {
                 PublicacionObjetivo.UsuariosReacciones = [];
             }
 
-            const ReaccionPrevia = PublicacionObjetivo.MiReaccionUsuario;
-            const DocIdReac = "Usuario_" + encodeURIComponent(NombreUsuario).replace(/[^a-zA-Z0-9_]/g, "_");
-            const IndiceUsuario = PublicacionObjetivo.UsuariosReacciones.findIndex(U => U.NombreUsuario === NombreUsuario);
+            const DocIdReac = "Usuario_" + encodeURIComponent(NombreUsuario.trim()).replace(/[^a-zA-Z0-9_]/g, "_");
+            const NombreNorm = NombreUsuario.trim().toLowerCase();
+            const IndiceUsuario = PublicacionObjetivo.UsuariosReacciones.findIndex(U => 
+                U.NombreUsuario && U.NombreUsuario.trim().toLowerCase() === NombreNorm
+            );
+            const ReaccionPrevia = (IndiceUsuario !== -1) ? PublicacionObjetivo.UsuariosReacciones[IndiceUsuario].TipoReaccion : null;
 
             if (ReaccionPrevia === TipoReaccion) {
                 // Quitar reacción (toggle off)
                 if (PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] && PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] > 0) {
                     PublicacionObjetivo.ReaccionesDetalle[TipoReaccion]--;
                 }
-                PublicacionObjetivo.CantidadMeGusta = Math.max(0, (PublicacionObjetivo.CantidadMeGusta || 1) - 1);
-                PublicacionObjetivo.MiReaccionUsuario = null;
-
                 if (IndiceUsuario !== -1) {
                     PublicacionObjetivo.UsuariosReacciones.splice(IndiceUsuario, 1);
                 }
+                PublicacionObjetivo.CantidadMeGusta = PublicacionObjetivo.UsuariosReacciones.length;
 
                 if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
                     this.ServicioFirebase.SubcoleccionReacciones(String(IdPublicacion))
@@ -805,8 +892,6 @@ class ModeloAlmacenamiento {
                 // Cambiar o añadir reacción
                 if (ReaccionPrevia && PublicacionObjetivo.ReaccionesDetalle[ReaccionPrevia] && PublicacionObjetivo.ReaccionesDetalle[ReaccionPrevia] > 0) {
                     PublicacionObjetivo.ReaccionesDetalle[ReaccionPrevia]--;
-                } else if (!ReaccionPrevia) {
-                    PublicacionObjetivo.CantidadMeGusta = (PublicacionObjetivo.CantidadMeGusta || 0) + 1;
                 }
 
                 if (PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] !== undefined) {
@@ -815,23 +900,22 @@ class ModeloAlmacenamiento {
                     PublicacionObjetivo.ReaccionesDetalle[TipoReaccion] = 1;
                 }
 
-                PublicacionObjetivo.MiReaccionUsuario = TipoReaccion;
-
                 if (IndiceUsuario !== -1) {
                     PublicacionObjetivo.UsuariosReacciones[IndiceUsuario].TipoReaccion = TipoReaccion;
                 } else {
                     PublicacionObjetivo.UsuariosReacciones.push({
                         IdReaccion: DocIdReac,
-                        NombreUsuario: NombreUsuario,
+                        NombreUsuario: NombreUsuario.trim(),
                         TipoReaccion: TipoReaccion
                     });
                 }
+                PublicacionObjetivo.CantidadMeGusta = PublicacionObjetivo.UsuariosReacciones.length;
 
                 if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
                     this.ServicioFirebase.SubcoleccionReacciones(String(IdPublicacion))
                         .doc(DocIdReac)
                         .set({
-                            NombreUsuario: NombreUsuario,
+                            NombreUsuario: NombreUsuario.trim(),
                             TipoReaccion: TipoReaccion,
                             CantidadTotal: 1,
                             FechaActualizacion: this.ServicioFirebase.MarcaDeTiempoServidor()

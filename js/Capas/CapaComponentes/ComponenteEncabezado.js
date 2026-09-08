@@ -25,11 +25,7 @@ class ComponenteEncabezado {
                 </button>
 
                 <div class="LogotipoMarcaLMP" id="BotonLogotipoInicio" title="Letras Mi Poblau - Inicio">
-                    <img src="LogoInicialesSinFondoNegro.png" alt="LMP Logo" class="ImagenLogoPrincipal" onerror="this.src='Logo1.png'">
-                    <span class="TextoMarcaLMP">
-                        <span class="TextoMarcaLMPCompleto">Letras<span>MiPoblau</span></span>
-                        <span class="TextoMarcaLMPCorto">L<span>MP</span></span>
-                    </span>
+                    <img src="LogoIniciales.png" alt="LMP Logo" class="ImagenLogoPrincipal" onerror="this.src='Logo1.png'">
                 </div>
 
                 <div class="ContenedorBuscadorSuperior">

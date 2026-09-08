@@ -10,7 +10,7 @@ class ComponenteSeccionGeneros {
     }
 
     Renderizar() {
-        const Generos = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || window.DatosGenerosColeccion || [];
+        const Generos = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || [];
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionGeneros">
@@ -24,7 +24,8 @@ class ComponenteSeccionGeneros {
                 </div>
             </div>
 
-            <!-- Cuadrícula de Géneros -->
+            <!-- Cuadrícula de Géneros o Estado Vacío -->
+            ${Generos.length > 0 ? `
             <div class="CuadriculaGenerosMusicales">
                 ${Generos.map(Gen => {
                     const IconoHtml = Gen.Icono || (Gen.IconoClase ? `<i class="${Gen.IconoClase}"></i>` : '<i class="fa-solid fa-guitar"></i>');
@@ -67,6 +68,13 @@ class ComponenteSeccionGeneros {
                     `;
                 }).join('')}
             </div>
+            ` : `
+            <div style="background-color: var(--ColorFondoSuperficie); padding: 40px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 20px;">
+                <i class="fa-solid fa-guitar" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
+                <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay géneros registrados</div>
+                <p style="font-size: 13px; margin-top: 4px;">Aún no se han registrado géneros o ritmos folklóricos en la base de datos.</p>
+            </div>
+            `}
         </div>
         `;
     }

@@ -10,15 +10,26 @@ class ComponenteSeccionArtistas {
     }
 
     Renderizar() {
-        const Artistas = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosArtistas()) || window.DatosArtistasColeccion || [];
+        const Artistas = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosArtistas()) || [];
+        if (Artistas.length === 0) {
+            return `
+            <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionArtistas">
+                <div style="background-color: var(--ColorFondoSuperficie); padding: 50px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 20px;">
+                    <i class="fa-solid fa-users" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay artistas registrados</div>
+                    <p style="font-size: 13px; margin-top: 4px;">Aún no se han registrado artistas ni compositores en la base de datos.</p>
+                </div>
+            </div>`;
+        }
+
         const ArtistaPrincipal = Artistas[0] || {};
         const CancionesDelArtista = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones()
-            .filter(C => C.Autor && C.Autor.includes(ArtistaPrincipal.NombreCompleto || "Edna Miriam"));
+            .filter(C => C.Autor && ArtistaPrincipal.NombreCompleto && C.Autor.toLowerCase().includes(ArtistaPrincipal.NombreCompleto.toLowerCase()));
 
         const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
         const EsUsuarioLogueado = UsuarioActual && !UsuarioActual.EsInvitado;
         const EsPerfilPropio = EsUsuarioLogueado && ArtistaPrincipal.NombreCompleto && 
-            (UsuarioActual.Nombre.toLowerCase().includes("edna") || UsuarioActual.Nombre.trim().toLowerCase() === ArtistaPrincipal.NombreCompleto.trim().toLowerCase());
+            (UsuarioActual.Nombre.trim().toLowerCase() === ArtistaPrincipal.NombreCompleto.trim().toLowerCase() || ArtistaPrincipal.NombreCompleto.toLowerCase().includes(UsuarioActual.Nombre.toLowerCase()));
 
         const FotoPortadaMostrar = (EsPerfilPropio && UsuarioActual.FotoPortada) 
             ? UsuarioActual.FotoPortada 
@@ -91,6 +102,7 @@ class ComponenteSeccionArtistas {
                 </div>
             </div>
 
+            ${CancionesDelArtista.length > 0 ? `
             <div class="CuadriculaTarjetasMusicales">
                 ${CancionesDelArtista.map(Cancion => `
                 <div class="TarjetaMusicalItem">
@@ -121,6 +133,11 @@ class ComponenteSeccionArtistas {
                 </div>
                 `).join('')}
             </div>
+            ` : `
+            <div style="background-color: var(--ColorFondoSuperficie); padding: 30px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 10px;">
+                <p style="font-size: 13px;">No hay canciones o composiciones registradas para este artista en la base de datos.</p>
+            </div>
+            `}
         </div>
         `;
     }

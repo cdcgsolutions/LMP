@@ -119,21 +119,11 @@
         justify-content: center;
     }
 
-    .ImagenLogoPrincipal {
-        display: none !important;
-    }
-
-    .TextoMarcaLMPCompleto {
-        display: none !important;
-    }
-
+    .LogotipoMarcaLMP,
+    .ImagenLogoPrincipal,
+    .TextoMarcaLMPCompleto,
     .TextoMarcaLMPCorto {
-        display: inline-flex !important;
-        align-items: center;
-        gap: 1px;
-        font-size: 20px;
-        font-weight: 900;
-        letter-spacing: 0.5px;
+        display: none !important;
     }
 
     .BarraNavegacionMovilInferior {

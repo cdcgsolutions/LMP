@@ -12,20 +12,26 @@ class ComponenteModalCrearAporte {
     Renderizar(DatosEdicion = null) {
         const EsEdicion = Boolean(DatosEdicion);
 
+        const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
+        const NombreUsuarioPorDefecto = (UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario") 
+            ? UsuarioActual.Nombre 
+            : "";
+
         const TituloCancion = EsEdicion ? (DatosEdicion.Titulo || "") : "";
-        const AutorCancion = EsEdicion ? (DatosEdicion.Autor || "Edna Miriam Edgley Cuellar") : "Edna Miriam Edgley Cuellar";
-        const GeneroCancion = EsEdicion ? (DatosEdicion.Genero || "Taquirari") : "Taquirari";
-        const TonoCancion = EsEdicion ? (DatosEdicion.TonoOriginal || "Re Mayor (D)") : "";
+        const AutorCancion = EsEdicion ? (DatosEdicion.Autor || NombreUsuarioPorDefecto) : NombreUsuarioPorDefecto;
+        const GenerosEnBD = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || [];
+        const GenerosNombres = GenerosEnBD.map(G => G.Nombre || G);
+        const GeneroCancion = EsEdicion ? (DatosEdicion.Genero || (GenerosNombres[0] || "")) : (GenerosNombres[0] || "");
+        const TonoCancion = EsEdicion ? (DatosEdicion.TonoOriginal || "") : "";
         const TempoCancion = EsEdicion ? (Number(DatosEdicion.TempoBPM) || 108) : 108;
         const LetraCancion = EsEdicion ? (DatosEdicion.LetraConAcordes || DatosEdicion.LetraLimpia || "") : "";
         const MensajeMuro = EsEdicion ? (DatosEdicion.TextoPublicacion || "") : "";
         const AudioActual = EsEdicion ? (DatosEdicion.AudioUrl || "") : "";
         const PartituraActual = EsEdicion ? (DatosEdicion.ImagenPartitura || "") : "";
 
-        const GenerosOpciones = ["Taquirari", "Chovena", "Carnavalito", "Danza Ritual / Sarao", "Polca Beniana"];
-        const SelectGenerosHtml = GenerosOpciones.map(Gen => 
-            `<option value="${Gen}" ${Gen === GeneroCancion ? 'selected' : ''}>${Gen}</option>`
-        ).join("");
+        const SelectGenerosHtml = GenerosNombres.length > 0 
+            ? GenerosNombres.map(Gen => `<option value="${Gen}" ${Gen === GeneroCancion ? 'selected' : ''}>${Gen}</option>`).join("")
+            : `<option value="">Sin géneros en BD</option>`;
 
         return `
         <div class="CapaFondoModalOscuro" id="ModalCrearAporteFondo">

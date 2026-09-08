@@ -42,40 +42,21 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .ImagenLogoPrincipal {
     height: 40px;
-    width: auto;
-    max-width: 44px;
-    object-fit: contain;
-    border-radius: var(--RadioPequeno);
+    width: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
 }
 
-.TextoMarcaLMP {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--ColorPrimarioAzul);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.TextoMarcaLMP span {
-    color: var(--ColorVerdeBeni);
-}
-
-.TextoMarcaLMPCompleto {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-}
-
-.TextoMarcaLMPCorto {
-    display: none;
-    font-weight: 900;
-    letter-spacing: 0.5px;
+.LogotipoMarcaLMP:hover .ImagenLogoPrincipal {
+    transform: scale(1.05);
 }
 
 .ContenedorBuscadorSuperior {
@@ -84,15 +65,17 @@
     align-items: center;
     background-color: var(--ColorFondoEntrada);
     border-radius: var(--RadioBotonPill);
-    padding: 0 12px;
+    padding: 0 14px;
     height: 40px;
-    width: 240px;
-    transition: width var(--TransicionMedia), box-shadow var(--TransicionMedia);
+    flex: 1;
+    width: 100%;
+    max-width: 280px;
+    transition: max-width var(--TransicionMedia), box-shadow var(--TransicionMedia);
 }
 
 .ContenedorBuscadorSuperior:focus-within {
     box-shadow: 0 0 0 2px var(--ColorPrimarioAzulSuave);
-    width: 280px;
+    max-width: 285px;
 }
 
 .IconoBuscadorSuperior {
@@ -743,7 +726,7 @@ body.ModoOscuroActivo .AcordeMusical {
     transition: color 0.2s ease;
 }
 
-/* Menú Emergente de Reacciones Flotantes FB con Nombres Debajo */
+/* Menú Emergente de Reacciones Flotantes FB con Nombres Debajo (Solo se abre mediante CLICK) */
 .ContenedorReaccionesEmergentes {
     position: absolute;
     bottom: calc(100% + 8px);
@@ -758,25 +741,19 @@ body.ModoOscuroActivo .AcordeMusical {
     border: 1px solid var(--ColorBordeSuave);
     z-index: 100;
     opacity: 0;
+    visibility: hidden;
     transform: scale(0.85) translateY(10px);
     pointer-events: none;
-    transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0.2s ease;
     max-width: calc(100vw - 36px);
 }
 
-.ContenedorBotonReaccionPrincipal:hover .ContenedorReaccionesEmergentes:not(.MenuReaccionesOculto),
-.ContenedorReaccionesEmergentes:hover:not(.MenuReaccionesOculto),
-.ContenedorReaccionesEmergentes.MenuReaccionesAbierto:not(.MenuReaccionesOculto) {
+/* Se abre estrictamente cuando se hace CLICK y se añade la clase .MenuReaccionesAbierto */
+.ContenedorReaccionesEmergentes.MenuReaccionesAbierto {
     opacity: 1;
+    visibility: visible;
     transform: scale(1) translateY(0);
     pointer-events: auto;
-}
-
-.ContenedorReaccionesEmergentes.MenuReaccionesOculto {
-    opacity: 0 !important;
-    transform: scale(0.85) translateY(10px) !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
 }
 
 .BotonReaccionEmoji {

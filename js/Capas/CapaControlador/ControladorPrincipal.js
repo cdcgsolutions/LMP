@@ -809,17 +809,13 @@ class ControladorPrincipal {
             return;
         }
         const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual();
-        const NombreUsuario = (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : "Edna Miriam Edgley Cuellar";
+        const NombreUsuario = (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : "Usuario LMP";
         const PublicacionActualizada = this.ModeloAlmacenamiento.RegistrarReaccionEnPublicacion(IdPublicacion, TipoReaccion, NombreUsuario);
         if (PublicacionActualizada) {
-            // 1. Cerrar y forzar desaparición inmediata del menú flotante
+            // 1. Cerrar inmediatamente el menú flotante
             const MenuEmergente = document.getElementById(`MenuReacciones_${IdPublicacion}`);
             if (MenuEmergente) {
                 MenuEmergente.classList.remove("MenuReaccionesAbierto");
-                MenuEmergente.classList.add("MenuReaccionesOculto");
-                setTimeout(() => {
-                    MenuEmergente.classList.remove("MenuReaccionesOculto");
-                }, 350);
             }
 
             // 2. Actualizar contador total de likes / reacciones
@@ -840,7 +836,7 @@ class ControladorPrincipal {
                 BurbujasElem.innerHTML = this.ComponenteMuroPrincipal.ComponenteTarjetaPublicacion.GenerarBurbujasReaccionesHtml(PublicacionActualizada);
             }
 
-            // 3. Obtener diccionario y reacción activa del usuario
+            // 3. Obtener reacción activa de ESTE usuario específico
             const Diccionario = window.DiccionarioReaccionesLMP || {
                 MeGusta: { Titulo: "Me gusta", TituloCorto: "Me gusta", Icono: '<i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i>', Color: "#1877f2" },
                 MeEncanta: { Titulo: "Me encanta", TituloCorto: "Me encanta", Icono: '<i class="fa-solid fa-heart" style="color: #f3425f;"></i>', Color: "#f3425f" },
@@ -849,7 +845,12 @@ class ControladorPrincipal {
                 BuenRitmo: { Titulo: "¡Buen ritmo!", TituloCorto: "Buen ritmo", Icono: '<i class="fa-solid fa-music" style="color: #8b5cf6;"></i>', Color: "#8b5cf6" }
             };
 
-            const MiReaccion = PublicacionActualizada.MiReaccionUsuario;
+            const ReaccionUsuarioActivo = Array.isArray(PublicacionActualizada.UsuariosReacciones)
+                ? PublicacionActualizada.UsuariosReacciones.find(u => 
+                    u.NombreUsuario && u.NombreUsuario.trim().toLowerCase() === NombreUsuario.toLowerCase()
+                )
+                : null;
+            const MiReaccion = ReaccionUsuarioActivo ? ReaccionUsuarioActivo.TipoReaccion : null;
             const BotonPrincipal = document.getElementById(`BotonReaccionPrincipal_${IdPublicacion}`);
 
             // 4. Actualizar estado visual del botón de reaccionar principal
@@ -871,6 +872,17 @@ class ControladorPrincipal {
                     BotonPrincipal.style.fontWeight = "";
                     BotonPrincipal.classList.remove("ReaccionadoActivo");
                 }
+            }
+
+            // 5. Actualizar selección visual dentro del menú emergente de emojis
+            if (MenuEmergente) {
+                MenuEmergente.querySelectorAll(".BotonReaccionEmoji").forEach(BtnEmoji => {
+                    if (BtnEmoji.dataset.tipoReaccion === MiReaccion) {
+                        BtnEmoji.classList.add("ReaccionSeleccionada");
+                    } else {
+                        BtnEmoji.classList.remove("ReaccionSeleccionada");
+                    }
+                });
             }
 
             // 5. Actualizar selección en las opciones del menú flotante
@@ -899,9 +911,12 @@ class ControladorPrincipal {
         const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual();
         const Texto = Entrada.value.trim();
         const ObjetoComentario = {
-            NombreUsuario: (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : "Edna Miriam Edgley Cuellar",
+            NombreUsuario: (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : "Usuario LMP",
             AvatarUsuario: (UsuarioActual && UsuarioActual.FotoPerfil) ? UsuarioActual.FotoPerfil : "Logo1.png",
-            TextoComentario: Texto
+            TextoComentario: Texto,
+            FechaCreacion: new Date().toISOString(),
+            CantidadLikes: 0,
+            UsuariosLikes: []
         };
 
         const PublicacionActualizada = this.ModeloAlmacenamiento.AgregarComentarioAPublicacion(IdPublicacion, ObjetoComentario);
@@ -921,7 +936,7 @@ class ControladorPrincipal {
                                 <div class="CuerpoComentario">${ObjetoComentario.TextoComentario}</div>
                             </div>
                             <div class="FilaMetaYAccionesComentario">
-                                <span class="MetaComentarioTiempo">Hace un momento</span>
+                                <span class="MetaComentarioTiempo" title="${this.ModeloAlmacenamiento ? this.ModeloAlmacenamiento.FormatearFechaCompleta(ObjetoComentario.FechaCreacion) : ''}">Hace un momento</span>
                                 <button class="BotonLikeComentario" 
                                         data-publicacion-id="${IdPublicacion}" 
                                         data-comentario-id="${ObjetoComentario.IdComentario}"
@@ -950,7 +965,19 @@ class ControladorPrincipal {
     }
 
     AlternarLikeComentario(IdPublicacion, IdComentario) {
-        const Resultado = this.ModeloAlmacenamiento.AlternarLikeEnComentario(IdPublicacion, IdComentario);
+        if (!this.ServicioEstado.EstaAutenticado()) {
+            this.AbrirModalIniciarSesion("Inicia sesión para dar 'Me gusta' a los comentarios.");
+            return;
+        }
+
+        const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual();
+        const NombreUsuario = (UsuarioActual && UsuarioActual.Nombre) ? UsuarioActual.Nombre : null;
+        if (!NombreUsuario) {
+            this.AbrirModalIniciarSesion("Inicia sesión para interactuar con los comentarios.");
+            return;
+        }
+
+        const Resultado = this.ModeloAlmacenamiento.AlternarLikeEnComentario(IdPublicacion, IdComentario, NombreUsuario);
         if (Resultado && Resultado.Comentario) {
             const Comentario = Resultado.Comentario;
             const Boton = document.getElementById(`BotonLikeCom_${IdComentario}`);
@@ -958,7 +985,7 @@ class ControladorPrincipal {
             const NumLikes = document.getElementById(`NumLikesCom_${IdComentario}`);
 
             if (Boton) {
-                if (Comentario.DioLikeUsuario) {
+                if (Resultado.DioLike) {
                     Boton.classList.add("LikeActivo");
                 } else {
                     Boton.classList.remove("LikeActivo");
@@ -1456,9 +1483,7 @@ class ControladorPrincipal {
                 AudioUrl: UrlAudioSubido,
                 LetraConAcordes: Letra,
                 LetraLimpia: LetraLimpia,
-                SecuenciaNotasMelodia: [
-                    { Nota: "D4", Duracion: 0.4 }, { Nota: "G4", Duracion: 0.4 }, { Nota: "A4", Duracion: 0.6 }
-                ]
+                SecuenciaNotasMelodia: []
             });
 
             const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
@@ -1595,6 +1620,9 @@ class ControladorPrincipal {
     ProcesarCerrarSesion() {
         this.ServicioEstado.CerrarSesion();
         this.CerrarModales();
+        document.querySelectorAll(".BotonLikeComentario.LikeActivo").forEach(btn => {
+            btn.classList.remove("LikeActivo");
+        });
         this.ServicioNotificaciones.MostrarMensajeToast(
             "Has cerrado sesión. Continuando como Invitado.",
             '<i class="fa-solid fa-arrow-right-from-bracket"></i>'
@@ -1628,19 +1656,47 @@ class ControladorPrincipal {
             }
         }
 
+        const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
+        const NombreUsuarioLogueado = (UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario") 
+            ? UsuarioActual.Nombre.trim().toLowerCase() 
+            : null;
+
         let FilasUsuariosHtml = "";
         if (Usuarios.length > 0) {
-            FilasUsuariosHtml = Usuarios.map(User => {
+            // Ordenar para que el usuario actual aparezca primero si ya reaccionó
+            const ListaOrdenada = [...Usuarios].sort((a, b) => {
+                const aEsTu = NombreUsuarioLogueado && a.NombreUsuario && a.NombreUsuario.trim().toLowerCase() === NombreUsuarioLogueado;
+                const bEsTu = NombreUsuarioLogueado && b.NombreUsuario && b.NombreUsuario.trim().toLowerCase() === NombreUsuarioLogueado;
+                if (aEsTu && !bEsTu) return -1;
+                if (!aEsTu && bEsTu) return 1;
+                return 0;
+            });
+
+            FilasUsuariosHtml = ListaOrdenada.map(User => {
                 const Conf = MapaReacciones[User.TipoReaccion] || MapaReacciones.MeGusta;
                 const IconoReac = Conf ? Conf.Icono : '<i class="fa-solid fa-thumbs-up" style="color: #1877f2;"></i>';
                 const NombreReac = Conf ? Conf.TituloCorto : 'Reacción';
-                const EsTuUsuario = User.NombreUsuario === "Edna Miriam Edgley Cuellar";
+                const EsTuUsuario = !!(NombreUsuarioLogueado && User.NombreUsuario && User.NombreUsuario.trim().toLowerCase() === NombreUsuarioLogueado);
+
+                let AvatarUser = "Logo1.png";
+                if (EsTuUsuario && UsuarioActual && UsuarioActual.FotoPerfil) {
+                    AvatarUser = UsuarioActual.FotoPerfil;
+                } else {
+                    const UsuarioEncontrado = this.ModeloAlmacenamiento.Usuarios.find(u => 
+                        u.NombreCompleto && User.NombreUsuario && u.NombreCompleto.trim().toLowerCase() === User.NombreUsuario.trim().toLowerCase()
+                    );
+                    if (UsuarioEncontrado && (UsuarioEncontrado.FotoPerfil || UsuarioEncontrado.FotoPerfilUrl)) {
+                        AvatarUser = UsuarioEncontrado.FotoPerfil || UsuarioEncontrado.FotoPerfilUrl;
+                    } else if (User.AvatarUsuario) {
+                        AvatarUser = User.AvatarUsuario;
+                    }
+                }
 
                 return `
                 <div class="ItemUsuarioReaccion" data-tipo-reaccion="${User.TipoReaccion}">
                     <div class="FilaUsuarioIzquierda">
                         <div class="ContenedorAvatarConInsigniaReaccion">
-                            <img src="Logo1.png" alt="${User.NombreUsuario}" class="AvatarUsuarioReaccion" onerror="this.src='Logo1.png'">
+                            <img src="${AvatarUser}" alt="${User.NombreUsuario}" class="AvatarUsuarioReaccion" onerror="this.src='Logo1.png'">
                             <span class="MiniInsigniaReaccionUsuario">${IconoReac}</span>
                         </div>
                         <div class="InfoTextoUsuarioReaccion">
