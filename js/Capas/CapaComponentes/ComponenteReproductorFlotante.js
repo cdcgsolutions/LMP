@@ -74,7 +74,7 @@ class ComponenteReproductorFlotante {
                     value="1" 
                     title="Volumen: 100%"
                 >
-                <button class="BotonCircularIcono" id="BotonCerrarReproductorFlotante" style="width: 28px; height: 28px; font-size: 11px; margin-left: 6px;" title="Cerrar reproductor"><i class="fa-solid fa-xmark"></i></button>
+                <button class="BotonCircularIcono" id="BotonCerrarReproductorFlotante" title="Cerrar reproductor"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
         `;

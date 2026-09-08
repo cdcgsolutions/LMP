@@ -47,34 +47,45 @@ class ComponenteSeccionCanciones {
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionCanciones">
-            <!-- Encabezado de la Sección -->
-            <div class="CabeceraSeccionPrincipal">
-                <div>
-                    <h1 class="TituloSeccionGrande"><i class="fa-solid fa-scroll" style="color: var(--ColorPrimarioAzul); margin-right: 8px;"></i>Cancionero & Letras del Beni</h1>
-                    <p class="DescripcionSeccionSubtitulo">
-                        Repertorio de composiciones, partituras transcritas y obras tradicionales de autores benianos y estudiantes de IFAEL.
-                    </p>
+            <!-- Encabezado de la Sección Compacto -->
+            <div class="CabeceraSeccionPrincipal CabeceraSeccionCanciones">
+                <div class="ContenedorEncabezadoCanciones">
+                    <div class="TextosEncabezadoCanciones">
+                        <h1 class="TituloSeccionGrande">
+                            <i class="fa-solid fa-scroll" style="color: var(--ColorPrimarioAzul);"></i>
+                            <span>Cancionero & Letras</span>
+                        </h1>
+                        <p class="DescripcionSeccionSubtitulo">
+                            Repertorio y partituras del Beni
+                        </p>
+                    </div>
+                    <button class="BotonAccionPrimario BotonAportarLetraEncabezado" id="BotonAportarNuevaCancionEnSeccion" title="Aportar nueva letra">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="TextoBotonLargo">Aportar Nueva Letra</span>
+                        <span class="TextoBotonCorto">Aportar</span>
+                    </button>
                 </div>
-                <button class="BotonAccionPrimario" id="BotonAportarNuevaCancionEnSeccion">
-                    <i class="fa-solid fa-plus" style="margin-right: 6px;"></i>
-                    <span class="TextoBotonLargo">Aportar Nueva Letra</span>
-                    <span class="TextoBotonCorto">Aportar</span>
-                </button>
             </div>
 
-            <!-- Barra de Filtros Rápidos Dinámicos -->
+            <!-- Barra de Filtros Rápidos Dinámicos (Fila de 2 en móvil) -->
             <div class="BarraFiltrosCanciones">
-                <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
-                    <span style="font-weight: 600; font-size: 13.5px;">Género:</span>
-                    <select id="SelectorFiltroGenero" style="flex: 1;">
+                <div class="ItemFiltroCanciones">
+                    <label for="SelectorFiltroGenero" class="EtiquetaFiltroCanciones">
+                        <i class="fa-solid fa-guitar"></i>
+                        <span>Género</span>
+                    </label>
+                    <select id="SelectorFiltroGenero" class="ControlFiltroCanciones">
                         <option value="Todos" ${FiltroGenero === 'Todos' ? 'selected' : ''}>Todos los Ritmos</option>
                         ${OpcionesGenerosHtml}
                     </select>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 180px;">
-                    <span style="font-weight: 600; font-size: 13.5px;">Tono:</span>
-                    <select id="SelectorFiltroTono" style="flex: 1;">
+                <div class="ItemFiltroCanciones">
+                    <label for="SelectorFiltroTono" class="EtiquetaFiltroCanciones">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Tono</span>
+                    </label>
+                    <select id="SelectorFiltroTono" class="ControlFiltroCanciones">
                         <option value="Todos" ${FiltroTono === 'Todos' ? 'selected' : ''}>Todos los Tonos</option>
                         ${OpcionesTonosHtml}
                     </select>
@@ -94,14 +105,14 @@ class ComponenteSeccionCanciones {
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;">
-                        <span class="InsigniaGeneroMusical">${Cancion.Genero}</span>
-                        <span class="InsigniaTonoMusical">${Cancion.TonoOriginal}</span>
-                        <span class="InsigniaCompasMusical">${Cancion.CompasRitmo}</span>
+                    <div style="display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; align-items: center;">
+                        <span class="InsigniaGeneroMusical" title="Género musical"><strong>Género:</strong> ${Cancion.Genero}</span>
+                        <span class="InsigniaTonoMusical" title="Tono original"><strong>Tono:</strong> ${Cancion.TonoOriginal}</span>
+                        ${Cancion.CompasRitmo ? `<span class="InsigniaCompasMusical" title="Compás / Ritmo"><strong>Compás:</strong> ${Cancion.CompasRitmo}</span>` : ''}
                     </div>
 
                     <div style="display: flex; gap: 8px; margin-top: 16px; align-items: center;">
-                        <button class="BotonAccionPrimario BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Reproducir audio">
+                        <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Reproducir audio">
                             <i class="fa-solid fa-play" style="margin-right: 6px;"></i>
                             <span class="TextoBotonLargo">Escuchar</span>
                             <span class="TextoBotonCorto">Oír</span>

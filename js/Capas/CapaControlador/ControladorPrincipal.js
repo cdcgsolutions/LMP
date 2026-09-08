@@ -263,7 +263,7 @@ class ControladorPrincipal {
         }
 
         // 5. Reproducción de Canción desde Tarjeta o Botón
-        const BotonReproducir = Objetivo.closest(".BotonReproducirTarjeta");
+        const BotonReproducir = Objetivo.closest(".BotonReproducirTarjeta, .BotonReproducirCancionEnLista");
         if (BotonReproducir) {
             const IdCancion = BotonReproducir.dataset.cancionId;
             this.EjecutarReproduccionCancionPorId(IdCancion);

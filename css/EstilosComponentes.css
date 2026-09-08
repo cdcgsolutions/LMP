@@ -997,16 +997,95 @@ body.ModoOscuroActivo .AcordeMusical {
     max-width: 600px;
 }
 
+/* Cabecera compacta específica para Canciones */
+.CabeceraSeccionCanciones {
+    padding: 16px 20px;
+}
+
+.ContenedorEncabezadoCanciones {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+}
+
+.TextosEncabezadoCanciones {
+    flex: 1;
+    min-width: 0;
+}
+
+.BotonAportarLetraEncabezado {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    font-size: 13.5px;
+    white-space: nowrap;
+}
+
 /* Barra de Filtros para Canciones */
 .BarraFiltrosCanciones {
     background-color: var(--ColorFondoSuperficie);
     border-radius: var(--RadioMediano);
-    padding: 12px 16px;
+    padding: 12px 18px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: var(--SombraNivelUno);
+    border: 1px solid var(--ColorBordeSuave);
+}
+
+.ItemFiltroCanciones {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    box-shadow: var(--SombraNivelUno);
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.EtiquetaFiltroCanciones {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--ColorTextoPrincipal);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.EtiquetaFiltroCanciones i {
+    color: var(--ColorPrimarioAzul);
+    font-size: 13px;
+}
+
+.ControlFiltroCanciones {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    font-size: 13px;
+    padding: 7px 10px;
+    border-radius: var(--RadioPequeno);
+    border: 1px solid var(--ColorBordeDivisor);
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoPrincipal);
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: border-color var(--TransicionRapida);
+}
+
+.ControlFiltroCanciones:focus {
+    border-color: var(--ColorPrimarioAzul);
 }
 
 .CuadriculaTarjetasMusicales {
@@ -1030,6 +1109,55 @@ body.ModoOscuroActivo .AcordeMusical {
 .TarjetaMusicalItem:hover {
     transform: translateY(-2px);
     box-shadow: var(--SombraTarjetaHover);
+}
+
+.InsigniaGeneroMusical,
+.InsigniaTonoMusical,
+.InsigniaCompasMusical {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: var(--RadioPequeno);
+    line-height: 1.3;
+}
+
+.InsigniaGeneroMusical strong,
+.InsigniaTonoMusical strong,
+.InsigniaCompasMusical strong {
+    font-weight: 700;
+}
+
+.InsigniaGeneroMusical {
+    background-color: var(--ColorVerdeBeniClaro);
+    color: var(--ColorVerdeBeni);
+}
+
+.InsigniaTonoMusical {
+    background-color: var(--ColorPrimarioAzulClaro);
+    color: var(--ColorPrimarioAzul);
+}
+
+.InsigniaCompasMusical {
+    background-color: var(--ColorDoradoClaro);
+    color: var(--ColorDorado);
+}
+
+body.ModoOscuroActivo .InsigniaGeneroMusical {
+    background-color: rgba(46, 125, 50, 0.25);
+    color: #81c784;
+}
+
+body.ModoOscuroActivo .InsigniaTonoMusical {
+    background-color: rgba(24, 119, 242, 0.25);
+    color: #82b1ff;
+}
+
+body.ModoOscuroActivo .InsigniaCompasMusical {
+    background-color: rgba(245, 158, 11, 0.25);
+    color: #fbbf24;
 }
 
 /* Tarjetas de Géneros */
@@ -1525,6 +1653,29 @@ body.ModoOscuroActivo .AcordeMusical {
     width: 70px;
     height: 24px;
     border-radius: var(--RadioPequeno);
+}
+
+#BotonCerrarReproductorFlotante {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--RadioCircular);
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoSecundario);
+    border: 1px solid var(--ColorBordeDivisor);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 6px;
+    transition: all var(--TransicionRapida);
+}
+
+#BotonCerrarReproductorFlotante:hover {
+    background-color: var(--ColorFondoActivo);
+    color: var(--ColorTextoPrincipal);
+    transform: scale(1.05);
 }
 
 /* ==========================================================================
