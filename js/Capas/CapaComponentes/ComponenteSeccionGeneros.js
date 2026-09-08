@@ -26,6 +26,10 @@ class ComponenteSeccionGeneros {
                             Guía histórica y compases tradicionales del Beni
                         </p>
                     </div>
+                    <button class="BotonAccionPrimario BotonAbrirModalNuevoGenero BotonRegistrarGeneroEncabezado" id="BotonAbrirModalCrearGenero" title="Registrar nuevo ritmo tradicional">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Registrar</span>
+                    </button>
                 </div>
             </div>
 
@@ -34,45 +38,47 @@ class ComponenteSeccionGeneros {
             <div class="CuadriculaGenerosMusicales">
                 ${Generos.map(Gen => {
                     const IconoHtml = Gen.Icono || (Gen.IconoClase ? `<i class="${Gen.IconoClase}"></i>` : '<i class="fa-solid fa-guitar"></i>');
+                    const ColorSolido = Gen.Color || '#1877f2';
                     return `
                     <div class="TarjetaGeneroBeniano">
-                        <!-- Cabecera Visual con Gradiente y Metadatos Clave -->
-                        <div class="CabeceraGeneroColor" style="background: ${Gen.ColorGradiente || 'linear-gradient(135deg, #1877f2, #0d5cb6)'};">
-                            <div class="FilaSuperiorCabeceraGenero">
-                                <div class="ContenedorIconoGenero" title="Ritmo: ${Gen.Nombre}">
-                                    ${IconoHtml}
-                                </div>
-                                ${Gen.Compas ? `
-                                <span class="InsigniaCompasPill" title="Compás rítmico">
-                                    <i class="fa-solid fa-music"></i>
-                                    <span>${Gen.Compas}</span>
-                                </span>` : ''}
+                        <!-- Cabecera Visual con Color Sólido (Sin Gradiente) y Distribución Unificada -->
+                        <div class="CabeceraGeneroSolida" style="background-color: ${ColorSolido};">
+                            <div class="ContenedorIconoGeneroSolido" title="Ritmo: ${Gen.Nombre}">
+                                ${IconoHtml}
                             </div>
-                            <div class="FilaInferiorCabeceraGenero">
-                                <h2 class="NombreGeneroTarjeta">${Gen.Nombre}</h2>
+                            <div class="DatosCabeceraGenero">
+                                <h2 class="NombreGeneroTarjeta" title="${Gen.Nombre}">${Gen.Nombre}</h2>
                                 ${Gen.Origen ? `
-                                <span class="OrigenGeneroPill" title="Origen geográfico">
+                                <div class="OrigenGeneroTexto" title="Origen geográfico: ${Gen.Origen}">
                                     <i class="fa-solid fa-location-dot"></i>
                                     <span>${Gen.Origen}</span>
-                                </span>` : ''}
+                                </div>` : ''}
                             </div>
                         </div>
 
-                        <!-- Cuerpo de la Tarjeta con Información Relevante y Despejada -->
+                        <!-- Cuerpo de la Tarjeta con Nueva Distribución de Información -->
                         <div class="CuerpoGeneroInfo">
+                            ${Gen.Compas ? `
+                            <div class="FilaMetaCompas">
+                                <span class="InsigniaCompasDestacada" style="color: ${ColorSolido}; border-color: ${ColorSolido}45; background-color: ${ColorSolido}14;">
+                                    <i class="fa-solid fa-music"></i>
+                                    <span><strong>Compás:</strong> ${Gen.Compas}</span>
+                                </span>
+                            </div>` : ''}
+
                             ${Gen.Descripcion ? `
                             <p class="DescripcionGeneroTexto" title="${Gen.Descripcion}">
                                 ${Gen.Descripcion}
                             </p>` : ''}
 
-                            <!-- Pie de Tarjeta con Dos Acciones: Ver Detalles en Modal y Explorar Canciones -->
+                            <!-- Pie de Tarjeta con Botones Rectangulares con Puntas Redondeadas -->
                             <div class="PieTarjetaGenero">
                                 <div class="FilaBotonesGenero">
                                     <button type="button" class="BotonAccionSecundario BotonAbrirModalGenero" data-genero="${Gen.Nombre}" title="Ver historia y ficha técnica completa">
                                         <i class="fa-solid fa-circle-info"></i>
                                         <span>Detalles</span>
                                     </button>
-                                    <button type="button" class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Gen.Nombre}" title="Explorar canciones de este ritmo">
+                                    <button type="button" class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Gen.Nombre}" style="background-color: ${ColorSolido}; border-color: ${ColorSolido};" title="Explorar canciones de este ritmo">
                                         <i class="fa-solid fa-scroll"></i>
                                         <span>Canciones</span>
                                     </button>

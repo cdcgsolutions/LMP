@@ -74,6 +74,13 @@ class ModeloAlmacenamiento {
         try {
             const GenEnBruto = localStorage.getItem(this.ClaveAlmacenamientoGeneros);
             this.Generos = GenEnBruto ? JSON.parse(GenEnBruto) : [];
+            if (Array.isArray(this.Generos)) {
+                this.Generos.forEach(G => {
+                    if (!G.Color) {
+                        G.Color = this.ExtraerColorSolidoDeGradiente(G.ColorGradiente);
+                    }
+                });
+            }
         } catch (Error) {
             this.Generos = [];
         }
@@ -176,13 +183,14 @@ class ModeloAlmacenamiento {
                 const GenerosLeidos = [];
                 SnapGeneros.forEach(Doc => {
                     const Data = Doc.data();
+                    const ColorFinal = Data.Color || (Data.ColorGradiente ? this.ExtraerColorSolidoDeGradiente(Data.ColorGradiente) : "#1877f2");
                     GenerosLeidos.push({
                         IdGenero: Doc.id,
                         Nombre: Data.Nombre || "",
                         Compas: Data.Compas || "",
                         Origen: Data.Origen || "",
                         Descripcion: Data.Descripcion || "",
-                        ColorGradiente: Data.ColorGradiente || "linear-gradient(135deg, #1877f2, #0d5cb6)",
+                        Color: ColorFinal,
                         Icono: Data.Icono || (Data.IconoClase ? `<i class="${Data.IconoClase}"></i>` : '<i class="fa-solid fa-guitar"></i>'),
                         IconoClase: Data.IconoClase || "fa-solid fa-music",
                         InstrumentosTipicos: Data.InstrumentosTipicos || [],
@@ -211,24 +219,27 @@ class ModeloAlmacenamiento {
                         ? UsuarioEnBD.FotoPerfil 
                         : (Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png");
 
-                    const FotoPortadaFinal = (UsuarioEnBD && UsuarioEnBD.FotoPortada) 
-                        ? UsuarioEnBD.FotoPortada 
-                        : (Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png");
-
                     ArtistasLeidos.push({
                         IdArtista: Doc.id,
                         NombreCompleto: NombreDoc,
+                        NombreArtistico: Data.NombreArtistico || "",
                         RolTitulo: Data.RolTitulo || "",
-                        Especialidad: Data.Especialidad || "",
+                        Especialidad: Data.Especialidad || Data.GeneroMusical || "",
                         FechaNacimiento: Data.FechaNacimiento || "",
-                        LugarOrigen: Data.LugarOrigen || "",
+                        LugarNacimiento: Data.LugarNacimiento || Data.LugarOrigen || "",
+                        LugarOrigen: Data.LugarOrigen || Data.LugarNacimiento || "",
+                        GeneroMusical: Data.GeneroMusical || Data.Especialidad || "",
                         Institucion: Data.Institucion || "",
+                        TrayectoriaAnos: Data.TrayectoriaAnos || 0,
+                        Instrumentos: Array.isArray(Data.Instrumentos) ? Data.Instrumentos : (Data.Instrumentos ? [Data.Instrumentos] : []),
                         FotoPerfil: FotoPerfilFinal,
-                        FotoPortada: FotoPortadaFinal,
                         Biografia: Data.Biografia || "",
-                        ObrasDestacadas: Data.ObrasDestacadas || [],
-                        Seguidores: Data.SeguidoresCantidad || Data.Seguidores || "1.4k",
-                        PublicacionesCantidad: Data.PublicacionesCantidad || 0
+                        Inicios: Data.Inicios || "",
+                        Trayectoria: Data.Trayectoria || "",
+                        ObrasDestacadas: Array.isArray(Data.ObrasDestacadas) ? Data.ObrasDestacadas : [],
+                        Legado: Data.Legado || "",
+                        CitaCelebre: Data.CitaCelebre || "",
+                        Activo: Data.Activo !== undefined ? Data.Activo : true
                     });
                 });
                 this.Artistas = ArtistasLeidos;
@@ -529,6 +540,61 @@ class ModeloAlmacenamiento {
         return this.Generos || [];
     }
 
+    async GuardarGeneroNuevo(DatosGenero) {
+        if (!DatosGenero || !DatosGenero.Nombre) {
+            throw new Error("El nombre del ritmo o género es obligatorio.");
+        }
+
+        const InstrumentosFinales = Array.isArray(DatosGenero.InstrumentosTipicos)
+            ? DatosGenero.InstrumentosTipicos
+            : (typeof DatosGenero.InstrumentosTipicos === "string"
+                ? DatosGenero.InstrumentosTipicos.split(",").map(I => I.trim()).filter(Boolean)
+                : []);
+
+        const ObjetoGuardar = {
+            Nombre: DatosGenero.Nombre.trim(),
+            Compas: (DatosGenero.Compas || "").trim(),
+            Origen: (DatosGenero.Origen || "").trim(),
+            Descripcion: (DatosGenero.Descripcion || "").trim(),
+            Color: (DatosGenero.Color || "#1877f2").trim(),
+            IconoClase: (DatosGenero.IconoClase || "fa-solid fa-guitar").trim(),
+            TempoTipico: (DatosGenero.TempoTipico || "").trim(),
+            Caracter: (DatosGenero.Caracter || "").trim(),
+            InstrumentosTipicos: InstrumentosFinales,
+            FechaCreacion: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
+                ? firebase.firestore.FieldValue.serverTimestamp()
+                : new Date().toISOString()
+        };
+
+        if (this.ServicioFirebase && typeof this.ServicioFirebase.ColeccionGeneros === "function") {
+            try {
+                const DocRef = await this.ServicioFirebase.ColeccionGeneros().add(ObjetoGuardar);
+                const NuevoGenero = {
+                    IdGenero: DocRef.id,
+                    ...ObjetoGuardar,
+                    Icono: `<i class="${ObjetoGuardar.IconoClase}"></i>`
+                };
+
+                this.Generos.unshift(NuevoGenero);
+                localStorage.setItem(this.ClaveAlmacenamientoGeneros, JSON.stringify(this.Generos));
+                return NuevoGenero;
+            } catch (ErrorFirestore) {
+                console.error("[ModeloAlmacenamiento] Error al guardar género en Firestore:", ErrorFirestore);
+                throw ErrorFirestore;
+            }
+        }
+
+        // Fallback local si no hay servicio Firebase
+        const NuevoGeneroLocal = {
+            IdGenero: "gen_" + Date.now(),
+            ...ObjetoGuardar,
+            Icono: `<i class="${ObjetoGuardar.IconoClase}"></i>`
+        };
+        this.Generos.unshift(NuevoGeneroLocal);
+        localStorage.setItem(this.ClaveAlmacenamientoGeneros, JSON.stringify(this.Generos));
+        return NuevoGeneroLocal;
+    }
+
     ObtenerTodosLosArtistas() {
         const Lista = this.Artistas || [];
         if (Array.isArray(this.Usuarios) && this.Usuarios.length > 0) {
@@ -538,14 +604,91 @@ class ModeloAlmacenamiento {
                     (U.NombreCompleto.trim().toLowerCase() === Artista.NombreCompleto.trim().toLowerCase() ||
                      Artista.NombreCompleto.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase()))
                 );
-                if (UsuarioBD) {
-                    if (UsuarioBD.FotoPerfil) Artista.FotoPerfil = UsuarioBD.FotoPerfil;
-                    if (UsuarioBD.FotoPortada) Artista.FotoPortada = UsuarioBD.FotoPortada;
-                    if (UsuarioBD.EsVerificado !== undefined) Artista.EsVerificado = UsuarioBD.EsVerificado;
+                if (UsuarioBD && UsuarioBD.FotoPerfil) {
+                    Artista.FotoPerfil = UsuarioBD.FotoPerfil;
                 }
             });
         }
         return Lista;
+    }
+
+    ObtenerArtistaPorId(IdArtista) {
+        if (!IdArtista) return null;
+        return (this.ObtenerTodosLosArtistas() || []).find(A => A.IdArtista === IdArtista) || null;
+    }
+
+    async GuardarArtistaNuevo(DatosArtista) {
+        if (!DatosArtista || !DatosArtista.NombreCompleto) {
+            throw new Error("El nombre completo del artista es obligatorio.");
+        }
+
+        const InstrumentosFinales = Array.isArray(DatosArtista.Instrumentos)
+            ? DatosArtista.Instrumentos
+            : (typeof DatosArtista.Instrumentos === "string"
+                ? DatosArtista.Instrumentos.split(",").map(I => I.trim()).filter(Boolean)
+                : []);
+
+        const ObrasFinales = Array.isArray(DatosArtista.ObrasDestacadas)
+            ? DatosArtista.ObrasDestacadas
+            : (typeof DatosArtista.ObrasDestacadas === "string"
+                ? DatosArtista.ObrasDestacadas.split(",").map(O => O.trim()).filter(Boolean)
+                : []);
+
+        const ObjetoGuardar = {
+            NombreCompleto: DatosArtista.NombreCompleto.trim(),
+            NombreArtistico: (DatosArtista.NombreArtistico || "").trim(),
+            RolTitulo: (DatosArtista.RolTitulo || "").trim(),
+            Especialidad: (DatosArtista.Especialidad || DatosArtista.GeneroMusical || "").trim(),
+            FechaNacimiento: (DatosArtista.FechaNacimiento || "").trim(),
+            LugarNacimiento: (DatosArtista.LugarNacimiento || "").trim(),
+            LugarOrigen: (DatosArtista.LugarNacimiento || "").trim(),
+            GeneroMusical: (DatosArtista.GeneroMusical || "").trim(),
+            Institucion: (DatosArtista.Institucion || "").trim(),
+            TrayectoriaAnos: DatosArtista.TrayectoriaAnos ? parseInt(DatosArtista.TrayectoriaAnos) : 0,
+            Instrumentos: InstrumentosFinales,
+            FotoPerfilUrl: DatosArtista.FotoPerfilUrl || DatosArtista.FotoPerfil || "Logo1.png",
+            Biografia: (DatosArtista.Biografia || "").trim(),
+            Inicios: (DatosArtista.Inicios || "").trim(),
+            Trayectoria: (DatosArtista.Trayectoria || "").trim(),
+            ObrasDestacadas: ObrasFinales,
+            Legado: (DatosArtista.Legado || "").trim(),
+            CitaCelebre: (DatosArtista.CitaCelebre || "").trim(),
+            Activo: true,
+            FechaCreacion: (typeof firebase !== "undefined" && firebase.firestore && firebase.firestore.FieldValue)
+                ? firebase.firestore.FieldValue.serverTimestamp()
+                : new Date().toISOString()
+        };
+
+        if (this.ServicioFirebase && typeof this.ServicioFirebase.ColeccionArtistas === "function") {
+            try {
+                const DocRef = await this.ServicioFirebase.ColeccionArtistas().add(ObjetoGuardar);
+                const NuevoArtista = {
+                    IdArtista: DocRef.id,
+                    ...ObjetoGuardar,
+                    FotoPerfil: ObjetoGuardar.FotoPerfilUrl
+                };
+
+                if (!this.Artistas) this.Artistas = [];
+                this.Artistas.unshift(NuevoArtista);
+                localStorage.setItem(this.ClaveAlmacenamientoArtistas, JSON.stringify(this.Artistas));
+                return NuevoArtista;
+            } catch (ErrorGuardar) {
+                console.error("[ModeloAlmacenamiento] Error al guardar artista en Firestore:", ErrorGuardar);
+                throw ErrorGuardar;
+            }
+        } else {
+            const IdGenerado = "art_" + Date.now();
+            const NuevoArtista = {
+                IdArtista: IdGenerado,
+                ...ObjetoGuardar,
+                FotoPerfil: ObjetoGuardar.FotoPerfilUrl,
+                FotoPortada: ObjetoGuardar.FotoPortadaUrl
+            };
+            if (!this.Artistas) this.Artistas = [];
+            this.Artistas.unshift(NuevoArtista);
+            localStorage.setItem(this.ClaveAlmacenamientoArtistas, JSON.stringify(this.Artistas));
+            return NuevoArtista;
+        }
     }
 
     ObtenerDatosIFAEL() {
@@ -1085,6 +1228,13 @@ class ModeloAlmacenamiento {
             return true;
         }
         return false;
+    }
+
+    ExtraerColorSolidoDeGradiente(TextoGradiente) {
+        if (!TextoGradiente || typeof TextoGradiente !== "string") return "#1877f2";
+        if (TextoGradiente.startsWith("#") || TextoGradiente.startsWith("rgb")) return TextoGradiente;
+        const Coincidencia = TextoGradiente.match(/#(?:[0-9a-fA-F]{3,8})/);
+        return Coincidencia ? Coincidencia[0] : "#1877f2";
     }
     // #endregion
 }

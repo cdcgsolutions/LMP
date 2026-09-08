@@ -1220,83 +1220,90 @@ body.ModoOscuroActivo .InsigniaConteoRitmos {
     box-shadow: var(--SombraTarjetaHover);
 }
 
-.CabeceraGeneroColor {
-    min-height: 86px;
+/* Cabecera Visual con Color Sólido (Sin Gradiente) y Distribución Unificada */
+.CabeceraGeneroSolida {
     padding: 14px 16px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     color: #ffffff;
     position: relative;
     box-sizing: border-box;
 }
 
-.FilaSuperiorCabeceraGenero {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    margin-bottom: 8px;
-}
-
-.ContenedorIconoGenero {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+.ContenedorIconoGeneroSolido {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--RadioPequeno);
     background-color: rgba(255, 255, 255, 0.22);
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 19px;
     color: #ffffff;
+    flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.InsigniaCompasPill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11.5px;
-    font-weight: 700;
-    padding: 3px 9px;
-    border-radius: var(--RadioBotonPill);
-    background-color: rgba(0, 0, 0, 0.3);
-    color: #ffffff;
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    letter-spacing: 0.3px;
-}
-
-.FilaInferiorCabeceraGenero {
+.DatosCabeceraGenero {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    width: 100%;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .NombreGeneroTarjeta {
-    font-size: 18px;
+    font-size: 17.5px;
     font-weight: 800;
     color: #ffffff;
     margin: 0;
-    line-height: 1.2;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    line-height: 1.25;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.OrigenGeneroPill {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.9);
+.OrigenGeneroTexto {
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.92);
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
     white-space: nowrap;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.OrigenGeneroTexto i {
+    font-size: 10px;
+    opacity: 0.9;
+}
+
+.FilaMetaCompas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.InsigniaCompasDestacada {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: var(--RadioPequeno);
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.InsigniaCompasDestacada strong {
+    font-weight: 700;
 }
 
 .CuerpoGeneroInfo {
@@ -1396,7 +1403,7 @@ body.ModoOscuroActivo .InsigniaConteoRitmos {
     width: 100%;
     box-sizing: border-box;
     white-space: nowrap;
-    border-radius: var(--RadioBotonPill);
+    border-radius: var(--RadioPequeno);
     cursor: pointer;
     transition: all var(--TransicionRapida);
 }
@@ -1422,6 +1429,13 @@ body.ModoOscuroActivo .InsigniaConteoRitmos {
     justify-content: center;
     gap: 6px;
     box-sizing: border-box;
+    transition: all var(--TransicionRapida);
+}
+
+.PieTarjetaGenero .BotonExplorarCancionesGenero:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Sección IFAEL y Artistas */
@@ -2672,5 +2686,440 @@ body.ModoOscuroActivo .TarjetaSkeletonCuadricula {
     border-radius: var(--RadioPequeno);
 }
 
+/* ==========================================================================
+   GALERÍA DE ARTISTAS Y PÁGINA DEDICADA DE BIOGRAFÍA
+   ========================================================================== */
 
+/* Cabecera compacta específica para Artistas (idéntica a Canciones y Géneros) */
+.CabeceraSeccionArtistas {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.ContenedorEncabezadoArtistas {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+}
+
+.TextosEncabezadoArtistas {
+    flex: 1;
+    min-width: 0;
+}
+
+.BotonRegistrarArtistaEncabezado {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    font-size: 13.5px;
+    white-space: nowrap;
+}
+
+/* Tarjeta de Artista Horizontal Compacta */
+.TarjetaArtistaGaleria {
+    background: var(--ColorFondoSuperficie);
+    border-radius: var(--RadioMediano);
+    border: 1px solid var(--ColorBordeSuave);
+    box-shadow: var(--SombraTarjeta);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    min-width: 0;
+}
+
+.TarjetaArtistaGaleria:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--SombraNivelDos, 0 8px 24px rgba(0,0,0,0.12));
+    border-color: var(--ColorPrimarioAzul);
+}
+
+.ContenedorAvatarTarjetaArtista {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--ColorPrimarioAzul);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    background: var(--ColorFondoSuperficie);
+}
+
+.AvatarTarjetaArtista {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.InfoTarjetaArtista {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    gap: 3px;
+}
+
+.NombreArtistaTarjeta {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ColorTextoPrincipal);
+    margin: 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.SubtituloArtistaTarjeta {
+    font-size: 13px;
+    color: var(--ColorPrimarioAzul);
+    font-weight: 600;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.InsigniasArtistaTarjeta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.InsigniaPillArtista {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--ColorFondoSecundario);
+    color: var(--ColorTextoSecundario);
+    border: 1px solid var(--ColorBordeDivisor);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.InsigniaPillArtista i.fa-award {
+    color: #d97706;
+}
+
+.AccionTarjetaArtista {
+    margin-top: 5px;
+}
+
+.BotonVerBioCompacto {
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 700;
+    border-radius: var(--RadioPequeno);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.TarjetaArtistaGaleria .BotonVerBiografiaArtista:hover {
+    transform: scale(1.02);
+}
+
+/* Cabecera de Biografía Horizontal y Compacta (Foto a la izquierda, Información a la derecha) */
+.TarjetaCabeceraBiografia {
+    background: var(--ColorFondoSuperficie);
+    border-radius: var(--RadioMediano);
+    border: 1px solid var(--ColorBordeSuave);
+    box-shadow: var(--SombraTarjeta);
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.ContenedorAvatarCabeceraBiografia {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3.5px solid var(--ColorPrimarioAzul);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    flex-shrink: 0;
+    background: var(--ColorFondoSuperficie);
+}
+
+.AvatarCabeceraBiografia {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.InfoCabeceraBiografia {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    overflow: hidden;
+}
+
+.NombreCabeceraBiografia {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ColorTextoPrincipal);
+    margin: 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.SubtituloCabeceraBiografia {
+    font-size: 14px;
+    color: var(--ColorPrimarioAzul);
+    font-weight: 700;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.DetalleCabeceraBiografia {
+    font-size: 12.5px;
+    color: var(--ColorTextoSecundario);
+    line-height: 1.35;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.InsigniaTrayectoriaBiografia {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(217, 119, 6, 0.12);
+    color: #d97706;
+    font-weight: 700;
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    white-space: nowrap;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+.PaginaBiografiaArtistaDedicada {
+    animation: fadeInLMP 0.25s ease-out;
+}
+
+@keyframes fadeInLMP {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+body.ModoOscuroActivo .TarjetaArtistaGaleria,
+body.ModoOscuroActivo .TarjetaCabeceraBiografia,
+body.ModoOscuroActivo .BloqueFichaTecnicaArtista,
+body.ModoOscuroActivo .BloqueBiograficoItem {
+    background-color: #242526;
+    border-color: #393a3b;
+}
+
+body.ModoOscuroActivo .BloqueCitaCelebreArtista {
+    background: linear-gradient(135deg, rgba(24, 119, 242, 0.15), rgba(46, 125, 50, 0.15));
+    border-left-color: var(--ColorPrimarioAzul);
+}
+
+body.ModoOscuroActivo .ModalFormularioGrande {
+    background-color: #242526;
+    color: #e4e6eb;
+}
+
+/* Bordes claramente visibles para los campos del Modal Crear Artista y Crear Género */
+#FormularioCrearArtista input[type="text"],
+#FormularioCrearArtista input[type="number"],
+#FormularioCrearArtista textarea,
+#FormularioCrearGenero input[type="text"],
+#FormularioCrearGenero select,
+#FormularioCrearGenero textarea {
+    border: 1.5px solid #b0b3b8 !important;
+    background-color: var(--ColorFondoSuperficie, #ffffff) !important;
+    color: var(--ColorTextoPrincipal, #050505) !important;
+    border-radius: var(--RadioPequeno);
+    padding: 10px 12px;
+    font-size: 13.5px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#FormularioCrearArtista input[type="text"]:focus,
+#FormularioCrearArtista input[type="number"]:focus,
+#FormularioCrearArtista textarea:focus,
+#FormularioCrearGenero input[type="text"]:focus,
+#FormularioCrearGenero select:focus,
+#FormularioCrearGenero textarea:focus {
+    border-color: var(--ColorPrimarioAzul) !important;
+    box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.2) !important;
+    outline: none;
+}
+
+body.ModoOscuroActivo #FormularioCrearArtista input[type="text"],
+body.ModoOscuroActivo #FormularioCrearArtista input[type="number"],
+body.ModoOscuroActivo #FormularioCrearArtista textarea,
+body.ModoOscuroActivo #FormularioCrearGenero input[type="text"],
+body.ModoOscuroActivo #FormularioCrearGenero select,
+body.ModoOscuroActivo #FormularioCrearGenero textarea {
+    border-color: #5a5c60 !important;
+    background-color: #18191a !important;
+    color: #e4e6eb !important;
+}
+
+body.ModoOscuroActivo #FormularioCrearArtista input[type="text"]:focus,
+body.ModoOscuroActivo #FormularioCrearArtista input[type="number"]:focus,
+body.ModoOscuroActivo #FormularioCrearArtista textarea:focus,
+body.ModoOscuroActivo #FormularioCrearGenero input[type="text"]:focus,
+body.ModoOscuroActivo #FormularioCrearGenero select:focus,
+body.ModoOscuroActivo #FormularioCrearGenero textarea:focus {
+    border-color: #4599ff !important;
+    box-shadow: 0 0 0 3px rgba(69, 153, 255, 0.25) !important;
+}
+
+/* Zona Drag & Drop Sencilla para Fotografía de Artista */
+.ZonaSubidaFotoArtista {
+    border: 2px dashed var(--ColorPrimarioAzul, #1877f2);
+    border-radius: var(--RadioMediano);
+    padding: 14px 18px;
+    background: var(--ColorFondoSuperficie);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.ZonaSubidaFotoArtista:hover,
+.ZonaSubidaFotoArtista.ArrastrandoSobre {
+    border-color: var(--ColorPrimarioAzul);
+    background-color: rgba(24, 119, 242, 0.08);
+    transform: scale(1.005);
+}
+
+.ContenidoZonaFotoArtista {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.ContenedorAvatarPreviaArtista {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--ColorPrimarioAzul);
+    flex-shrink: 0;
+    background: var(--ColorFondoSuperficie);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+}
+
+.ImagenAvatarPrevia {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.TextosZonaFotoArtista {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.TituloSubidaFoto {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ColorTextoPrincipal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.TituloSubidaFoto i {
+    font-size: 18px;
+    color: var(--ColorPrimarioAzul);
+}
+
+.EnlaceExaminarFoto {
+    color: var(--ColorPrimarioAzul);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.InstruccionSubidaFoto {
+    font-size: 11.5px;
+    color: var(--ColorTextoSecundario);
+}
+
+body.ModoOscuroActivo .ZonaSubidaFotoArtista {
+    border-color: #3b82f6;
+    background-color: #18191a;
+}
+
+/* ==========================================================================
+   ESTILOS: COLOR PERSONALIZADO Y BUSCADOR DE ICONOS
+   ========================================================================== */
+#FormularioCrearGenero #InputHexColorGenero {
+    width: 110px !important;
+}
+
+.TarjetaOpcionIconoFA:hover {
+    border-color: var(--ColorPrimarioAzul) !important;
+    background-color: var(--ColorPrimarioAzulSuave) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.TarjetaOpcionIconoFA:hover i {
+    color: var(--ColorPrimarioAzul) !important;
+}
+
+.ChipCategoriaFA:hover,
+.ChipSugerenciaCompas:hover {
+    background-color: var(--ColorPrimarioAzulSuave) !important;
+    color: var(--ColorPrimarioAzul) !important;
+    border-color: var(--ColorPrimarioAzul) !important;
+}
+
+body.ModoOscuroActivo .ContenedorListaResultadosFA {
+    background-color: #18191a !important;
+    border-color: #393a3b !important;
+}
+
+body.ModoOscuroActivo .TarjetaOpcionIconoFA {
+    background-color: #242526 !important;
+    border-color: #393a3b !important;
+}
+
+body.ModoOscuroActivo .TarjetaOpcionIconoFA.IconoFAActivo {
+    background-color: rgba(24, 119, 242, 0.2) !important;
+    border-color: var(--ColorPrimarioAzul) !important;
+}
+
+body.ModoOscuroActivo .ChipCategoriaFA,
+body.ModoOscuroActivo .ChipSugerenciaCompas {
+    background-color: #242526 !important;
+    border-color: #393a3b !important;
+    color: #e4e6eb !important;
+}
 

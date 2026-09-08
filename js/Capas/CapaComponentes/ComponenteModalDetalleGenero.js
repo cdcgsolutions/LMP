@@ -35,8 +35,8 @@ class ComponenteModalDetalleGenero {
         return `
         <div class="CapaFondoModalOscuro" id="ModalDetalleGeneroFondo">
             <div class="ContenedorVentanaModal ModalAnchoMediano" id="ContenedorVentanaModalGenero" style="overflow: hidden; max-width: 580px;">
-                <!-- Cabecera Visual Temática con Color del Género -->
-                <div class="CabeceraModalGeneroColor" style="background: ${Genero.ColorGradiente || 'var(--ColorPrimarioAzul)'}; padding: 18px 20px; color: #ffffff; position: relative;">
+                <!-- Cabecera Visual Temática con Color Sólido del Género -->
+                <div class="CabeceraModalGeneroColor" style="background-color: ${Genero.Color || 'var(--ColorPrimarioAzul)'}; padding: 18px 20px; color: #ffffff; position: relative;">
                     <button class="BotonCerrarModal" id="BotonCerrarModalGenero" title="Cerrar" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.35); color: #fff; border: 1px solid rgba(255,255,255,0.3); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -146,7 +146,7 @@ class ComponenteModalDetalleGenero {
                     <button class="BotonAccionSecundario" id="BotonCerrarModalGeneroPie" style="font-size: 13px; padding: 7px 14px;">
                         Cerrar
                     </button>
-                    <button class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Genero.Nombre}" style="font-size: 13px; padding: 7px 16px; display: inline-flex; align-items: center; gap: 6px;">
+                    <button class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Genero.Nombre}" style="font-size: 13px; padding: 7px 16px; display: inline-flex; align-items: center; gap: 6px; background-color: ${Genero.Color || 'var(--ColorPrimarioAzul)'}; border-color: ${Genero.Color || 'var(--ColorPrimarioAzul)'};">
                         <i class="fa-solid fa-scroll"></i>
                         <span>Explorar Canciones</span>
                     </button>

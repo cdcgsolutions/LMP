@@ -32,6 +32,8 @@ class ControladorPrincipal {
         this.ComponenteModalCrearAporte = new ComponenteModalCrearAporte(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalIniciarSesion = new ComponenteModalIniciarSesion(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalDetalleGenero = new ComponenteModalDetalleGenero(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteModalCrearArtista = new ComponenteModalCrearArtista();
+        this.ComponenteModalCrearGenero = new ComponenteModalCrearGenero();
         this.ComponenteBarraNavegacionMovil = new ComponenteBarraNavegacionMovil(this.ServicioEstado);
         this.ComponenteReproductorFlotante = new ComponenteReproductorFlotante(this.ServicioEstado, this.ServicioReproductor);
 
@@ -599,22 +601,66 @@ class ControladorPrincipal {
             return;
         }
 
-        // 15. Seguir y Mensaje a Artistas
-        if (Objetivo.closest("#BotonSeguirArtista")) {
-            if (!this.ServicioEstado.EstaAutenticado()) {
-                this.AbrirModalIniciarSesion("Inicia sesión para seguir a los artistas y compositores.");
-                return;
+        // 15. Acciones de la Galería y Biografía de Artistas
+        const BotonVerBio = Objetivo.closest(".BotonVerBiografiaArtista");
+        if (BotonVerBio) {
+            const IdArtista = BotonVerBio.dataset.artistaId;
+            if (this.ComponenteSeccionArtistas) {
+                this.ComponenteSeccionArtistas.EstablecerArtistaActivo(IdArtista);
+                this.ActualizarVistaCentral();
+                window.scrollTo({ top: 0, behavior: "smooth" });
             }
-            this.ServicioNotificaciones.MostrarMensajeToast("¡Ahora sigues a este artista!", '<i class="fa-solid fa-user-check"></i>');
             return;
         }
 
-        if (Objetivo.closest("#BotonMensajeArtista")) {
-            if (!this.ServicioEstado.EstaAutenticado()) {
-                this.AbrirModalIniciarSesion("Inicia sesión para enviar un mensaje a este artista.");
-                return;
+        const BotonVolverGaleria = Objetivo.closest(".BotonVolverGaleriaArtistas");
+        if (BotonVolverGaleria) {
+            if (this.ComponenteSeccionArtistas) {
+                this.ComponenteSeccionArtistas.LimpiarArtistaActivo();
+                this.ActualizarVistaCentral();
+                window.scrollTo({ top: 0, behavior: "smooth" });
             }
-            this.ServicioNotificaciones.MostrarMensajeToast("Mensajería directa habilitada para tu cuenta.", '<i class="fa-solid fa-comment-dots"></i>');
+            return;
+        }
+
+        if (Objetivo.closest(".BotonAbrirModalNuevoArtista")) {
+            this.AbrirModalCrearArtista();
+            return;
+        }
+
+        if (
+            Objetivo.closest("#BotonCerrarModalCrearArtista") ||
+            Objetivo.closest("#BotonCancelarCrearArtista") ||
+            Objetivo.id === "ModalCrearArtistaFondo" ||
+            Objetivo.closest("#ModalCrearArtistaFondo") === Objetivo
+        ) {
+            this.CerrarModales();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonGuardarNuevoArtista")) {
+            this.ProcesarGuardarNuevoArtista();
+            return;
+        }
+
+        // 15.2. Eventos de Modal Crear Ritmo/Género
+        if (Objetivo.closest(".BotonAbrirModalNuevoGenero") || Objetivo.closest("#BotonAbrirModalCrearGenero")) {
+            this.AbrirModalCrearGenero();
+            return;
+        }
+
+        if (
+            Objetivo.closest("#BotonCerrarModalCrearGenero") ||
+            Objetivo.closest("#BotonCancelarCrearGenero") ||
+            Objetivo.id === "ModalCrearGeneroFondo" ||
+            Objetivo.closest("#ModalCrearGeneroFondo") === Objetivo
+        ) {
+            this.CerrarModales();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonGuardarNuevoGenero")) {
+            this.ProcesarGuardarNuevoGenero();
             return;
         }
 
@@ -1102,6 +1148,198 @@ class ControladorPrincipal {
         const Html = this.ComponenteModalDetalleGenero.Renderizar(NombreOGeneroId);
         if (Html) {
             this.ContenedorModales.innerHTML = Html;
+        }
+    }
+
+    AbrirModalCrearArtista() {
+        if (!this.ContenedorModales) return;
+        if (!this.ServicioEstado.EstaAutenticado()) {
+            this.AbrirModalIniciarSesion("Inicia sesión para registrar nuevos artistas y compositores benianos.");
+            return;
+        }
+        this.ContenedorModales.innerHTML = this.ComponenteModalCrearArtista.Renderizar();
+        this.ComponenteModalCrearArtista.VincularContadoresEnTiempoReal();
+        this.VincularEventosModalCrearArtista();
+    }
+
+    VincularEventosModalCrearArtista() {
+        const InputArchivo = document.getElementById("InputArchivoFotoArtista");
+        const ZonaDragDrop = document.getElementById("ZonaDragDropFotoArtista");
+        const EtiquetaNombre = document.getElementById("NombreArchivoFotoArtista");
+        const VistaPrevia = document.getElementById("VistaPreviaFotoNuevoArtista");
+
+        const ManejarArchivoSeleccionado = (Archivo) => {
+            if (!Archivo) return;
+            if (EtiquetaNombre) {
+                EtiquetaNombre.textContent = Archivo.name;
+                EtiquetaNombre.title = Archivo.name;
+            }
+            if (VistaPrevia && Archivo.type.startsWith("image/")) {
+                VistaPrevia.src = URL.createObjectURL(Archivo);
+            }
+        };
+
+        if (ZonaDragDrop && InputArchivo) {
+            ZonaDragDrop.addEventListener("click", () => InputArchivo.click());
+
+            ZonaDragDrop.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                ZonaDragDrop.classList.add("ArrastrandoSobre");
+            });
+
+            ZonaDragDrop.addEventListener("dragleave", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                ZonaDragDrop.classList.remove("ArrastrandoSobre");
+            });
+
+            ZonaDragDrop.addEventListener("drop", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                ZonaDragDrop.classList.remove("ArrastrandoSobre");
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    InputArchivo.files = e.dataTransfer.files;
+                    ManejarArchivoSeleccionado(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        if (InputArchivo) {
+            InputArchivo.addEventListener("change", () => {
+                if (InputArchivo.files && InputArchivo.files.length > 0) {
+                    ManejarArchivoSeleccionado(InputArchivo.files[0]);
+                }
+            });
+        }
+    }
+
+    async ProcesarGuardarNuevoArtista() {
+        const CampoNombre = document.getElementById("CampoNuevoArtistaNombre");
+        const CampoBio = document.getElementById("CampoNuevoArtistaBiografia");
+        if (!CampoNombre || !CampoNombre.value.trim()) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Por favor escribe el nombre completo del artista.", '<i class="fa-solid fa-triangle-exclamation"></i>');
+            if (CampoNombre) CampoNombre.focus();
+            return;
+        }
+        if (!CampoBio || !CampoBio.value.trim()) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Por favor redacta la biografía general del artista.", '<i class="fa-solid fa-triangle-exclamation"></i>');
+            if (CampoBio) CampoBio.focus();
+            return;
+        }
+
+        const BotonGuardar = document.getElementById("BotonGuardarNuevoArtista");
+        const IndicadorCloudinary = document.getElementById("IndicadorSubidaFotoArtista");
+        const InputArchivo = document.getElementById("InputArchivoFotoArtista");
+        let UrlFotoFinal = "Logo1.png";
+
+        try {
+            if (BotonGuardar) {
+                BotonGuardar.disabled = true;
+                BotonGuardar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+            }
+
+            // Subir foto a Cloudinary si se seleccionó archivo
+            if (InputArchivo && InputArchivo.files && InputArchivo.files.length > 0 && this.ServicioCloudinary) {
+                if (IndicadorCloudinary) IndicadorCloudinary.style.display = "block";
+                if (BotonGuardar) BotonGuardar.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-fade"></i> Subiendo foto a Cloudinary...';
+                
+                const ResCloud = await this.ServicioCloudinary.SubirArchivo(InputArchivo.files[0], "lmp_artistas");
+                if (ResCloud && ResCloud.UrlSegura) {
+                    UrlFotoFinal = ResCloud.UrlSegura;
+                }
+            }
+
+            const DatosArtista = {
+                NombreCompleto: CampoNombre.value.trim(),
+                NombreArtistico: (document.getElementById("CampoNuevoArtistaApodo")?.value || "").trim(),
+                FechaNacimiento: (document.getElementById("CampoNuevoArtistaNacimiento")?.value || "").trim(),
+                LugarNacimiento: (document.getElementById("CampoNuevoArtistaLugar")?.value || "").trim(),
+                TrayectoriaAnos: (document.getElementById("CampoNuevoArtistaTrayectoriaAnos")?.value || "").trim() || 0,
+                GeneroMusical: (document.getElementById("CampoNuevoArtistaGenero")?.value || "").trim(),
+                Instrumentos: (document.getElementById("CampoNuevoArtistaInstrumentos")?.value || "").trim(),
+                FotoPerfilUrl: UrlFotoFinal,
+                FotoPerfil: UrlFotoFinal,
+                Biografia: CampoBio.value.trim(),
+                Inicios: (document.getElementById("CampoNuevoArtistaInicios")?.value || "").trim(),
+                Trayectoria: (document.getElementById("CampoNuevoArtistaTrayectoria")?.value || "").trim(),
+                ObrasDestacadas: (document.getElementById("CampoNuevoArtistaObras")?.value || "").trim(),
+                Legado: (document.getElementById("CampoNuevoArtistaLegado")?.value || "").trim(),
+                CitaCelebre: (document.getElementById("CampoNuevoArtistaCita")?.value || "").trim()
+            };
+
+            await this.ModeloAlmacenamiento.GuardarArtistaNuevo(DatosArtista);
+
+            this.CerrarModales();
+            this.ActualizarVistaCentral();
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `¡'${DatosArtista.NombreCompleto}' registrado con éxito!`,
+                '<i class="fa-solid fa-circle-check"></i>'
+            );
+        } catch (ErrorGuardar) {
+            console.error("[ControladorPrincipal] Error al registrar artista:", ErrorGuardar);
+            this.ServicioNotificaciones.MostrarMensajeToast("Error al registrar artista. Intenta de nuevo.", '<i class="fa-solid fa-triangle-exclamation"></i>');
+            if (BotonGuardar) {
+                BotonGuardar.disabled = false;
+                BotonGuardar.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Artista';
+            }
+            if (IndicadorCloudinary) IndicadorCloudinary.style.display = "none";
+        }
+    }
+
+    AbrirModalCrearGenero() {
+        if (!this.ContenedorModales) return;
+        if (!this.ServicioEstado.EstaAutenticado()) {
+            this.AbrirModalIniciarSesion("Inicia sesión para registrar nuevos ritmos y géneros benianos.");
+            return;
+        }
+        this.ContenedorModales.innerHTML = this.ComponenteModalCrearGenero.Renderizar();
+        this.ComponenteModalCrearGenero.VincularEventos();
+    }
+
+    async ProcesarGuardarNuevoGenero() {
+        const CampoNombre = document.getElementById("CampoNuevoGeneroNombre");
+        if (!CampoNombre || !CampoNombre.value.trim()) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Por favor escribe el nombre del ritmo o género.", '<i class="fa-solid fa-triangle-exclamation"></i>');
+            if (CampoNombre) CampoNombre.focus();
+            return;
+        }
+
+        const BotonGuardar = document.getElementById("BotonGuardarNuevoGenero");
+
+        try {
+            if (BotonGuardar) {
+                BotonGuardar.disabled = true;
+                BotonGuardar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+            }
+
+            const DatosGenero = {
+                Nombre: CampoNombre.value.trim(),
+                Compas: (document.getElementById("CampoNuevoGeneroCompas")?.value || "").trim(),
+                Origen: (document.getElementById("CampoNuevoGeneroOrigen")?.value || "").trim(),
+                Color: (document.getElementById("CampoColorGeneroSeleccionado")?.value || "#1877f2").trim(),
+                IconoClase: (document.getElementById("CampoClaseIconoSeleccionado")?.value || "fa-solid fa-guitar").trim(),
+                TempoTipico: (document.getElementById("CampoNuevoGeneroTempo")?.value || "").trim(),
+                Caracter: (document.getElementById("CampoNuevoGeneroCaracter")?.value || "").trim(),
+                InstrumentosTipicos: (document.getElementById("CampoNuevoGeneroInstrumentos")?.value || "").trim(),
+                Descripcion: (document.getElementById("CampoNuevoGeneroDescripcion")?.value || "").trim()
+            };
+
+            await this.ModeloAlmacenamiento.GuardarGeneroNuevo(DatosGenero);
+
+            this.CerrarModales();
+            this.ActualizarVistaCentral();
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `¡Ritmo '${DatosGenero.Nombre}' registrado con éxito!`,
+                '<i class="fa-solid fa-circle-check"></i>'
+            );
+        } catch (ErrorGuardar) {
+            console.error("[ControladorPrincipal] Error al registrar género:", ErrorGuardar);
+            this.ServicioNotificaciones.MostrarMensajeToast("Error al registrar el ritmo. Intenta de nuevo.", '<i class="fa-solid fa-triangle-exclamation"></i>');
+            if (BotonGuardar) {
+                BotonGuardar.disabled = false;
+                BotonGuardar.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Ritmo';
+            }
         }
     }
 

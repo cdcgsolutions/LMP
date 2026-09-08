@@ -2,7 +2,7 @@
    SERVICE WORKER: LETRAS MI POBLAU (LMP) - PWA
    ========================================================================== */
 
-const CACHE_NAME = 'lmp-pwa-cache-v34';
+const CACHE_NAME = 'lmp-pwa-cache-v44';
 const RECURSOS_PRECACHE = [
   './',
   './index.html',
@@ -24,9 +24,10 @@ const RECURSOS_PRECACHE = [
   './js/Capas/CapaDatos/ModeloAlmacenamiento.js',
   './js/Capas/CapaServicios/ServicioCloudinary.js',
   './js/Capas/CapaServicios/ServicioEstado.js',
-  './js/Capas/CapaServicios/ServicioReproductor.js',
   './js/Capas/CapaServicios/ServicioNotificaciones.js',
+  './js/Capas/CapaServicios/ServicioReproductor.js',
   './js/Capas/CapaComponentes/ComponenteEncabezado.js',
+  './js/Capas/CapaComponentes/ComponenteHistorias.js',
   './js/Capas/CapaComponentes/ComponenteBarraLateralIzquierda.js',
   './js/Capas/CapaComponentes/ComponenteBarraLateralDerecha.js',
   './js/Capas/CapaComponentes/ComponenteCrearPublicacion.js',
@@ -42,6 +43,9 @@ const RECURSOS_PRECACHE = [
   './js/Capas/CapaComponentes/ComponenteModalCrearAporte.js',
   './js/Capas/CapaComponentes/ComponenteModalIniciarSesion.js',
   './js/Capas/CapaComponentes/ComponenteModalDetalleGenero.js',
+  './js/Capas/CapaComponentes/ComponenteSelectorIconosFA.js',
+  './js/Capas/CapaComponentes/ComponenteModalCrearGenero.js',
+  './js/Capas/CapaComponentes/ComponenteModalCrearArtista.js',
   './js/Capas/CapaComponentes/ComponenteBarraNavegacionMovil.js',
   './js/Capas/CapaComponentes/ComponenteReproductorFlotante.js',
   './js/Capas/CapaControlador/ControladorPrincipal.js'
