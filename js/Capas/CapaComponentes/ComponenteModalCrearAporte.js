@@ -13,12 +13,9 @@ class ComponenteModalCrearAporte {
         const EsEdicion = Boolean(DatosEdicion);
 
         const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
-        const NombreUsuarioPorDefecto = (UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario") 
-            ? UsuarioActual.Nombre 
-            : "";
 
         const TituloCancion = EsEdicion ? (DatosEdicion.Titulo || "") : "";
-        const AutorCancion = EsEdicion ? (DatosEdicion.Autor || NombreUsuarioPorDefecto) : NombreUsuarioPorDefecto;
+        const AutorCancion = EsEdicion ? (DatosEdicion.Autor || "") : "";
         const GenerosEnBD = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || [];
         const GenerosNombres = GenerosEnBD.map(G => G.Nombre || G);
         const GeneroCancion = EsEdicion ? (DatosEdicion.Genero || (GenerosNombres[0] || "")) : (GenerosNombres[0] || "");
@@ -54,8 +51,8 @@ class ComponenteModalCrearAporte {
 
                     <div class="CuadriculaFormularioDoble">
                         <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label style="font-weight: 700; font-size: 13px;">Autor / Compositor *</label>
-                            <input type="text" id="CampoNuevoAutor" placeholder="Ej: Edna Miriam Edgley" value="${this.EscaparHtml(AutorCancion)}">
+                            <label style="font-weight: 700; font-size: 13px;">Autor / Compositor de la Canción *</label>
+                            <input type="text" id="CampoNuevoAutor" placeholder="Ej: Rafael Seghers, Gilberto Rojas..." value="${this.EscaparHtml(AutorCancion)}">
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 4px;">
                             <label style="font-weight: 700; font-size: 13px;">Ritmo o Género *</label>

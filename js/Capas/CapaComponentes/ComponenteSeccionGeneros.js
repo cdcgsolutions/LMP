@@ -14,13 +14,18 @@ class ComponenteSeccionGeneros {
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionGeneros">
-            <!-- Encabezado de la Sección -->
-            <div class="CabeceraSeccionPrincipal">
-                <div>
-                    <h1 class="TituloSeccionGrande"><i class="fa-solid fa-guitar" style="color: var(--ColorVerdeBeni); margin-right: 8px;"></i>Ritmos y Géneros Tradicionales del Beni</h1>
-                    <p class="DescripcionSeccionSubtitulo">
-                        Guía pedagógica e histórica de los compases, raíces y melodías autóctonas que dan identidad a la música boliviana oriental.
-                    </p>
+            <!-- Encabezado de la Sección Compacto -->
+            <div class="CabeceraSeccionPrincipal CabeceraSeccionGeneros">
+                <div class="ContenedorEncabezadoGeneros">
+                    <div class="TextosEncabezadoGeneros">
+                        <h1 class="TituloSeccionGrande">
+                            <i class="fa-solid fa-guitar" style="color: var(--ColorPrimarioAzul);"></i>
+                            <span>Ritmos y Géneros</span>
+                        </h1>
+                        <p class="DescripcionSeccionSubtitulo">
+                            Guía histórica y compases tradicionales del Beni
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -31,26 +36,47 @@ class ComponenteSeccionGeneros {
                     const IconoHtml = Gen.Icono || (Gen.IconoClase ? `<i class="${Gen.IconoClase}"></i>` : '<i class="fa-solid fa-guitar"></i>');
                     return `
                     <div class="TarjetaGeneroBeniano">
+                        <!-- Cabecera Visual con Gradiente y Metadatos Clave -->
                         <div class="CabeceraGeneroColor" style="background: ${Gen.ColorGradiente || 'linear-gradient(135deg, #1877f2, #0d5cb6)'};">
-                            <span style="font-size: 32px; margin-bottom: 4px;">${IconoHtml}</span>
-                            <div style="font-size: 20px; font-weight: 800;">${Gen.Nombre}</div>
-                            <div style="font-size: 12px; opacity: 0.9;">Compás: ${Gen.Compas}</div>
+                            <div class="FilaSuperiorCabeceraGenero">
+                                <div class="ContenedorIconoGenero" title="Ritmo: ${Gen.Nombre}">
+                                    ${IconoHtml}
+                                </div>
+                                ${Gen.Compas ? `
+                                <span class="InsigniaCompasPill" title="Compás rítmico">
+                                    <i class="fa-solid fa-music"></i>
+                                    <span>${Gen.Compas}</span>
+                                </span>` : ''}
+                            </div>
+                            <div class="FilaInferiorCabeceraGenero">
+                                <h2 class="NombreGeneroTarjeta">${Gen.Nombre}</h2>
+                                ${Gen.Origen ? `
+                                <span class="OrigenGeneroPill" title="Origen geográfico">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span>${Gen.Origen}</span>
+                                </span>` : ''}
+                            </div>
                         </div>
 
+                        <!-- Cuerpo de la Tarjeta con Información Relevante y Despejada -->
                         <div class="CuerpoGeneroInfo">
-                            <p style="font-size: 13.5px; color: var(--ColorTextoSecundario); line-height: 1.45; margin-bottom: 12px;">
+                            ${Gen.Descripcion ? `
+                            <p class="DescripcionGeneroTexto" title="${Gen.Descripcion}">
                                 ${Gen.Descripcion}
-                            </p>
+                            </p>` : ''}
 
-                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
-                                <span class="InsigniaCompasMusical">Tempo: ${Gen.TempoTipico}</span>
-                                <span class="InsigniaTonoMusical">Carácter: ${Gen.Caracter}</span>
-                            </div>
-
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--ColorBordeDivisor);">
-                                <button class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Gen.Nombre}" style="width: 100%; font-size: 13px;">
-                                    <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>Explorar canciones de ${Gen.Nombre}
-                                </button>
+                            <!-- Pie de Tarjeta con Dos Acciones: Ver Detalles en Modal y Explorar Canciones -->
+                            <div class="PieTarjetaGenero">
+                                <div class="FilaBotonesGenero">
+                                    <button type="button" class="BotonAccionSecundario BotonAbrirModalGenero" data-genero="${Gen.Nombre}" title="Ver historia y ficha técnica completa">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                        <span>Detalles</span>
+                                    </button>
+                                    <button type="button" class="BotonAccionPrimario BotonExplorarCancionesGenero" data-genero="${Gen.Nombre}" title="Explorar canciones de este ritmo">
+                                        <i class="fa-solid fa-scroll"></i>
+                                        <span>Canciones</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

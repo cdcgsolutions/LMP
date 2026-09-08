@@ -31,6 +31,7 @@ class ControladorPrincipal {
         this.ComponenteModalPartitura = new ComponenteModalPartitura(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalCrearAporte = new ComponenteModalCrearAporte(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalIniciarSesion = new ComponenteModalIniciarSesion(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteModalDetalleGenero = new ComponenteModalDetalleGenero(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteBarraNavegacionMovil = new ComponenteBarraNavegacionMovil(this.ServicioEstado);
         this.ComponenteReproductorFlotante = new ComponenteReproductorFlotante(this.ServicioEstado, this.ServicioReproductor);
 
@@ -659,9 +660,24 @@ class ControladorPrincipal {
             return;
         }
 
-        // Explorar Canciones por Género
+        // Abrir Modal Detalle Pedagógico de Género / Ritmo
+        const BotonAbrirGenero = Objetivo.closest(".BotonAbrirModalGenero");
+        if (BotonAbrirGenero) {
+            const NombreGenero = BotonAbrirGenero.dataset.genero;
+            this.AbrirModalDetalleGenero(NombreGenero);
+            return;
+        }
+
+        // Cerrar Modal de Género
+        if (Objetivo.closest("#BotonCerrarModalGenero") || Objetivo.closest("#BotonCerrarModalGeneroPie") || Objetivo.id === "ModalDetalleGeneroFondo") {
+            this.CerrarModales();
+            return;
+        }
+
+        // Explorar Canciones por Género (desde tarjeta o desde modal)
         const BotonExplorarGenero = Objetivo.closest(".BotonExplorarCancionesGenero");
         if (BotonExplorarGenero) {
+            this.CerrarModales();
             const GeneroElegido = BotonExplorarGenero.dataset.genero;
             this.ServicioEstado.EstablecerFiltrosCanciones(GeneroElegido, "Todos");
             this.ServicioEstado.EstablecerPestanaActiva("canciones");
@@ -1081,6 +1097,14 @@ class ControladorPrincipal {
         this.ContenedorModales.innerHTML = this.ComponenteModalPartitura.Renderizar(IdCancion);
     }
 
+    AbrirModalDetalleGenero(NombreOGeneroId) {
+        if (!this.ContenedorModales) return;
+        const Html = this.ComponenteModalDetalleGenero.Renderizar(NombreOGeneroId);
+        if (Html) {
+            this.ContenedorModales.innerHTML = Html;
+        }
+    }
+
     ActualizarZoomPartitura() {
         const Imagen = document.getElementById("ImagenPartituraZoomable");
         const Etiqueta = document.getElementById("EtiquetaPorcentajeZoom");
@@ -1113,12 +1137,18 @@ class ControladorPrincipal {
 
         const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
         const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
-        const EsAutor = EstaAutenticado && Publicacion.NombreAutor && (
-            UsuarioActual.Nombre.trim().toLowerCase() === Publicacion.NombreAutor.trim().toLowerCase() ||
-            Publicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
+        const EsAdmin = UsuarioActual && (UsuarioActual.Rol === "Admin" || UsuarioActual.Rol === "admin");
+        const Publicador = Publicacion.NombrePublicador || Publicacion.NombreAutor || "";
+        const EsPublicador = EstaAutenticado && (
+            EsAdmin ||
+            (Publicador && (
+                UsuarioActual.Nombre.trim().toLowerCase() === Publicador.trim().toLowerCase() ||
+                Publicador.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase()) ||
+                UsuarioActual.Nombre.trim().toLowerCase().includes(Publicador.trim().toLowerCase())
+            ))
         );
-        if (!EsAutor) {
-            this.ServicioNotificaciones.MostrarMensajeToast("Solo el autor de la publicación puede editarla.", '<i class="fa-solid fa-lock"></i>');
+        if (!EsPublicador) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Solo quien publicó este aporte puede editarlo.", '<i class="fa-solid fa-lock"></i>');
             return;
         }
 
@@ -1140,7 +1170,7 @@ class ControladorPrincipal {
             TextoPublicacion: Publicacion.TextoPublicacion || "",
             IdCancion: Cancion ? Cancion.IdCancion : (Publicacion.IdCancionAsociada || null),
             Titulo: Cancion ? Cancion.Titulo : "",
-            Autor: Cancion ? Cancion.Autor : (Publicacion.NombreAutor || "Edna Miriam Edgley Cuellar"),
+            Autor: Cancion ? (Cancion.Autor || "") : "",
             Genero: Cancion ? Cancion.Genero : "Taquirari",
             TonoOriginal: Cancion ? Cancion.TonoOriginal : "Re Mayor (D)",
             TempoBPM: Cancion ? Cancion.TempoBPM : 108,
@@ -1460,10 +1490,9 @@ class ControladorPrincipal {
                 });
             }
 
-            // 2. Actualizar Publicación
+            // 2. Actualizar Publicación: se preserva intacto el usuario que la publicó originalmente
             await this.ModeloAlmacenamiento.ActualizarPublicacion(IdPublicacion, {
                 TextoPublicacion: MensajeMuro,
-                NombreAutor: Autor,
                 EsEditada: true
             });
 
@@ -1496,13 +1525,16 @@ class ControladorPrincipal {
             });
 
             const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
-            const NombreAutorFinal = (UsuarioActual && UsuarioActual.Nombre && !UsuarioActual.EsInvitado) ? UsuarioActual.Nombre : Autor;
+            const NombrePublicadorFinal = (UsuarioActual && UsuarioActual.Nombre && !UsuarioActual.EsInvitado && UsuarioActual.Nombre !== "Usuario") 
+                ? UsuarioActual.Nombre 
+                : "Usuario LMP";
             const AvatarFinal = (UsuarioActual && UsuarioActual.FotoPerfil) ? UsuarioActual.FotoPerfil : "Logo1.png";
 
             await this.ModeloAlmacenamiento.GuardarPublicacionNueva({
-                NombreAutor: NombreAutorFinal,
+                NombrePublicador: NombrePublicadorFinal,
+                NombreAutor: NombrePublicadorFinal,
                 AvatarAutor: AvatarFinal,
-                EsVerificado: this.ModeloAlmacenamiento.EsUsuarioVerificado(NombreAutorFinal),
+                EsVerificado: this.ModeloAlmacenamiento.EsUsuarioVerificado(NombrePublicadorFinal),
                 TextoPublicacion: MensajeMuro,
                 IdCancionAsociada: NuevaCancion.IdCancion
             });
@@ -1796,12 +1828,18 @@ class ControladorPrincipal {
 
         const UsuarioActual = this.ServicioEstado ? (this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual")) : null;
         const EstaAutenticado = !!(UsuarioActual && !UsuarioActual.EsInvitado && UsuarioActual.Nombre && UsuarioActual.Nombre !== "Usuario");
-        const EsAutor = EstaAutenticado && Publicacion.NombreAutor && (
-            UsuarioActual.Nombre.trim().toLowerCase() === Publicacion.NombreAutor.trim().toLowerCase() ||
-            Publicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
+        const EsAdmin = UsuarioActual && (UsuarioActual.Rol === "Admin" || UsuarioActual.Rol === "admin");
+        const Publicador = Publicacion.NombrePublicador || Publicacion.NombreAutor || "";
+        const EsPublicador = EstaAutenticado && (
+            EsAdmin ||
+            (Publicador && (
+                UsuarioActual.Nombre.trim().toLowerCase() === Publicador.trim().toLowerCase() ||
+                Publicador.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase()) ||
+                UsuarioActual.Nombre.trim().toLowerCase().includes(Publicador.trim().toLowerCase())
+            ))
         );
-        if (!EsAutor) {
-            this.ServicioNotificaciones.MostrarMensajeToast("Solo el autor de la publicación puede eliminarla.", '<i class="fa-solid fa-lock"></i>');
+        if (!EsPublicador) {
+            this.ServicioNotificaciones.MostrarMensajeToast("Solo quien publicó este aporte puede eliminarlo.", '<i class="fa-solid fa-lock"></i>');
             return;
         }
 

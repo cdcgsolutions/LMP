@@ -104,7 +104,7 @@ class ComponenteSeccionPerfil {
 
         const PublicacionesDelUsuario = TodasLasPublicaciones.filter(Pub => {
             if (!Pub) return false;
-            const AutorPub = (Pub.NombreAutor || Pub.Autor || Pub.NombreUsuario || "").trim().toLowerCase();
+            const AutorPub = (Pub.NombrePublicador || Pub.NombreAutor || Pub.Autor || Pub.NombreUsuario || "").trim().toLowerCase();
             if (!AutorPub) return false;
             return NombresPosibles.some(Nombre => 
                 AutorPub === Nombre ||
@@ -200,7 +200,7 @@ class ComponenteSeccionPerfil {
                                 return `
                                 <div class="TarjetaCancionSimple" style="background: var(--ColorFondoSecundario); padding: 12px; border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeDivisor);">
                                     <div style="font-weight: 700; font-size: 14px; color: var(--ColorTextoPrincipal);">${Pub.TextoPublicacion || 'Publicación musical'}</div>
-                                    <div style="font-size: 12px; color: var(--ColorTextoSecundario); margin-top: 4px;">Por: ${Pub.NombreAutor || NombreCompleto}</div>
+                                    <div style="font-size: 12px; color: var(--ColorTextoSecundario); margin-top: 4px;">Por: ${Pub.NombrePublicador || Pub.NombreAutor || NombreCompleto}</div>
                                 </div>
                                 `;
                             }).join('')}

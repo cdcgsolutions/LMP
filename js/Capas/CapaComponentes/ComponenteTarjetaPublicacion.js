@@ -176,15 +176,22 @@ class ComponenteTarjetaPublicacion {
             ? `color: ${InfoReaccionActiva.Color}; font-weight: 700;` 
             : '';
 
+        const NombrePublicador = ObjetoPublicacion.NombrePublicador || ObjetoPublicacion.NombreAutor || "Usuario LMP";
+
         let EsVerificadoAutor = false;
         if (this.ModeloAlmacenamiento && typeof this.ModeloAlmacenamiento.EsUsuarioVerificado === "function") {
-            EsVerificadoAutor = this.ModeloAlmacenamiento.EsUsuarioVerificado(ObjetoPublicacion.NombreAutor, ObjetoPublicacion.EsVerificado === true);
+            EsVerificadoAutor = this.ModeloAlmacenamiento.EsUsuarioVerificado(NombrePublicador, ObjetoPublicacion.EsVerificado === true);
         } else {
             EsVerificadoAutor = ObjetoPublicacion.EsVerificado === true;
         }
-        const EsAutorDeLaPublicacion = EstaAutenticado && ObjetoPublicacion.NombreAutor && (
-            UsuarioActual.Nombre.trim().toLowerCase() === ObjetoPublicacion.NombreAutor.trim().toLowerCase() ||
-            ObjetoPublicacion.NombreAutor.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase())
+        const EsAdmin = UsuarioActual && (UsuarioActual.Rol === "Admin" || UsuarioActual.Rol === "admin");
+        const EsAutorDeLaPublicacion = EstaAutenticado && (
+            EsAdmin ||
+            (NombrePublicador && (
+                UsuarioActual.Nombre.trim().toLowerCase() === NombrePublicador.trim().toLowerCase() ||
+                NombrePublicador.trim().toLowerCase().includes(UsuarioActual.Nombre.trim().toLowerCase()) ||
+                UsuarioActual.Nombre.trim().toLowerCase().includes(NombrePublicador.trim().toLowerCase())
+            ))
         );
 
         const TiempoPublicacion = (this.ModeloAlmacenamiento && ObjetoPublicacion.FechaCreacion)
@@ -199,11 +206,11 @@ class ComponenteTarjetaPublicacion {
             <!-- 1. Encabezado de la Publicación -->
             <header class="EncabezadoPublicacion">
                 <div class="InfoAutorPublicacion">
-                    <img src="${ObjetoPublicacion.AvatarAutor || 'Logo1.png'}" alt="${ObjetoPublicacion.NombreAutor}" class="AvatarAutorPublicacion" onerror="this.src='Logo1.png'">
+                    <img src="${ObjetoPublicacion.AvatarAutor || 'Logo1.png'}" alt="${NombrePublicador}" class="AvatarAutorPublicacion" onerror="this.src='Logo1.png'">
                     <div class="DetallesAutorTexto">
                         <div class="NombreAutorTexto">
-                            ${ObjetoPublicacion.NombreAutor}
-                            ${EsVerificadoAutor ? '<span class="InsigniaVerificada" title="Autor Verificado LMP"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                            ${NombrePublicador}
+                            ${EsVerificadoAutor ? '<span class="InsigniaVerificada" title="Publicador Verificado LMP"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                         </div>
                         <div class="MetaTiempoPublicacion">
                             <span ${TituloFechaPublicacion ? `title="${TituloFechaPublicacion}"` : ''}>${TiempoPublicacion}</span>

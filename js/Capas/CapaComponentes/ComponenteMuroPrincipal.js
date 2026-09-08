@@ -54,7 +54,8 @@ class ComponenteMuroPrincipal {
         if (TerminoBusqueda) {
             Publicaciones = Publicaciones.filter(Pub => {
                 const CoincideTexto = Pub.TextoPublicacion && Pub.TextoPublicacion.toLowerCase().includes(TerminoBusqueda);
-                const CoincideAutor = Pub.NombreAutor && Pub.NombreAutor.toLowerCase().includes(TerminoBusqueda);
+                const NombrePub = Pub.NombrePublicador || Pub.NombreAutor || "";
+                const CoincideAutor = NombrePub && NombrePub.toLowerCase().includes(TerminoBusqueda);
                 
                 let CoincideCancion = false;
                 let Cancion = Pub.IdCancionAsociada ? this.ModeloAlmacenamiento.ObtenerCancionPorId(Pub.IdCancionAsociada) : null;

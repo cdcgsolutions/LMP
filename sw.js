@@ -2,7 +2,7 @@
    SERVICE WORKER: LETRAS MI POBLAU (LMP) - PWA
    ========================================================================== */
 
-const CACHE_NAME = 'lmp-pwa-cache-v28';
+const CACHE_NAME = 'lmp-pwa-cache-v34';
 const RECURSOS_PRECACHE = [
   './',
   './index.html',
@@ -41,6 +41,7 @@ const RECURSOS_PRECACHE = [
   './js/Capas/CapaComponentes/ComponenteModalPartitura.js',
   './js/Capas/CapaComponentes/ComponenteModalCrearAporte.js',
   './js/Capas/CapaComponentes/ComponenteModalIniciarSesion.js',
+  './js/Capas/CapaComponentes/ComponenteModalDetalleGenero.js',
   './js/Capas/CapaComponentes/ComponenteBarraNavegacionMovil.js',
   './js/Capas/CapaComponentes/ComponenteReproductorFlotante.js',
   './js/Capas/CapaControlador/ControladorPrincipal.js'

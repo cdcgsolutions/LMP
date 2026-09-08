@@ -186,7 +186,8 @@ class ModeloAlmacenamiento {
                         Icono: Data.Icono || (Data.IconoClase ? `<i class="${Data.IconoClase}"></i>` : '<i class="fa-solid fa-guitar"></i>'),
                         IconoClase: Data.IconoClase || "fa-solid fa-music",
                         InstrumentosTipicos: Data.InstrumentosTipicos || [],
-                        CancionesRepresentativas: Data.CancionesRepresentativas || []
+                        TempoTipico: Data.TempoTipico || Data.Tempo || "",
+                        Caracter: Data.Caracter || ""
                     });
                 });
                 this.Generos = GenerosLeidos;
@@ -340,12 +341,12 @@ class ModeloAlmacenamiento {
                         }
                     }
 
-                    const NombreAutorPub = Data.NombreAutor || "Usuario LMP";
+                    const NombrePublicadorPub = Data.NombrePublicador || Data.NombreAutor || "Usuario LMP";
                     let EsVerificadoAutor = false;
                     const UsuarioAutor = this.Usuarios.find(U => 
                         U.NombreCompleto && (
-                            U.NombreCompleto.trim().toLowerCase() === NombreAutorPub.trim().toLowerCase() ||
-                            NombreAutorPub.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase())
+                            U.NombreCompleto.trim().toLowerCase() === NombrePublicadorPub.trim().toLowerCase() ||
+                            NombrePublicadorPub.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase())
                         )
                     );
                     if (UsuarioAutor && UsuarioAutor.EsVerificado !== undefined) {
@@ -357,7 +358,8 @@ class ModeloAlmacenamiento {
                     const FechaPublicacion = Data.FechaCreacion || Data.createTime || null;
                     PublicacionesLeidas.push({
                         IdPublicacion: IdPublicacion,
-                        NombreAutor: NombreAutorPub,
+                        NombrePublicador: NombrePublicadorPub,
+                        NombreAutor: NombrePublicadorPub,
                         AvatarAutor: Data.AvatarAutor || "Logo1.png",
                         FechaCreacion: FechaPublicacion,
                         TiempoTranscurrido: this.FormatearTiempoRelativo(FechaPublicacion),
@@ -754,13 +756,16 @@ class ModeloAlmacenamiento {
         ObjetoPublicacion.CantidadCompartidos = 0;
         ObjetoPublicacion.Comentarios = [];
 
-        const AutorActual = ObjetoPublicacion.NombreAutor || "Edna Miriam Edgley Cuellar";
-        const EsVerificadoActual = this.EsUsuarioVerificado(AutorActual, ObjetoPublicacion.EsVerificado === true);
+        const PublicadorActual = ObjetoPublicacion.NombrePublicador || ObjetoPublicacion.NombreAutor || "Usuario LMP";
+        const EsVerificadoActual = this.EsUsuarioVerificado(PublicadorActual, ObjetoPublicacion.EsVerificado === true);
+        ObjetoPublicacion.NombrePublicador = PublicadorActual;
+        ObjetoPublicacion.NombreAutor = PublicadorActual;
         ObjetoPublicacion.EsVerificado = EsVerificadoActual;
 
         if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
             const DocFirestore = {
-                NombreAutor: AutorActual,
+                NombrePublicador: PublicadorActual,
+                NombreAutor: PublicadorActual,
                 AvatarAutor: ObjetoPublicacion.AvatarAutor || "Logo1.png",
                 TextoPublicacion: ObjetoPublicacion.TextoPublicacion || "",
                 EsVerificado: EsVerificadoActual,
