@@ -13,8 +13,8 @@ class ComponenteBarraLateralIzquierda {
         const PestanaActiva = this.ServicioEstado.ObtenerEstado("PestanaActiva");
         const UsuarioActual = this.ServicioEstado.ObtenerUsuarioActual() || this.ServicioEstado.ObtenerEstado("UsuarioActual");
         const EsInvitado = !UsuarioActual || UsuarioActual.EsInvitado === true || UsuarioActual.Nombre === "Usuario";
-        const EsVerificado = (!EsInvitado && this.ModeloAlmacenamiento) 
-            ? this.ModeloAlmacenamiento.EsUsuarioVerificado(UsuarioActual.Nombre, UsuarioActual.EsVerificado === true) 
+        const EsVerificado = (!EsInvitado && this.ModeloAlmacenamiento)
+            ? this.ModeloAlmacenamiento.EsUsuarioVerificado(UsuarioActual.Nombre, UsuarioActual.EsVerificado === true)
             : false;
 
         return `
@@ -71,19 +71,11 @@ class ComponenteBarraLateralIzquierda {
 
             <div class="SeparadorBarraLateral"></div>
 
-            <div class="TituloSeccionLateral">Tus Colecciones y Archivos</div>
+            <div class="TituloSeccionLateral">Colecciones y Archivos</div>
             <ul class="ListaAccesosDirectos">
-                <li class="ElementoAccesoDirecto" data-pestana="canciones">
-                    <div class="IconoCirculoColor IconoTeal"><i class="fa-solid fa-file-audio"></i></div>
-                    <span>Partituras Digitales</span>
-                </li>
                 <li class="ElementoAccesoDirecto" data-accion="ver-himno">
                     <div class="IconoCirculoColor IconoVerde"><i class="fa-solid fa-flag"></i></div>
                     <span>Himno al Beni</span>
-                </li>
-                <li class="ElementoAccesoDirecto" data-accion="crear-aporte">
-                    <div class="IconoCirculoColor IconoAzul"><i class="fa-solid fa-pen-nib"></i></div>
-                    <span>Aportar Nueva Letra</span>
                 </li>
                 ${!EsInvitado ? `
                 <li class="ElementoAccesoDirecto" data-accion="cerrar-sesion" style="color: var(--ColorPeligroRojo);">

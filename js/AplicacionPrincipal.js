@@ -28,22 +28,13 @@ class AplicacionLetrasMiPoblau {
         // 1. Instanciar Capa de Datos y Servicios vinculando Firebase
         this.InstanciaModeloAlmacenamiento = new window.ModeloAlmacenamiento(this.InstanciaServicioFirebase);
 
-        // 2. Cargar datos en vivo desde Firestore (con fallback transparente a caché local)
-        if (FirebaseExitoso) {
-            try {
-                await this.InstanciaModeloAlmacenamiento.CargarDatosDesdeFirestore();
-            } catch (ErrorCargaBD) {
-                console.warn("[LMP] Error al cargar datos iniciales de Firestore, operando con caché local:", ErrorCargaBD);
-            }
-        }
-
         this.InstanciaServicioCloudinary = new window.ServicioCloudinary();
         this.InstanciaServicioEstado = new window.ServicioEstado();
         this.InstanciaServicioEstado.SincronizarUsuarioConBaseDatos(this.InstanciaModeloAlmacenamiento.ObtenerTodosLosUsuarios());
         this.InstanciaServicioReproductor = new window.ServicioReproductor();
         this.InstanciaServicioNotificaciones = new window.ServicioNotificaciones();
 
-        // 3. Instanciar Capa de Controlador
+        // 2. Instanciar Capa de Controlador
         this.InstanciaControladorPrincipal = new window.ControladorPrincipal(
             this.InstanciaServicioEstado,
             this.InstanciaModeloAlmacenamiento,
@@ -52,10 +43,30 @@ class AplicacionLetrasMiPoblau {
             this.InstanciaServicioCloudinary
         );
 
-        // 4. Montar y Ejecutar la UI
+        // 3. Montar y Ejecutar la UI INMEDIATAMENTE (0ms de espera, sin pantalla en blanco)
         this.InstanciaControladorPrincipal.Inicializar();
 
-        console.log("Letras Mi Poblau inicializado con éxito con base de datos en vivo.");
+        // 4. Sincronizar datos en vivo desde Firestore en segundo plano (Skeletons activos mientras carga)
+        if (FirebaseExitoso) {
+            this.SincronizarDatosEnSegundoPlano();
+        }
+
+        console.log("Letras Mi Poblau montado e inicializado con éxito.");
+    }
+
+    async SincronizarDatosEnSegundoPlano() {
+        try {
+            console.log("[LMP] Sincronizando datos con Firestore en segundo plano...");
+            const Exito = await this.InstanciaModeloAlmacenamiento.CargarDatosDesdeFirestore();
+            if (Exito) {
+                this.InstanciaServicioEstado.SincronizarUsuarioConBaseDatos(this.InstanciaModeloAlmacenamiento.ObtenerTodosLosUsuarios());
+                console.log("[LMP] Sincronización en segundo plano completada con éxito.");
+            }
+        } catch (ErrorCargaBD) {
+            console.warn("[LMP] Error al sincronizar con Firestore en segundo plano:", ErrorCargaBD);
+        } finally {
+            this.InstanciaControladorPrincipal.ActualizarVistaTrasSincronizacionFirestore();
+        }
     }
 }
 

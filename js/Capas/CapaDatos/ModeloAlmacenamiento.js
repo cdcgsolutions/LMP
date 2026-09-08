@@ -23,6 +23,7 @@ class ModeloAlmacenamiento {
         this.Usuarios = [];
         this.DatosIFAEL = null;
         this.DatosCargadosDesdeFirestore = false;
+        this.EstaCargandoFirestore = true;
 
         this.CargarDesdeCacheLocal();
     }
@@ -31,6 +32,10 @@ class ModeloAlmacenamiento {
     // #region Sincronizacion y Fallback Local
     EstablecerServicioFirebase(Instancia) {
         this.ServicioFirebase = Instancia;
+    }
+
+    EstaSincronizandoDatos() {
+        return !this.DatosCargadosDesdeFirestore || this.EstaCargandoFirestore === true;
     }
 
     CargarDesdeCacheLocal() {
@@ -99,6 +104,8 @@ class ModeloAlmacenamiento {
         if (!this.ServicioFirebase) return false;
         const db = this.ServicioFirebase.ObtenerFirestore();
         if (!db) return false;
+
+        this.EstaCargandoFirestore = true;
 
         try {
             // 0. Usuarios (para perfiles y verificación)
@@ -373,6 +380,9 @@ class ModeloAlmacenamiento {
         } catch (ErrorCapturado) {
             console.error("[ModeloAlmacenamiento] Error al cargar desde Firestore:", ErrorCapturado);
             return false;
+        } finally {
+            this.EstaCargandoFirestore = false;
+            this.DatosCargadosDesdeFirestore = true;
         }
     }
 

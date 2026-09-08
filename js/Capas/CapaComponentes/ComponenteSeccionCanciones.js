@@ -81,7 +81,7 @@ class ComponenteSeccionCanciones {
                 </div>
             </div>
 
-            <!-- Cuadrícula de Canciones o Estado Vacío -->
+            <!-- Cuadrícula de Canciones o Estado Vacío / Skeleton -->
             ${Canciones.length > 0 ? `
             <div class="CuadriculaTarjetasMusicales">
                 ${Canciones.map(Cancion => `
@@ -93,19 +93,15 @@ class ComponenteSeccionCanciones {
                             <div style="font-size: 13px; color: var(--ColorTextoSecundario); margin-top: 2px;">${Cancion.Autor}</div>
                         </div>
                     </div>
-
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <span class="InsigniaRitmo">${Cancion.Genero}</span>
-                        <span class="InsigniaTono">${Cancion.TonoOriginal}</span>
-                        ${Cancion.TempoBPM ? `<span style="font-size: 11px; background: var(--ColorFondoSecundario); padding: 3px 6px; border-radius: 4px; font-weight: 600;"><i class="fa-regular fa-clock" style="margin-right: 4px;"></i>${Cancion.TempoBPM} BPM</span>` : ''}
+                    
+                    <div style="display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;">
+                        <span class="InsigniaGeneroMusical">${Cancion.Genero}</span>
+                        <span class="InsigniaTonoMusical">${Cancion.TonoOriginal}</span>
+                        <span class="InsigniaCompasMusical">${Cancion.CompasRitmo}</span>
                     </div>
 
-                    <p style="font-size: 13px; color: var(--ColorTextoSecundario); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                        ${Cancion.Descripcion || 'Letra y partitura folklórica preservada en el archivo digital Letras Mi Poblau.'}
-                    </p>
-
-                    <div style="display: flex; gap: 8px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--ColorBordeDivisor);">
-                        <button class="BotonAccionPrimario BotonReproducirTarjeta" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Escuchar">
+                    <div style="display: flex; gap: 8px; margin-top: 16px; align-items: center;">
+                        <button class="BotonAccionPrimario BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Reproducir audio">
                             <i class="fa-solid fa-play" style="margin-right: 6px;"></i>
                             <span class="TextoBotonLargo">Escuchar</span>
                             <span class="TextoBotonCorto">Oír</span>
@@ -124,13 +120,35 @@ class ComponenteSeccionCanciones {
                 </div>
                 `).join('')}
             </div>
+            ` : (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EstaSincronizandoDatos() ? `
+            <div class="CuadriculaTarjetasMusicales">
+                ${[1, 2, 3, 4, 5, 6].map(() => `
+                <div class="TarjetaSkeletonCuadricula">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div class="ElementoShimmerLMP" style="width: 54px; height: 54px; border-radius: var(--RadioMediano); flex-shrink: 0;"></div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 75%;"></div>
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 45%; height: 10px;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 6px; margin-top: 8px;">
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 50px; height: 18px; border-radius: var(--RadioBotonPill);"></div>
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 65px; height: 18px; border-radius: var(--RadioBotonPill);"></div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="flex: 1; height: 32px; border-radius: var(--RadioBotonPill);"></div>
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="flex: 1; height: 32px; border-radius: var(--RadioBotonPill);"></div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
             ` : `
             <div style="background-color: var(--ColorFondoSuperficie); padding: 40px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 18px;">
                 <i class="fa-solid fa-music" style="font-size: 36px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
                 <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay canciones disponibles</div>
                 <p style="font-size: 13px; margin-top: 4px;">Aún no se han registrado canciones en la base de datos o ninguna coincide con los filtros aplicados.</p>
             </div>
-            `}
+            `)}
         </div>
         `;
     }

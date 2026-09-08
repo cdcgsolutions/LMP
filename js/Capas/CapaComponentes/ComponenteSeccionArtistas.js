@@ -11,7 +11,24 @@ class ComponenteSeccionArtistas {
 
     Renderizar() {
         const Artistas = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosArtistas()) || [];
-        if (Artistas.length === 0) {
+        if (!Artistas || Artistas.length === 0) {
+            const EstaSincronizando = this.ModeloAlmacenamiento && typeof this.ModeloAlmacenamiento.EstaSincronizandoDatos === "function" && this.ModeloAlmacenamiento.EstaSincronizandoDatos();
+            if (EstaSincronizando) {
+                return `
+                <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionArtistas">
+                    <div class="TarjetaPerfilIFAEL" style="overflow: hidden; background: var(--ColorFondoSuperficie); border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeSuave);">
+                        <div class="ElementoShimmerLMP" style="width: 100%; height: 200px;"></div>
+                        <div style="padding: 20px; display: flex; gap: 16px; align-items: flex-end; margin-top: -50px;">
+                            <div class="ElementoShimmerLMP" style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--ColorFondoSuperficie); flex-shrink: 0;"></div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 50%; height: 20px;"></div>
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 30%; height: 12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }
             return `
             <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionArtistas">
                 <div style="background-color: var(--ColorFondoSuperficie); padding: 50px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 20px;">

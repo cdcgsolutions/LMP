@@ -38,24 +38,13 @@ class ComponenteSeccionGeneros {
                         </div>
 
                         <div class="CuerpoGeneroInfo">
-                            <div style="font-size: 12px; color: var(--ColorTextoSecundario);">
-                                <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i><strong>Origen:</strong> ${Gen.Origen}
-                            </div>
-                            <p style="font-size: 13.5px; color: var(--ColorTextoPrincipal); line-height: 1.4;">
+                            <p style="font-size: 13.5px; color: var(--ColorTextoSecundario); line-height: 1.45; margin-bottom: 12px;">
                                 ${Gen.Descripcion}
                             </p>
 
-                            <div style="margin-top: 6px;">
-                                <div style="font-size: 12px; font-weight: 700; color: var(--ColorTextoSecundario); margin-bottom: 4px;">
-                                    <i class="fa-solid fa-music" style="margin-right: 4px;"></i>Instrumentos Típicos:
-                                </div>
-                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                    ${(Gen.InstrumentosTipicos || []).map(Inst => `
-                                        <span style="font-size: 11px; background-color: var(--ColorFondoSecundario); padding: 3px 8px; border-radius: 4px; font-weight: 600;">
-                                            ${Inst}
-                                        </span>
-                                    `).join('')}
-                                </div>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                                <span class="InsigniaCompasMusical">Tempo: ${Gen.TempoTipico}</span>
+                                <span class="InsigniaTonoMusical">Carácter: ${Gen.Caracter}</span>
                             </div>
 
                             <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--ColorBordeDivisor);">
@@ -68,13 +57,26 @@ class ComponenteSeccionGeneros {
                     `;
                 }).join('')}
             </div>
+            ` : (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EstaSincronizandoDatos() ? `
+            <div class="CuadriculaGenerosMusicales">
+                ${[1, 2, 3, 4].map(() => `
+                <div class="TarjetaSkeletonCuadricula" style="overflow: hidden; padding: 0;">
+                    <div class="ElementoShimmerLMP" style="height: 100px; border-radius: 0;"></div>
+                    <div style="padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 85%;"></div>
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 60%;"></div>
+                        <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 100%; height: 32px; border-radius: var(--RadioBotonPill); margin-top: 8px;"></div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
             ` : `
             <div style="background-color: var(--ColorFondoSuperficie); padding: 40px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 20px;">
                 <i class="fa-solid fa-guitar" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
                 <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay géneros registrados</div>
                 <p style="font-size: 13px; margin-top: 4px;">Aún no se han registrado géneros o ritmos folklóricos en la base de datos.</p>
             </div>
-            `}
+            `)}
         </div>
         `;
     }

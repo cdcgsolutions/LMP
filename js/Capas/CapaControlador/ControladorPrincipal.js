@@ -143,6 +143,11 @@ class ControladorPrincipal {
         }
     }
 
+    ActualizarVistaTrasSincronizacionFirestore() {
+        console.log("[ControladorPrincipal] Datos de Firestore sincronizados. Actualizando vista activa...");
+        this.ActualizarVistaCentral();
+    }
+
     ActualizarEstadosPestanasUI(PestanaActiva) {
         // Pestañas superiores
         document.querySelectorAll(".PestanaNavegacionSuperior").forEach(Btn => {
