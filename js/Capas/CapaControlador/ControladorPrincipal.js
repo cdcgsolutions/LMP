@@ -26,6 +26,7 @@ class ControladorPrincipal {
         this.ComponenteSeccionGeneros = new ComponenteSeccionGeneros(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionArtistas = new ComponenteSeccionArtistas(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionIFAEL = new ComponenteSeccionIFAEL(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteSeccionPerfil = new ComponenteSeccionPerfil(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalLetra = new ComponenteModalLetra(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalPartitura = new ComponenteModalPartitura(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalCrearAporte = new ComponenteModalCrearAporte(this.ServicioEstado, this.ModeloAlmacenamiento);
@@ -131,6 +132,8 @@ class ControladorPrincipal {
                 return this.ComponenteSeccionArtistas.Renderizar();
             case "ifael":
                 return this.ComponenteSeccionIFAEL.Renderizar();
+            case "perfil":
+                return this.ComponenteSeccionPerfil.Renderizar();
             default:
                 return this.ComponenteMuroPrincipal.Renderizar();
         }
@@ -626,11 +629,12 @@ class ControladorPrincipal {
         }
 
         if (Objetivo.closest("#BotonPerfilUsuario")) {
-            if (!this.ServicioEstado.EstaAutenticado()) {
-                this.AbrirModalIniciarSesion();
-            } else {
-                this.ServicioEstado.EstablecerPestanaActiva("artistas");
-            }
+            this.ServicioEstado.EstablecerPestanaActiva("perfil");
+            return;
+        }
+
+        if (Objetivo.closest("#BotonPerfilCrearAporte")) {
+            this.AbrirModalCrearPublicacion();
             return;
         }
 

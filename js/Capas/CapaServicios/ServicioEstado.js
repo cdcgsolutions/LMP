@@ -120,8 +120,7 @@ class ServicioEstado {
             IdUsuario: DatosUsuario.IdUsuario || "",
             Nombre: DatosUsuario.NombreCompleto || DatosUsuario.Nombre || "Usuario",
             Rol: DatosUsuario.Rol || "Usuario",
-            Carrera: DatosUsuario.Institucion || DatosUsuario.Rol || "",
-            Institucion: DatosUsuario.Institucion || "",
+            Carrera: DatosUsuario.Carrera || "",
             Avatar: DatosUsuario.FotoPerfilUrl || DatosUsuario.FotoPerfil || DatosUsuario.Avatar || "Logo1.png",
             FotoPerfil: DatosUsuario.FotoPerfilUrl || DatosUsuario.FotoPerfil || DatosUsuario.Avatar || "Logo1.png",
             FotoPortada: DatosUsuario.FotoPortadaUrl || DatosUsuario.FotoPortada || "Logo1.png",
@@ -154,9 +153,8 @@ class ServicioEstado {
             UsuarioActual.FotoPerfil = UsuarioFresco.FotoPerfil || UsuarioFresco.FotoPerfilUrl || UsuarioActual.FotoPerfil;
             UsuarioActual.Avatar = UsuarioActual.FotoPerfil;
             UsuarioActual.FotoPortada = UsuarioFresco.FotoPortada || UsuarioFresco.FotoPortadaUrl || UsuarioActual.FotoPortada;
-            UsuarioActual.Institucion = UsuarioFresco.Institucion || UsuarioActual.Institucion;
             UsuarioActual.Rol = UsuarioFresco.Rol || UsuarioActual.Rol;
-            UsuarioActual.Carrera = UsuarioFresco.Institucion || UsuarioFresco.Rol || UsuarioActual.Carrera;
+            UsuarioActual.Carrera = UsuarioFresco.Carrera || UsuarioActual.Carrera;
             UsuarioActual.EsVerificado = UsuarioFresco.EsVerificado === true;
             UsuarioActual.CorreoElectronico = UsuarioFresco.CorreoElectronico || UsuarioActual.CorreoElectronico;
 

@@ -115,19 +115,22 @@ class ModeloAlmacenamiento {
                     const UsuariosLeidos = [];
                     SnapUsuarios.forEach(Doc => {
                         const Data = Doc.data();
+                        const { Institucion: _Inst, UltimoAcceso: _Ult, ...DatosUsuarioLimpio } = Data;
                         UsuariosLeidos.push({
                             IdUsuario: Doc.id,
+                            ...DatosUsuarioLimpio,
                             NombreCompleto: Data.NombreCompleto || "",
+                            Nombre: Data.NombreCompleto || "",
                             EsVerificado: Data.EsVerificado === true,
                             FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
                             FotoPerfilUrl: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
                             FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
                             FotoPortadaUrl: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
-                            Institucion: Data.Institucion || "",
                             Rol: Data.Rol || "Usuario",
                             Activo: Data.Activo !== undefined ? Data.Activo : true,
                             Ciudad: Data.Ciudad || "Trinidad, Beni",
                             CorreoElectronico: Data.CorreoElectronico || "",
+                            FechaRegistro: Data.FechaRegistro || null,
                             Contrasena: Data.Contrasena || Data.Password || ""
                         });
                     });
@@ -580,6 +583,17 @@ class ModeloAlmacenamiento {
         return null;
     }
 
+    ObtenerUsuarioPorCorreo(Correo) {
+        if (!Correo) return null;
+        const CorreoLimpio = Correo.trim().toLowerCase();
+        if (Array.isArray(this.Usuarios) && this.Usuarios.length > 0) {
+            return this.Usuarios.find(U => 
+                U.CorreoElectronico && U.CorreoElectronico.trim().toLowerCase() === CorreoLimpio
+            ) || null;
+        }
+        return null;
+    }
+
     async AutenticarUsuarioEnBaseDatos(Correo, Contrasena) {
         if (!Correo || !Contrasena) {
             return { Exito: false, Mensaje: "Por favor ingresa tu correo y contraseña." };
@@ -620,8 +634,10 @@ class ModeloAlmacenamiento {
                         return { Exito: false, Mensaje: "Contraseña incorrecta. Verifica tus credenciales." };
                     }
 
+                    const { Institucion: _InstAuth, UltimoAcceso: _UltAuth, ...DatosAuthLimpios } = Data;
                     const UsuarioAutenticado = {
                         IdUsuario: Doc.id,
+                        ...DatosAuthLimpios,
                         NombreCompleto: Data.NombreCompleto || "",
                         Nombre: Data.NombreCompleto || "",
                         EsVerificado: Data.EsVerificado === true,
@@ -629,11 +645,11 @@ class ModeloAlmacenamiento {
                         FotoPerfilUrl: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
                         FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
                         FotoPortadaUrl: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
-                        Institucion: Data.Institucion || "",
                         Rol: Data.Rol || "Usuario",
                         Activo: Data.Activo !== undefined ? Data.Activo : true,
                         Ciudad: Data.Ciudad || "Trinidad, Beni",
                         CorreoElectronico: Data.CorreoElectronico || "",
+                        FechaRegistro: Data.FechaRegistro || null,
                         Contrasena: PassBD
                     };
 

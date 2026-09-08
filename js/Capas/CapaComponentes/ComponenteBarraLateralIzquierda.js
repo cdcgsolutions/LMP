@@ -33,14 +33,14 @@ class ComponenteBarraLateralIzquierda {
                 </div>
             </div>
             ` : `
-            <div class="ElementoAccesoDirecto" data-pestana="artistas" style="margin-bottom: 8px;">
+            <div class="ElementoAccesoDirecto ${PestanaActiva === 'perfil' ? 'AccesoActivo' : ''}" data-pestana="perfil" style="margin-bottom: 8px; cursor: pointer;" title="Ver tu perfil">
                 <img src="${UsuarioActual.FotoPerfil || 'Logo1.png'}" alt="Perfil" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;" onerror="this.src='Logo1.png'">
                 <div style="display: flex; flex-direction: column;">
                     <span style="font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 4px;">
                         <span>${UsuarioActual.Nombre}</span>
                         ${EsVerificado ? '<span class="InsigniaVerificada" style="font-size: 11px;" title="Verificado"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                     </span>
-                    <span style="font-size: 12px; color: var(--ColorTextoSecundario);">${UsuarioActual.Carrera || UsuarioActual.Rol || 'Téc. Sup. Música Boliviana'}</span>
+                    <span style="font-size: 12px; color: var(--ColorTextoSecundario);">Ver perfil</span>
                 </div>
             </div>
             `}

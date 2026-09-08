@@ -108,9 +108,45 @@
         display: none;
     }
 
-    .SeccionEncabezadoIzquierda {
-        width: auto;
+    .EncabezadoSuperiorPrincipal {
+        padding: 0 10px;
         gap: 8px;
+    }
+
+    .SeccionEncabezadoIzquierda {
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .ContenedorBuscadorSuperior {
+        display: flex;
+        align-items: center;
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 40px;
+    }
+
+    .ContenedorBuscadorSuperior:focus-within {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .CampoEntradaBuscador {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+    }
+
+    .SeccionEncabezadoDerecha {
+        width: auto !important;
+        gap: 8px;
+        flex-shrink: 0;
     }
 
     .BotonMenuMovilEncabezado {
@@ -249,29 +285,69 @@
         overflow-x: hidden;
     }
 
+    .EncabezadoSuperiorPrincipal {
+        padding: 0 6px !important;
+        gap: 6px !important;
+    }
+
+    .BotonMenuMovilEncabezado {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 16px !important;
+        flex-shrink: 0 !important;
+    }
+
     .SeccionEncabezadoIzquierda {
-        width: auto;
-        flex: 1;
-        gap: 6px;
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        gap: 6px !important;
     }
 
     .ContenedorBuscadorSuperior {
-        width: auto;
-        flex: 1;
-        max-width: 160px;
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 38px;
+        padding: 0 12px;
     }
 
     .ContenedorBuscadorSuperior:focus-within {
-        width: 100%;
-        max-width: 220px;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .CampoEntradaBuscador {
+        font-size: 13.5px;
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+    }
+
+    .SeccionEncabezadoDerecha {
+        width: auto !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .SeccionEncabezadoDerecha .BotonCircularIcono {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 14.5px !important;
+        flex-shrink: 0 !important;
     }
 
     .TextoMarcaLMPCorto {
         font-size: 18px !important;
     }
 
-    .PerfilUsuarioBoton span {
-        display: none;
+    .PerfilUsuarioBoton {
+        display: none !important;
     }
 
     .AreaContenidoCentral {
