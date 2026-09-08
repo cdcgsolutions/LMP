@@ -1,6 +1,7 @@
 /* ==========================================================================
-   COMPONENTE: SECCIÓN IFAEL (PÁGINA INSTITUCIONAL ESTILO FACEBOOK)
+   COMPONENTE: SECCIÓN IFAEL (PÁGINA INSTITUCIONAL)
    Nombres en PascalCase - Letras Mi Poblau (LMP)
+   Refleja fielmente los datos reales registrados en la colección 'IFAEL' de Firestore
    ========================================================================== */
 
 class ComponenteSeccionIFAEL {
@@ -21,41 +22,39 @@ class ComponenteSeccionIFAEL {
             <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionIFAEL">
                 <div class="TarjetaPerfilIFAEL" style="background-color: var(--ColorFondoSuperficie); border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeSuave); overflow: hidden;">
                     <!-- Portada Skeleton -->
-                    <div class="ElementoShimmerLMP" style="width: 100%; height: 220px; border-radius: 0;"></div>
+                    <div class="ElementoShimmerLMP" style="width: 100%; height: 200px; border-radius: 0;"></div>
 
-                    <div class="CuerpoPerfilInstitucion" style="padding: 20px;">
-                        <div class="FilaAvatarYDatosPrincipales" style="display: flex; gap: 16px; align-items: flex-end; margin-top: -60px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div class="CuerpoPerfilInstitucion" style="padding: 0 20px 20px;">
+                        <div class="FilaAvatarYDatosPrincipales" style="display: flex; gap: 16px; align-items: flex-end; margin-top: -55px; margin-bottom: 20px; flex-wrap: wrap;">
                             <!-- Avatar Skeleton -->
                             <div class="ElementoShimmerLMP" style="width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--ColorFondoSuperficie); flex-shrink: 0; box-shadow: var(--SombraNivelDos);"></div>
-                            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 200px;">
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 60%; height: 24px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 35%; height: 14px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 45%; height: 12px;"></div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 200px; padding-top: 10px;">
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 65%; height: 22px;"></div>
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 40%; height: 14px;"></div>
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 50%; height: 12px;"></div>
                             </div>
-                            <div style="display: flex; gap: 8px;">
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 100px; height: 36px; border-radius: var(--RadioBotonPill);"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 100px; height: 36px; border-radius: var(--RadioBotonPill);"></div>
+                            <div style="display: flex; gap: 8px; padding-top: 10px;">
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 110px; height: 36px; border-radius: var(--RadioBotonPill);"></div>
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 110px; height: 36px; border-radius: var(--RadioBotonPill);"></div>
                             </div>
                         </div>
 
                         <!-- Cajas de Información Skeleton -->
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ColorBordeDivisor);">
-                            <div style="background-color: var(--ColorFondoSecundario); padding: 18px; border-radius: var(--RadioMediano); display: flex; flex-direction: column; gap: 10px;">
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 40%; height: 16px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 90%; height: 12px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 85%; height: 12px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 70%; height: 12px;"></div>
-                            </div>
-                            <div style="background-color: var(--ColorFondoSecundario); padding: 18px; border-radius: var(--RadioMediano); display: flex; flex-direction: column; gap: 10px;">
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 50%; height: 16px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 95%; height: 12px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 88%; height: 12px;"></div>
-                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 75%; height: 12px;"></div>
-                            </div>
+                        <div style="margin-top: 20px; background-color: var(--ColorFondoSecundario); padding: 18px; border-radius: var(--RadioMediano); display: flex; flex-direction: column; gap: 10px;">
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 35%; height: 16px;"></div>
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 95%; height: 12px;"></div>
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 88%; height: 12px;"></div>
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 72%; height: 12px;"></div>
                         </div>
 
-                        <!-- Barra Inferior Skeleton -->
-                        <div style="margin-top: 16px; height: 50px; border-radius: var(--RadioMediano);" class="ElementoShimmerLMP"></div>
+                        <div style="margin-top: 16px; background-color: var(--ColorFondoSecundario); padding: 18px; border-radius: var(--RadioMediano); display: flex; flex-direction: column; gap: 12px;">
+                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 45%; height: 16px;"></div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="height: 56px; border-radius: var(--RadioPequeno);"></div>
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="height: 56px; border-radius: var(--RadioPequeno);"></div>
+                                <div class="BarraTextoShimmer ElementoShimmerLMP" style="height: 56px; border-radius: var(--RadioPequeno);"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -74,94 +73,131 @@ class ComponenteSeccionIFAEL {
         }
 
         const NombreInstitucion = DatosIFAEL.Nombre;
-        const Descripcion = DatosIFAEL.Descripcion || DatosIFAEL.ResenaHistorica || '';
+        const Descripcion = DatosIFAEL.Descripcion || '';
         const Ciudad = DatosIFAEL.Ciudad || '';
-        const Carrera = DatosIFAEL.CarreraPrincipal || DatosIFAEL.Carrera || '';
-        const Modalidad = DatosIFAEL.Modalidad || '';
-        const LogoUrl = DatosIFAEL.LogoUrl || DatosIFAEL.Logo || 'Logo1.png';
-        const PortadaUrl = DatosIFAEL.FotoPortadaUrl || DatosIFAEL.FotoPortada || DatosIFAEL.PortadaUrl || 'IFAEL.jpg';
-        const ProyectoAcademico = DatosIFAEL.ProyectoAcademico || '';
+        const Direccion = DatosIFAEL.Direccion || '';
+        const ContactoTelefono = DatosIFAEL.ContactoTelefono || '';
+        const LogoUrl = DatosIFAEL.LogoUrl || 'IFAEL.jpg';
+        const PortadaUrl = DatosIFAEL.FotoPortadaUrl || 'Logo1.png';
 
-        const MetaItems = [];
-        if (Carrera) MetaItems.push(`Carrera: ${Carrera}`);
-        if (Modalidad) MetaItems.push(Modalidad);
-        const MetaTexto = MetaItems.join(' • ');
-
-        const InfoItems = [];
-        if (Ciudad) InfoItems.push(`<div><i class="fa-solid fa-city" style="margin-right: 4px;"></i><strong>Ciudad:</strong> ${Ciudad}</div>`);
-        if (Carrera) InfoItems.push(`<div><i class="fa-solid fa-award" style="margin-right: 4px;"></i><strong>Carrera:</strong> ${Carrera}</div>`);
-        if (Modalidad) InfoItems.push(`<div><i class="fa-solid fa-music" style="margin-right: 4px;"></i><strong>Modalidad:</strong> ${Modalidad}</div>`);
+        const TelefonoLimpio = ContactoTelefono ? ContactoTelefono.replace(/[^0-9+]/g, '') : '';
+        const TelefonoWhatsApp = ContactoTelefono ? ContactoTelefono.replace(/[^0-9]/g, '') : '';
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionIFAEL">
-            <!-- Portada Institucional Estilo Página de Facebook -->
+            <!-- Portada Institucional Estilo Perfil -->
             <div class="TarjetaPerfilIFAEL">
                 <div class="PortadaInstitucionIFAEL">
-                    <img src="${PortadaUrl}" alt="${NombreInstitucion}" class="ImagenPortadaInstitucion" onerror="this.src='IFAEL.jpg'">
+                    <img src="${PortadaUrl}" alt="${NombreInstitucion}" class="ImagenPortadaInstitucion" onerror="this.src='Logo1.png'">
                 </div>
 
                 <div class="CuerpoPerfilInstitucion">
                     <div class="FilaAvatarYDatosPrincipales">
                         <div class="ContenedorAvatarFlotantePerfil">
-                            <img src="${LogoUrl}" alt="Logo IFAEL" class="AvatarInstitucionGrande" onerror="this.src='Logo1.png'">
+                            <img src="${LogoUrl}" alt="Logo IFAEL" class="AvatarInstitucionGrande" onerror="this.src='IFAEL.jpg'">
                         </div>
                         <div class="DatosTextoInstitucion">
                             <h1 class="NombreInstitucionGrande">
                                 <span>${NombreInstitucion}</span>
                                 <span class="InsigniaVerificada" title="Institución Educativa Oficial"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>
                             </h1>
-                            <div class="SubtituloInstitucion">Educación Musical Superior${Ciudad ? ` • ${Ciudad}` : ''}</div>
-                            ${MetaTexto ? `
+                            <div class="SubtituloInstitucion">
+                                <i class="fa-solid fa-graduation-cap" style="color: var(--ColorPrimarioAzul); margin-right: 4px;"></i>Educación Musical Superior
+                                ${Ciudad ? ` • <i class="fa-solid fa-location-dot" style="margin-left: 2px; margin-right: 3px;"></i>${Ciudad}` : ''}
+                            </div>
+                            ${Direccion ? `
                             <div class="MetaDetalleInstitucion">
-                                <i class="fa-solid fa-graduation-cap" style="margin-right: 4px;"></i>${MetaTexto}
+                                <i class="fa-solid fa-map-location-dot" style="margin-right: 5px; color: var(--ColorTextoSecundario);"></i>${Direccion}
+                            </div>
+                            ` : ''}
+                            ${ContactoTelefono ? `
+                            <div class="MetaDetalleInstitucion">
+                                <i class="fa-solid fa-phone" style="margin-right: 5px; color: var(--ColorTextoSecundario);"></i>${ContactoTelefono}
                             </div>
                             ` : ''}
                         </div>
 
                         <div class="BotonesAccionPerfilInstitucion">
-                            <button class="BotonAccionPrimario" id="BotonContactarIFAEL">
+                            ${TelefonoWhatsApp ? `
+                            <a href="https://wa.me/${TelefonoWhatsApp}?text=Hola%2C%20quisiera%20recibir%20informaci%C3%B3n%20sobre%20el%20IFAEL" target="_blank" rel="noopener noreferrer" class="BotonAccionPrimario" id="BotonContactarIFAEL" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fa-brands fa-whatsapp" style="font-size: 15px;"></i>Contactar
+                            </a>
+                            ` : `
+                            <button type="button" class="BotonAccionPrimario" id="BotonContactarIFAEL">
                                 <i class="fa-solid fa-phone" style="margin-right: 6px;"></i>Contactar
                             </button>
-                            <button class="BotonAccionSecundario" id="BotonCompartirIFAEL">
-                                <i class="fa-solid fa-share" style="margin-right: 6px;"></i>Compartir
+                            `}
+                            <button type="button" class="BotonAccionSecundario" id="BotonCompartirIFAEL">
+                                <i class="fa-solid fa-share-nodes" style="margin-right: 6px;"></i>Compartir
                             </button>
                         </div>
                     </div>
 
-                    <!-- Misión y Proyecto Académico Letras Mi Poblau -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--ColorBordeDivisor);">
-                        ${Descripcion ? `
-                        <div style="background-color: var(--ColorFondoSecundario); padding: 16px; border-radius: var(--RadioMediano);">
-                            <div style="font-weight: 700; font-size: 15px; margin-bottom: 8px; color: var(--ColorTextoPrincipal);">
-                                <i class="fa-solid fa-building-columns" style="color: var(--ColorPrimarioAzul); margin-right: 6px;"></i>Sobre el Instituto IFAEL:
-                            </div>
-                            <p style="font-size: 13.5px; color: var(--ColorTextoPrincipal); line-height: 1.5;">
-                                ${Descripcion}
-                            </p>
+                    <!-- 1. Sobre el Instituto IFAEL (Descripción oficial) -->
+                    ${Descripcion ? `
+                    <div style="background-color: var(--ColorFondoSecundario); padding: 20px 22px; border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeDivisor); margin-top: 18px;">
+                        <div style="font-weight: 700; font-size: 15.5px; margin-bottom: 10px; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-building-columns" style="color: var(--ColorPrimarioAzul);"></i>
+                            <span>Sobre el Instituto IFAEL</span>
                         </div>
-                        ` : ''}
-
-                        <div style="background-color: var(--ColorFondoSecundario); padding: 16px; border-radius: var(--RadioMediano);">
-                            <div style="font-weight: 700; font-size: 15px; margin-bottom: 8px; color: var(--ColorTextoPrincipal);">
-                                <i class="fa-solid fa-scroll" style="color: var(--ColorVerdeBeni); margin-right: 6px;"></i>Proyecto Académico "Letras Mi Poblau":
-                            </div>
-                            <p style="font-size: 13.5px; color: var(--ColorTextoPrincipal); line-height: 1.5;">
-                                ${ProyectoAcademico || 'Iniciativa de graduación y archivo digital desarrollada por estudiantes de la carrera de Técnico Superior en Música Boliviana para sistematizar letras, partituras, audios demostrativos y biografías de los creadores del folklore beniano.'}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Datos de Contacto y Ubicación -->
-                    ${InfoItems.length > 0 ? `
-                    <div style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, var(--ColorPrimarioAzulSuave), rgba(46, 125, 50, 0.1)); border-radius: var(--RadioMediano); border: 1px solid var(--ColorPrimarioAzulSuave);">
-                        <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--ColorTextoPrincipal);">
-                            <i class="fa-solid fa-location-dot" style="color: var(--ColorPrimarioAzul); margin-right: 6px;"></i>Ubicación e Informaciones:
-                        </div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ColorTextoPrincipal);">
-                            ${InfoItems.join('')}
-                        </div>
+                        <p style="font-size: 14px; color: var(--ColorTextoPrincipal); line-height: 1.65; margin: 0;">
+                            ${Descripcion}
+                        </p>
                     </div>
                     ` : ''}
+
+                    <!-- 2. Información y Ubicación Institucional -->
+                    <div style="margin-top: 16px; padding: 20px 22px; background-color: var(--ColorFondoSecundario); border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeDivisor);">
+                        <div style="font-weight: 700; font-size: 15.5px; margin-bottom: 14px; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--ColorPrimarioAzul);"></i>
+                            <span>Información Institucional y Contacto</span>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+                            ${Ciudad ? `
+                            <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--ColorFondoSuperficie); padding: 12px 16px; border-radius: var(--RadioPequeno); border: 1px solid var(--ColorBordeSuave);">
+                                <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--ColorPrimarioAzulSuave); color: var(--ColorPrimarioAzul); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">
+                                    <i class="fa-solid fa-city"></i>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <span style="font-size: 11.5px; font-weight: 700; color: var(--ColorTextoSecundario); text-transform: uppercase;">Ciudad</span>
+                                    <span style="font-size: 13.5px; font-weight: 600; color: var(--ColorTextoPrincipal);">${Ciudad}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            ${Direccion ? `
+                            <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--ColorFondoSuperficie); padding: 12px 16px; border-radius: var(--RadioPequeno); border: 1px solid var(--ColorBordeSuave);">
+                                <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(46, 125, 50, 0.12); color: var(--ColorVerdeBeni); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 2px;">
+                                    <span style="font-size: 11.5px; font-weight: 700; color: var(--ColorTextoSecundario); text-transform: uppercase;">Dirección</span>
+                                    <span style="font-size: 13.5px; font-weight: 600; color: var(--ColorTextoPrincipal);">${Direccion}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            ${ContactoTelefono ? `
+                            <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--ColorFondoSuperficie); padding: 12px 16px; border-radius: var(--RadioPequeno); border: 1px solid var(--ColorBordeSuave);">
+                                <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(37, 211, 102, 0.12); color: #25D366; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 17px;">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 3px;">
+                                    <span style="font-size: 11.5px; font-weight: 700; color: var(--ColorTextoSecundario); text-transform: uppercase;">Teléfono de Contacto</span>
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <a href="tel:${TelefonoLimpio}" style="font-size: 13.5px; font-weight: 700; color: var(--ColorPrimarioAzul); text-decoration: none;">
+                                            ${ContactoTelefono}
+                                        </a>
+                                        <a href="https://wa.me/${TelefonoWhatsApp}?text=Hola%2C%20quisiera%20recibir%20informaci%C3%B3n%20sobre%20el%20IFAEL" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 700; color: #166534; background-color: #dcfce7; padding: 2px 8px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                            <i class="fa-brands fa-whatsapp"></i> Chat WhatsApp
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

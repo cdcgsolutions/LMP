@@ -255,6 +255,23 @@ class ControladorPrincipal {
             return;
         }
 
+        // Compartir Perfil IFAEL
+        if (Objetivo.closest("#BotonCompartirIFAEL")) {
+            const DatosIFAEL = this.ModeloAlmacenamiento ? this.ModeloAlmacenamiento.ObtenerDatosIFAEL() : null;
+            const Titulo = DatosIFAEL?.Nombre || "IFAEL";
+            const Texto = "Conoce el perfil del Instituto de Formación Artística 'Edelmira Limpias' (IFAEL) en Letras Mi Poblau";
+            const Url = window.location.href;
+
+            if (navigator.share) {
+                navigator.share({ title: Titulo, text: Texto, url: Url }).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(Url).then(() => {
+                    this.ServicioNotificaciones.MostrarMensajeToast("Enlace copiado al portapapeles", '<i class="fa-solid fa-copy"></i>');
+                }).catch(() => {});
+            }
+            return;
+        }
+
         // 4. Abrir / Cerrar Menú Móvil
         if (Objetivo.closest("#BotonAbrirMenuMovilLateral") || Objetivo.closest("#BotonMenuMovilDrawer")) {
             this.AlternarMenuLateralMovil();
