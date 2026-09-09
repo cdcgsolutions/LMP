@@ -136,44 +136,16 @@ class ComponenteSeccionPerfil {
                                 <span>${NombreCompleto}</span>
                                 ${EsVerificado ? '<span class="InsigniaVerificada" title="Cuenta Verificada en Letras Mi Poblau"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                             </h1>
-                            <div class="MetaDetalleInstitucion">
-                                <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i>${Ciudad}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Ficha de Datos Personales Registrados en la Base de Datos -->
-                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--ColorBordeDivisor);">
-                        <!-- Caja de Datos Personales -->
-                        <div style="background-color: var(--ColorFondoSecundario); padding: 18px 20px; border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeDivisor);">
-                            <div style="font-weight: 700; font-size: 15px; margin-bottom: 14px; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-address-card" style="color: var(--ColorPrimarioAzul); font-size: 18px;"></i>
-                                <span>Datos Personales Registrados:</span>
-                            </div>
-                            <ul style="list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; font-size: 13.5px; color: var(--ColorTextoSecundario); padding: 0; margin: 0;">
-                                <li style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid fa-user" style="width: 18px; color: var(--ColorPrimarioAzul);"></i>
-                                    <span><strong>Nombre:</strong> ${NombreCompleto}</span>
-                                </li>
-                                <li style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid fa-envelope" style="width: 18px; color: var(--ColorPrimarioAzul);"></i>
-                                    <span><strong>Correo:</strong> ${Correo || 'No especificado'}</span>
-                                </li>
-                                <li style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid fa-map-pin" style="width: 18px; color: var(--ColorPrimarioAzul);"></i>
-                                    <span><strong>Ciudad:</strong> ${Ciudad}</span>
-                                </li>
+                            <div class="MetaDetalleInstitucion" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 4px;">
+                                <span><i class="fa-solid fa-location-dot" style="color: var(--ColorVerdeBeni); margin-right: 5px;"></i>${Ciudad}</span>
                                 ${FechaRegistroTexto ? `
-                                <li style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid fa-calendar-check" style="width: 18px; color: var(--ColorPrimarioAzul);"></i>
-                                    <span><strong>Miembro desde:</strong> ${FechaRegistroTexto}</span>
-                                </li>
+                                <span><i class="fa-solid fa-calendar-check" style="color: var(--ColorPrimarioAzul); margin-right: 5px;"></i>Miembro desde: ${FechaRegistroTexto}</span>
                                 ` : ''}
-                            </ul>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 3. Lista de Aportes del Usuario -->
+                    <!-- 2. Lista de Aportes del Usuario -->
                     <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--ColorBordeDivisor);">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                             <h2 style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px; margin: 0;">
@@ -226,10 +198,8 @@ class ComponenteSeccionPerfil {
                         <div class="DatosTextoInstitucion" style="flex: 1;">
                             <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 50%; height: 22px; margin-bottom: 8px;"></div>
                             <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 35%; height: 14px; margin-bottom: 6px;"></div>
-                            <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 25%; height: 12px;"></div>
                         </div>
                     </div>
-                    <div style="margin-top: 20px; height: 90px; border-radius: var(--RadioMediano);" class="ElementoShimmerLMP"></div>
                 </div>
             </div>
         </div>

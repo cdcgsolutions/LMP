@@ -115,14 +115,14 @@ class ComponenteSeccionCanciones {
                         <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Reproducir audio">
                             <i class="fa-solid fa-play" style="margin-right: 6px;"></i>
                             <span class="TextoBotonLargo">Escuchar</span>
-                            <span class="TextoBotonCorto">Oír</span>
+                            <span class="TextoBotonCorto">Escuchar</span>
                         </button>
                         <button class="BotonAccionSecundario BotonAbrirModalLetra" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Ver letra y acordes">
                             <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>
                             <span class="TextoBotonLargo">Ver Letra</span>
                             <span class="TextoBotonCorto">Letra</span>
                         </button>
-                        ${Cancion.ImagenPartitura ? `
+                        ${(Cancion.ImagenPartituraUrl && Cancion.ImagenPartituraUrl !== 'IFAEL.jpg') ? `
                         <button class="BotonCircularIcono BotonAbrirModalPartitura" data-cancion-id="${Cancion.IdCancion}" style="width: 34px; height: 34px; font-size: 14px;" title="Ver partitura">
                             <i class="fa-solid fa-file-lines"></i>
                         </button>

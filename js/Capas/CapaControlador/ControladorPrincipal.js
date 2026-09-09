@@ -794,21 +794,39 @@ class ControladorPrincipal {
     EjecutarReproduccionCancionPorId(IdCancion) {
         const Cancion = this.ModeloAlmacenamiento.ObtenerCancionPorId(IdCancion);
         if (Cancion) {
-            this.ServicioReproductor.CargarYReproducirCancion(Cancion);
-            this.ServicioEstado.EstablecerCancionReproduciendo(Cancion, true);
-            this.ActualizarBarraReproductorFlotante(Cancion);
-            this.ServicioNotificaciones.MostrarMensajeToast(`Reproduciendo: ${Cancion.Titulo}`, '<i class="fa-solid fa-music"></i>');
+            if (!Cancion.AudioUrl || Cancion.AudioUrl.trim() === "") {
+                this.ServicioNotificaciones.MostrarMensajeToast(
+                    `'${Cancion.Titulo}' no cuenta con archivo de audio disponible.`,
+                    '<i class="fa-solid fa-volume-xmark" style="color: #e67e22;"></i>'
+                );
+                return;
+            }
+            const Exito = this.ServicioReproductor.CargarYReproducirCancion(Cancion);
+            if (Exito) {
+                this.ServicioEstado.EstablecerCancionReproduciendo(Cancion, true);
+                this.ActualizarBarraReproductorFlotante(Cancion);
+                this.ServicioNotificaciones.MostrarMensajeToast(`Reproduciendo: ${Cancion.Titulo}`, '<i class="fa-solid fa-music"></i>');
+            }
         }
     }
 
     ReproducirHimnoAlBeni() {
         const CancionHimno = this.ModeloAlmacenamiento.ObtenerHimnoAlBeni();
-        this.ServicioReproductor.CargarYReproducirCancion(CancionHimno);
-        this.ServicioEstado.EstablecerCancionReproduciendo(CancionHimno, true);
-        this.ActualizarBarraReproductorFlotante(CancionHimno);
-        this.ServicioNotificaciones.MostrarMensajeToast("¡Reproduciendo Himno al Beni!", '<i class="fa-solid fa-flag" style="color: #2e7d32;"></i>');
-        if (window.innerWidth <= 768) {
-            this.CerrarMenuLateralMovil();
+        if (CancionHimno) {
+            if (!CancionHimno.AudioUrl || CancionHimno.AudioUrl.trim() === "") {
+                this.ServicioNotificaciones.MostrarMensajeToast(
+                    "El Himno al Beni no cuenta con archivo de audio configurado.",
+                    '<i class="fa-solid fa-volume-xmark" style="color: #e67e22;"></i>'
+                );
+                return;
+            }
+            this.ServicioReproductor.CargarYReproducirCancion(CancionHimno);
+            this.ServicioEstado.EstablecerCancionReproduciendo(CancionHimno, true);
+            this.ActualizarBarraReproductorFlotante(CancionHimno);
+            this.ServicioNotificaciones.MostrarMensajeToast("¡Reproduciendo Himno al Beni!", '<i class="fa-solid fa-flag" style="color: #2e7d32;"></i>');
+            if (window.innerWidth <= 768) {
+                this.CerrarMenuLateralMovil();
+            }
         }
     }
 
@@ -1432,7 +1450,7 @@ class ControladorPrincipal {
             LetraConAcordes: Cancion ? (Cancion.LetraConAcordes || Cancion.LetraLimpia || "") : "",
             LetraLimpia: Cancion ? Cancion.LetraLimpia : "",
             AudioUrl: Cancion ? Cancion.AudioUrl : "",
-            ImagenPartitura: Cancion ? Cancion.ImagenPartitura : ""
+            ImagenPartituraUrl: Cancion ? (Cancion.ImagenPartituraUrl || Cancion.ImagenPartitura || "") : ""
         };
 
         this.ContenedorModales.innerHTML = this.ComponenteModalCrearAporte.Renderizar(DatosEdicion);
@@ -1641,6 +1659,14 @@ class ControladorPrincipal {
 
             ZonaPartitura.addEventListener("drop", (e) => {
                 if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+                    const Archivo = e.dataTransfer.files[0];
+                    if (!Archivo.type.startsWith("image/")) {
+                        this.ServicioNotificaciones.MostrarMensajeToast(
+                            "Solo se permiten imágenes (JPG, PNG, WEBP) para las partituras. No se permiten PDFs.",
+                            '<i class="fa-solid fa-triangle-exclamation" style="color: #e67e22;"></i>'
+                        );
+                        return;
+                    }
                     InputPartitura.files = e.dataTransfer.files;
                     InputPartitura.dispatchEvent(new Event("change"));
                 }
@@ -1649,15 +1675,25 @@ class ControladorPrincipal {
             InputPartitura.addEventListener("change", () => {
                 if (InputPartitura.files && InputPartitura.files.length > 0) {
                     const Archivo = InputPartitura.files[0];
+                    if (!Archivo.type.startsWith("image/")) {
+                        this.ServicioNotificaciones.MostrarMensajeToast(
+                            "Solo se permiten imágenes (JPG, PNG, WEBP) para las partituras. No se permiten PDFs.",
+                            '<i class="fa-solid fa-triangle-exclamation" style="color: #e67e22;"></i>'
+                        );
+                        InputPartitura.value = "";
+                        if (VistaPreviaPartitura) VistaPreviaPartitura.style.display = "none";
+                        if (EstadoVacioPartitura) EstadoVacioPartitura.style.display = "flex";
+                        return;
+                    }
                     const TamanoMB = (Archivo.size / (1024 * 1024)).toFixed(2);
                     if (EtiquetaNombrePartitura) {
                         EtiquetaNombrePartitura.textContent = `${Archivo.name} (${TamanoMB} MB)`;
                         EtiquetaNombrePartitura.title = Archivo.name;
                     }
                     if (EtiquetaEstadoPartitura) {
-                        EtiquetaEstadoPartitura.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--ColorVerdeBeni);"></i> Listo para subir a Cloudinary';
+                        EtiquetaEstadoPartitura.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--ColorVerdeBeni);"></i> Imagen lista para subir a Cloudinary';
                     }
-                    if (ImgMiniaturaPartitura && Archivo.type.startsWith("image/")) {
+                    if (ImgMiniaturaPartitura) {
                         ImgMiniaturaPartitura.src = URL.createObjectURL(Archivo);
                     }
                     if (VistaPreviaPartitura) VistaPreviaPartitura.style.display = "flex";
@@ -1686,10 +1722,18 @@ class ControladorPrincipal {
             return;
         }
 
+        if (InputPartitura?.files?.length > 0 && !InputPartitura.files[0].type.startsWith("image/")) {
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                "La partitura debe ser una imagen (JPG, PNG o WEBP).",
+                '<i class="fa-solid fa-triangle-exclamation" style="color: #e67e22;"></i>'
+            );
+            return;
+        }
+
         const EsModoEdicion = Boolean(this.PublicacionEnEdicion);
 
         let UrlAudioSubido = EsModoEdicion && this.CancionEnEdicion ? (this.CancionEnEdicion.AudioUrl || "") : "";
-        let UrlPartituraSubida = EsModoEdicion && this.CancionEnEdicion ? (this.CancionEnEdicion.ImagenPartitura || "IFAEL.jpg") : "IFAEL.jpg";
+        let UrlPartituraSubida = EsModoEdicion && this.CancionEnEdicion ? (this.CancionEnEdicion.ImagenPartituraUrl || "") : "";
 
         // Subir a Cloudinary si se seleccionaron archivos nuevos
         const HayArchivos = (InputAudio?.files?.length > 0) || (InputPartitura?.files?.length > 0);
@@ -1739,7 +1783,7 @@ class ControladorPrincipal {
                     TonoOriginal: Tono,
                     TempoBPM: Tempo,
                     AudioUrl: UrlAudioSubido,
-                    ImagenPartitura: UrlPartituraSubida,
+                    ImagenPartituraUrl: UrlPartituraSubida,
                     LetraConAcordes: Letra,
                     LetraLimpia: LetraLimpia
                 });
@@ -1772,11 +1816,10 @@ class ControladorPrincipal {
                 EsEstudianteIFAEL: true,
                 Descripcion: `Composición beniana registrada en Letras Mi Poblau en ritmo de ${Genero}.`,
                 Caratula: "Logo1.png",
-                ImagenPartitura: UrlPartituraSubida,
+                ImagenPartituraUrl: UrlPartituraSubida,
                 AudioUrl: UrlAudioSubido,
                 LetraConAcordes: Letra,
-                LetraLimpia: LetraLimpia,
-                SecuenciaNotasMelodia: []
+                LetraLimpia: LetraLimpia
             });
 
             const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;

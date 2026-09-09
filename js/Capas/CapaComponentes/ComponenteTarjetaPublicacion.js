@@ -268,9 +268,9 @@ class ComponenteTarjetaPublicacion {
                     </div>
 
                     <!-- Vista previa de Partitura si existe -->
-                    ${CancionAsociada.ImagenPartitura ? `
+                    ${(CancionAsociada.ImagenPartituraUrl && CancionAsociada.ImagenPartituraUrl !== 'IFAEL.jpg') ? `
                     <div class="VistaPreviaPartituraTarjeta" data-cancion-id="${CancionAsociada.IdCancion}" title="Ver manuscrito y partitura original">
-                        <img src="${CancionAsociada.ImagenPartitura}" alt="Partitura ${CancionAsociada.Titulo}" class="ImagenPartituraMini">
+                        <img src="${CancionAsociada.ImagenPartituraUrl}" alt="Partitura ${CancionAsociada.Titulo}" class="ImagenPartituraMini">
                         <div class="InsigniaSuperpuestaPartitura"><i class="fa-solid fa-file-lines" style="margin-right: 4px;"></i>Ver Partitura / Manuscrito</div>
                     </div>
                     ` : ''}
@@ -335,7 +335,7 @@ class ComponenteTarjetaPublicacion {
                     <i class="fa-regular fa-comment"></i>
                     <span>
                         <span class="TextoBotonLargo">Comentar</span>
-                        <span class="TextoBotonCorto">Opinar</span>
+                        <span class="TextoBotonCorto">Comentar</span>
                     </span>
                 </button>
 

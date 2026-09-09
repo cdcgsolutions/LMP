@@ -56,6 +56,10 @@ class ServicioCloudinary {
     }
 
     async SubirPartitura(ArchivoPartitura) {
+        if (!ArchivoPartitura) return null;
+        if (!ArchivoPartitura.type.startsWith("image/")) {
+            throw new Error("La partitura debe ser una imagen (JPG, PNG o WEBP). No se permiten PDFs.");
+        }
         const Resultado = await this.SubirArchivo(ArchivoPartitura, "lmp_partituras");
         return Resultado ? Resultado.UrlSegura : null;
     }

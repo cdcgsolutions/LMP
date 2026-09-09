@@ -10,7 +10,26 @@ class ComponenteSeccionGeneros {
     }
 
     Renderizar() {
-        const Generos = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || [];
+        const EstadoActual = this.ServicioEstado ? this.ServicioEstado.ObtenerEstado() : {};
+        const TerminoBusqueda = (EstadoActual.TerminoBusquedaGlobal || "").trim().toLowerCase();
+        let Generos = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosGeneros()) || [];
+
+        // Filtrado por buscador global
+        if (TerminoBusqueda) {
+            Generos = Generos.filter(Gen => {
+                const CoincideNombre = Gen.Nombre && Gen.Nombre.toLowerCase().includes(TerminoBusqueda);
+                const CoincideOrigen = Gen.Origen && Gen.Origen.toLowerCase().includes(TerminoBusqueda);
+                const CoincideDescripcion = Gen.Descripcion && Gen.Descripcion.toLowerCase().includes(TerminoBusqueda);
+                const CoincideCompas = Gen.Compas && Gen.Compas.toLowerCase().includes(TerminoBusqueda);
+                const CoincideInstrumentos = Array.isArray(Gen.InstrumentosTipicos)
+                    ? Gen.InstrumentosTipicos.some(Inst => String(Inst).toLowerCase().includes(TerminoBusqueda))
+                    : (typeof Gen.InstrumentosTipicos === "string" && Gen.InstrumentosTipicos.toLowerCase().includes(TerminoBusqueda));
+
+                return CoincideNombre || CoincideOrigen || CoincideDescripcion || CoincideCompas || CoincideInstrumentos;
+            });
+        }
+
+        const EsBusquedaActiva = Boolean(TerminoBusqueda);
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionGeneros">
@@ -23,7 +42,7 @@ class ComponenteSeccionGeneros {
                             <span>Ritmos y Géneros</span>
                         </h1>
                         <p class="DescripcionSeccionSubtitulo">
-                            Guía histórica y compases tradicionales del Beni
+                            ${EsBusquedaActiva ? `Resultados de búsqueda para "${EstadoActual.TerminoBusquedaGlobal}"` : 'Guía histórica y compases tradicionales del Beni'}
                         </p>
                     </div>
                     <button class="BotonAccionPrimario BotonAbrirModalNuevoGenero BotonRegistrarGeneroEncabezado" id="BotonAbrirModalCrearGenero" title="Registrar nuevo ritmo tradicional">
@@ -89,7 +108,7 @@ class ComponenteSeccionGeneros {
                     `;
                 }).join('')}
             </div>
-            ` : (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EstaSincronizandoDatos() ? `
+            ` : (this.ModeloAlmacenamiento && !EsBusquedaActiva && this.ModeloAlmacenamiento.EstaSincronizandoDatos() ? `
             <div class="CuadriculaGenerosMusicales">
                 ${[1, 2, 3, 4].map(() => `
                 <div class="TarjetaSkeletonCuadricula" style="overflow: hidden; padding: 0;">
@@ -104,9 +123,9 @@ class ComponenteSeccionGeneros {
             </div>
             ` : `
             <div style="background-color: var(--ColorFondoSuperficie); padding: 40px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 20px;">
-                <i class="fa-solid fa-guitar" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
-                <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay géneros registrados</div>
-                <p style="font-size: 13px; margin-top: 4px;">Aún no se han registrado géneros o ritmos folklóricos en la base de datos.</p>
+                <i class="fa-solid ${EsBusquedaActiva ? 'fa-magnifying-glass' : 'fa-guitar'}" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6; color: ${EsBusquedaActiva ? 'var(--ColorPrimarioAzul)' : 'inherit'};"></i>
+                <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">${EsBusquedaActiva ? 'No se encontraron ritmos o géneros' : 'No hay géneros registrados'}</div>
+                <p style="font-size: 13px; margin-top: 4px;">${EsBusquedaActiva ? `No hay ritmos ni géneros que coincidan con "<strong>${EstadoActual.TerminoBusquedaGlobal}</strong>".` : 'Aún no se han registrado géneros o ritmos folklóricos en la base de datos.'}</p>
             </div>
             `)}
         </div>

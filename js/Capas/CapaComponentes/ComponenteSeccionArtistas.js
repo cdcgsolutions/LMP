@@ -28,10 +28,33 @@ class ComponenteSeccionArtistas {
 
     // #region 1. Vista Galería de Artistas
     RenderizarGaleria() {
-        const Artistas = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosArtistas()) || [];
+        const EstadoActual = this.ServicioEstado ? this.ServicioEstado.ObtenerEstado() : {};
+        const TerminoBusqueda = (EstadoActual.TerminoBusquedaGlobal || "").trim().toLowerCase();
+        let Artistas = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodosLosArtistas()) || [];
+
+        // Filtrado por buscador global
+        if (TerminoBusqueda) {
+            Artistas = Artistas.filter(Artista => {
+                const CoincideNombre = Artista.NombreCompleto && Artista.NombreCompleto.toLowerCase().includes(TerminoBusqueda);
+                const CoincideArtistico = Artista.NombreArtistico && Artista.NombreArtistico.toLowerCase().includes(TerminoBusqueda);
+                const CoincideRol = Artista.RolTitulo && Artista.RolTitulo.toLowerCase().includes(TerminoBusqueda);
+                const CoincideLugar = (Artista.LugarNacimiento && Artista.LugarNacimiento.toLowerCase().includes(TerminoBusqueda)) ||
+                                      (Artista.LugarOrigen && Artista.LugarOrigen.toLowerCase().includes(TerminoBusqueda));
+                const CoincideBio = (Artista.BiografiaCorta && Artista.BiografiaCorta.toLowerCase().includes(TerminoBusqueda)) ||
+                                    (Artista.Biografia && Artista.Biografia.toLowerCase().includes(TerminoBusqueda)) ||
+                                    (Artista.Resena && Artista.Resena.toLowerCase().includes(TerminoBusqueda));
+                const CoincideInstrumentos = Array.isArray(Artista.InstrumentosPrincipales)
+                    ? Artista.InstrumentosPrincipales.some(I => String(I).toLowerCase().includes(TerminoBusqueda))
+                    : (typeof Artista.InstrumentosPrincipales === "string" && Artista.InstrumentosPrincipales.toLowerCase().includes(TerminoBusqueda));
+
+                return CoincideNombre || CoincideArtistico || CoincideRol || CoincideLugar || CoincideBio || CoincideInstrumentos;
+            });
+        }
+
+        const EsBusquedaActiva = Boolean(TerminoBusqueda);
 
         if (!Artistas || Artistas.length === 0) {
-            const EstaSincronizando = this.ModeloAlmacenamiento && typeof this.ModeloAlmacenamiento.EstaSincronizandoDatos === "function" && this.ModeloAlmacenamiento.EstaSincronizandoDatos();
+            const EstaSincronizando = !EsBusquedaActiva && (this.ModeloAlmacenamiento && typeof this.ModeloAlmacenamiento.EstaSincronizandoDatos === "function" && this.ModeloAlmacenamiento.EstaSincronizandoDatos());
             if (EstaSincronizando) {
                 return `
                 <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionArtistas">
@@ -52,7 +75,7 @@ class ComponenteSeccionArtistas {
                                 <span>Artistas & Compositores</span>
                             </h1>
                             <p class="DescripcionSeccionSubtitulo">
-                                Músicos y creadores del Beni
+                                ${EsBusquedaActiva ? `Resultados de búsqueda para "${EstadoActual.TerminoBusquedaGlobal}"` : 'Músicos y creadores del Beni'}
                             </p>
                         </div>
                         <button class="BotonAccionPrimario BotonAbrirModalNuevoArtista BotonRegistrarArtistaEncabezado" title="Registrar nuevo artista">
@@ -61,10 +84,10 @@ class ComponenteSeccionArtistas {
                         </button>
                     </div>
                 </div>
-                <div style="background-color: var(--ColorFondoSuperficie); padding: 50px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave);">
-                    <i class="fa-solid fa-users" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6;"></i>
-                    <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">No hay artistas registrados</div>
-                    <p style="font-size: 13px; margin-top: 4px;">Sé el primero en registrar un gran compositor beniano.</p>
+                <div style="background-color: var(--ColorFondoSuperficie); padding: 50px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 16px;">
+                    <i class="fa-solid ${EsBusquedaActiva ? 'fa-magnifying-glass' : 'fa-users'}" style="font-size: 38px; display: block; margin-bottom: 12px; opacity: 0.6; color: ${EsBusquedaActiva ? 'var(--ColorPrimarioAzul)' : 'inherit'};"></i>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--ColorTextoPrincipal);">${EsBusquedaActiva ? 'No se encontraron artistas o compositores' : 'No hay artistas registrados'}</div>
+                    <p style="font-size: 13px; margin-top: 4px;">${EsBusquedaActiva ? `No hay resultados que coincidan con "<strong>${EstadoActual.TerminoBusquedaGlobal}</strong>".` : 'Sé el primero en registrar un gran compositor beniano.'}</p>
                 </div>
             </div>`;
         }
@@ -80,7 +103,7 @@ class ComponenteSeccionArtistas {
                             <span>Artistas & Compositores</span>
                         </h1>
                         <p class="DescripcionSeccionSubtitulo">
-                            Músicos y creadores del Beni
+                            ${EsBusquedaActiva ? `Resultados de búsqueda para "${EstadoActual.TerminoBusquedaGlobal}"` : 'Músicos y creadores del Beni'}
                         </p>
                     </div>
                     <button class="BotonAccionPrimario BotonAbrirModalNuevoArtista BotonRegistrarArtistaEncabezado" title="Registrar nuevo artista">

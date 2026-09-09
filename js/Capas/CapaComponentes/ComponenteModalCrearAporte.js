@@ -24,7 +24,8 @@ class ComponenteModalCrearAporte {
         const LetraCancion = EsEdicion ? (DatosEdicion.LetraConAcordes || DatosEdicion.LetraLimpia || "") : "";
         const MensajeMuro = EsEdicion ? (DatosEdicion.TextoPublicacion || "") : "";
         const AudioActual = EsEdicion ? (DatosEdicion.AudioUrl || "") : "";
-        const PartituraActual = EsEdicion ? (DatosEdicion.ImagenPartitura || "") : "";
+        const PartituraActual = EsEdicion ? (DatosEdicion.ImagenPartituraUrl || DatosEdicion.ImagenPartitura || "") : "";
+        const PartituraValida = Boolean(PartituraActual && PartituraActual !== "IFAEL.jpg");
 
         const SelectGenerosHtml = GenerosNombres.length > 0 
             ? GenerosNombres.map(Gen => `<option value="${Gen}" ${Gen === GeneroCancion ? 'selected' : ''}>${Gen}</option>`).join("")
@@ -100,7 +101,7 @@ class ComponenteModalCrearAporte {
                                             </div>
                                         </div>
                                         <button type="button" class="BotonCambiarArchivo" id="BotonCambiarAudio" title="Seleccionar otro audio">
-                                            <i class="fa-solid fa-arrows-rotate"></i> Cambiar
+                                             <i class="fa-solid fa-arrows-rotate"></i> Cambiar
                                         </button>
                                     </div>
 
@@ -132,24 +133,24 @@ class ComponenteModalCrearAporte {
                         <!-- 2. Campo y Zona de Partitura -->
                         <div class="CampoFormularioMultimedia">
                             <label class="EtiquetaFormularioMultimedia">
-                                <i class="fa-solid fa-file-lines" style="color: var(--ColorVerdeBeni);"></i>
-                                Partitura o Manuscrito (JPG/PNG/PDF)
+                                <i class="fa-solid fa-file-image" style="color: var(--ColorVerdeBeni);"></i>
+                                Partitura o Manuscrito (JPG / PNG / WEBP)
                             </label>
                             <div class="ZonaSubidaArchivo" id="ZonaSoltarPartitura">
-                                <input type="file" id="CampoNuevoArchivoPartitura" accept="image/*,application/pdf" class="InputArchivoOculto">
+                                <input type="file" id="CampoNuevoArchivoPartitura" accept="image/png, image/jpeg, image/webp, image/jpg" class="InputArchivoOculto">
                                 
-                                <div class="VistaPreviaArchivoCargado" id="VistaPreviaPartituraCargada" style="${PartituraActual && PartituraActual !== 'IFAEL.jpg' ? 'display: flex;' : 'display: none;'}">
+                                <div class="VistaPreviaArchivoCargado" id="VistaPreviaPartituraCargada" style="${PartituraValida ? 'display: flex;' : 'display: none;'}">
                                     <div class="FilaEncabezadoVistaPrevia">
                                         <div class="IconoYDatosArchivo">
                                             <div class="MiniaturaPartituraPrevia">
-                                                <img src="${PartituraActual || 'IFAEL.jpg'}" alt="Partitura" id="ImgMiniaturaPartitura" onerror="this.src='IFAEL.jpg'">
+                                                <img src="${PartituraValida ? PartituraActual : ''}" alt="Partitura" id="ImgMiniaturaPartitura">
                                             </div>
                                             <div class="DetallesArchivoCargado">
-                                                <div class="NombreArchivoCargado" id="EtiquetaNombrePartitura" title="${EsEdicion && PartituraActual && PartituraActual !== 'IFAEL.jpg' ? 'Partitura cargada en Cloudinary' : 'Partitura seleccionada'}">
-                                                    ${EsEdicion && PartituraActual && PartituraActual !== 'IFAEL.jpg' ? 'Partitura en Cloudinary' : 'Partitura seleccionada'}
+                                                <div class="NombreArchivoCargado" id="EtiquetaNombrePartitura" title="${EsEdicion && PartituraValida ? 'Partitura cargada en Cloudinary' : 'Partitura seleccionada'}">
+                                                    ${EsEdicion && PartituraValida ? 'Partitura en Cloudinary' : 'Partitura seleccionada'}
                                                 </div>
                                                 <span class="EstadoArchivoTexto" id="EtiquetaEstadoPartitura">
-                                                    <i class="fa-solid fa-circle-check"></i> ${PartituraActual && PartituraActual !== 'IFAEL.jpg' ? 'Registrada en la canción' : 'Lista para guardar'}
+                                                    <i class="fa-solid fa-circle-check"></i> ${PartituraValida ? 'Registrada en la canción' : 'Lista para guardar'}
                                                 </span>
                                             </div>
                                         </div>
@@ -159,10 +160,10 @@ class ComponenteModalCrearAporte {
                                     </div>
                                 </div>
 
-                                <div class="EstadoVacioSubida" id="EstadoVacioPartitura" style="${PartituraActual && PartituraActual !== 'IFAEL.jpg' ? 'display: none;' : 'display: flex;'}">
+                                <div class="EstadoVacioSubida" id="EstadoVacioPartitura" style="${PartituraValida ? 'display: none;' : 'display: flex;'}">
                                     <i class="fa-solid fa-file-image IconoNubeSubida" style="color: var(--ColorVerdeBeni);"></i>
-                                    <span class="TextoPrincipalSubida">Arrastra tu partitura o <strong>examina</strong></span>
-                                    <span class="TextoSecundarioSubida">Soporta PNG, JPG, PDF</span>
+                                    <span class="TextoPrincipalSubida">Arrastra tu imagen de partitura o <strong>examina</strong></span>
+                                    <span class="TextoSecundarioSubida">Soporta PNG, JPG, WEBP (solo imágenes)</span>
                                 </div>
                             </div>
                         </div>

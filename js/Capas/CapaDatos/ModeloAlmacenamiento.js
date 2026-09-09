@@ -42,6 +42,18 @@ class ModeloAlmacenamiento {
         try {
             const CancionesEnBruto = localStorage.getItem(this.ClaveAlmacenamientoCanciones);
             this.Canciones = CancionesEnBruto ? JSON.parse(CancionesEnBruto) : [];
+            if (Array.isArray(this.Canciones)) {
+                this.Canciones.forEach(C => {
+                    if (C.ImagenPartitura !== undefined && !C.ImagenPartituraUrl) {
+                        C.ImagenPartituraUrl = C.ImagenPartitura !== "IFAEL.jpg" ? C.ImagenPartitura : "";
+                    }
+                    if (C.ImagenPartituraUrl === "IFAEL.jpg") {
+                        C.ImagenPartituraUrl = "";
+                    }
+                    delete C.ImagenPartitura;
+                    delete C.SecuenciaNotasMelodia;
+                });
+            }
         } catch (Error) {
             this.Canciones = [];
         }
@@ -154,6 +166,10 @@ class ModeloAlmacenamiento {
                 const CancionesLeidas = [];
                 SnapCanciones.forEach(Doc => {
                     const Data = Doc.data();
+                    const PartituraLeida = (Data.ImagenPartituraUrl && Data.ImagenPartituraUrl !== "IFAEL.jpg")
+                        ? Data.ImagenPartituraUrl
+                        : (Data.ImagenPartitura && Data.ImagenPartitura !== "IFAEL.jpg" ? Data.ImagenPartitura : "");
+
                     CancionesLeidas.push({
                         IdCancion: Doc.id,
                         Titulo: Data.Titulo || "Sin Título",
@@ -164,9 +180,8 @@ class ModeloAlmacenamiento {
                         EsEstudianteIFAEL: Data.EsEstudianteIFAEL !== undefined ? Data.EsEstudianteIFAEL : true,
                         Descripcion: Data.Descripcion || "",
                         Caratula: Data.CaratulaUrl || Data.Caratula || "Logo1.png",
-                        ImagenPartitura: Data.ImagenPartituraUrl || Data.ImagenPartitura || "IFAEL.jpg",
+                        ImagenPartituraUrl: PartituraLeida,
                         AudioUrl: Data.AudioUrl || "",
-                        SecuenciaNotasMelodia: Data.SecuenciaNotasMelodia || [],
                         LetraConAcordes: Data.LetraConAcordes || "",
                         LetraLimpia: Data.LetraLimpia || "",
                         FechaCreacion: Data.FechaCreacion || null,
@@ -175,6 +190,9 @@ class ModeloAlmacenamiento {
                 });
                 this.Canciones = CancionesLeidas;
                 localStorage.setItem(this.ClaveAlmacenamientoCanciones, JSON.stringify(this.Canciones));
+
+                // Ejecutar limpieza automática en segundo plano de campos obsoletos en Firestore
+                this.LimpiarCamposObsoletosEnFirestore().catch(e => console.warn("[ModeloAlmacenamiento] Limpieza en Firestore diferida:", e));
             }
 
             // 2. Géneros
@@ -844,6 +862,10 @@ class ModeloAlmacenamiento {
     async GuardarCancionNueva(ObjetoCancion) {
         let IdFinal = Date.now().toString();
 
+        const PartituraLimpia = (ObjetoCancion.ImagenPartituraUrl && ObjetoCancion.ImagenPartituraUrl !== "IFAEL.jpg")
+            ? ObjetoCancion.ImagenPartituraUrl
+            : (ObjetoCancion.ImagenPartitura && ObjetoCancion.ImagenPartitura !== "IFAEL.jpg" ? ObjetoCancion.ImagenPartitura : "");
+
         if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
             const DocFirestore = {
                 Titulo: ObjetoCancion.Titulo || "",
@@ -854,9 +876,8 @@ class ModeloAlmacenamiento {
                 EsEstudianteIFAEL: ObjetoCancion.EsEstudianteIFAEL !== undefined ? ObjetoCancion.EsEstudianteIFAEL : true,
                 Descripcion: ObjetoCancion.Descripcion || "",
                 CaratulaUrl: ObjetoCancion.Caratula || ObjetoCancion.CaratulaUrl || "Logo1.png",
-                ImagenPartituraUrl: ObjetoCancion.ImagenPartitura || ObjetoCancion.ImagenPartituraUrl || "IFAEL.jpg",
+                ImagenPartituraUrl: PartituraLimpia,
                 AudioUrl: ObjetoCancion.AudioUrl || "",
-                SecuenciaNotasMelodia: ObjetoCancion.SecuenciaNotasMelodia || [],
                 LetraConAcordes: ObjetoCancion.LetraConAcordes || "",
                 LetraLimpia: ObjetoCancion.LetraLimpia || "",
                 FechaCreacion: this.ServicioFirebase.MarcaDeTiempoServidor(),
@@ -874,6 +895,10 @@ class ModeloAlmacenamiento {
         }
 
         ObjetoCancion.IdCancion = IdFinal;
+        ObjetoCancion.ImagenPartituraUrl = PartituraLimpia;
+        delete ObjetoCancion.ImagenPartitura;
+        delete ObjetoCancion.SecuenciaNotasMelodia;
+
         this.Canciones.unshift(ObjetoCancion);
         localStorage.setItem(this.ClaveAlmacenamientoCanciones, JSON.stringify(this.Canciones));
 
@@ -1145,19 +1170,41 @@ class ModeloAlmacenamiento {
     async ActualizarCancion(IdCancion, CamposActualizados) {
         const Indice = this.Canciones.findIndex(C => String(C.IdCancion) === String(IdCancion));
         if (Indice !== -1) {
+            if (CamposActualizados.ImagenPartitura !== undefined && CamposActualizados.ImagenPartituraUrl === undefined) {
+                CamposActualizados.ImagenPartituraUrl = CamposActualizados.ImagenPartitura;
+            }
+            if (CamposActualizados.ImagenPartituraUrl === "IFAEL.jpg") {
+                CamposActualizados.ImagenPartituraUrl = "";
+            }
+            delete CamposActualizados.ImagenPartitura;
+            delete CamposActualizados.SecuenciaNotasMelodia;
+
             this.Canciones[Indice] = { ...this.Canciones[Indice], ...CamposActualizados };
+            delete this.Canciones[Indice].ImagenPartitura;
+            delete this.Canciones[Indice].SecuenciaNotasMelodia;
+
             localStorage.setItem(this.ClaveAlmacenamientoCanciones, JSON.stringify(this.Canciones));
 
             if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
                 try {
                     const DocActualizar = { ...CamposActualizados };
                     delete DocActualizar.IdCancion;
+                    delete DocActualizar.SecuenciaNotasMelodia;
+
                     if (DocActualizar.Caratula && !DocActualizar.CaratulaUrl) {
                         DocActualizar.CaratulaUrl = DocActualizar.Caratula;
                     }
                     if (DocActualizar.ImagenPartitura && !DocActualizar.ImagenPartituraUrl) {
                         DocActualizar.ImagenPartituraUrl = DocActualizar.ImagenPartitura;
                     }
+                    delete DocActualizar.ImagenPartitura;
+
+                    const FieldValue = window.firebase ? window.firebase.firestore.FieldValue : null;
+                    if (FieldValue) {
+                        DocActualizar.ImagenPartitura = FieldValue.delete();
+                        DocActualizar.SecuenciaNotasMelodia = FieldValue.delete();
+                    }
+
                     await this.ServicioFirebase.ColeccionCanciones().doc(String(IdCancion)).update(DocActualizar);
                 } catch (Error) {
                     console.error("[ModeloAlmacenamiento] Error al actualizar canción:", Error);
@@ -1166,6 +1213,52 @@ class ModeloAlmacenamiento {
             return this.Canciones[Indice];
         }
         return null;
+    }
+
+    async LimpiarCamposObsoletosEnFirestore() {
+        if (!this.ServicioFirebase || !this.ServicioFirebase.ObtenerFirestore()) return;
+        try {
+            const SnapCanciones = await this.ServicioFirebase.ColeccionCanciones().get();
+            if (SnapCanciones.empty) return;
+
+            const FieldValue = window.firebase ? window.firebase.firestore.FieldValue : null;
+            if (!FieldValue) return;
+
+            const Promesas = [];
+            SnapCanciones.forEach(Doc => {
+                const Data = Doc.data();
+                const CamposAjustar = {};
+
+                // 1. Si existe ImagenPartitura (campo redundante), migrar a ImagenPartituraUrl y eliminarlo
+                if (Data.ImagenPartitura !== undefined) {
+                    if (!Data.ImagenPartituraUrl && Data.ImagenPartitura && Data.ImagenPartitura !== "IFAEL.jpg") {
+                        CamposAjustar.ImagenPartituraUrl = Data.ImagenPartitura;
+                    }
+                    CamposAjustar.ImagenPartitura = FieldValue.delete();
+                }
+
+                // 2. Si ImagenPartituraUrl es "IFAEL.jpg", limpiarlo a vacío
+                if (Data.ImagenPartituraUrl === "IFAEL.jpg") {
+                    CamposAjustar.ImagenPartituraUrl = "";
+                }
+
+                // 3. Si existe SecuenciaNotasMelodia, eliminarlo
+                if (Data.SecuenciaNotasMelodia !== undefined) {
+                    CamposAjustar.SecuenciaNotasMelodia = FieldValue.delete();
+                }
+
+                if (Object.keys(CamposAjustar).length > 0) {
+                    Promesas.push(Doc.ref.update(CamposAjustar));
+                }
+            });
+
+            if (Promesas.length > 0) {
+                await Promise.all(Promesas);
+                console.log(`[ModeloAlmacenamiento] Limpieza en Firestore completada: ${Promesas.length} canciones migradas/limpiadas.`);
+            }
+        } catch (ErrLimpieza) {
+            console.warn("[ModeloAlmacenamiento] Aviso durante la limpieza de campos obsoletos en Firestore:", ErrLimpieza);
+        }
     }
 
     GuardarEstadoTemaOscuro(EsTemaOscuro) {
