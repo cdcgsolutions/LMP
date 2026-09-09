@@ -152,9 +152,7 @@ class ModeloAlmacenamiento {
                             EsVerificado: Data.EsVerificado === true,
                             FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
                             FotoPerfilUrl: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
-                            FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
-                            FotoPortadaUrl: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
-                            Rol: Data.Rol || "Usuario",
+                            Rol: Data.Rol || "User",
                             Activo: Data.Activo !== undefined ? Data.Activo : true,
                             Ciudad: Data.Ciudad || "Trinidad, Beni",
                             CorreoElectronico: Data.CorreoElectronico || "",
@@ -831,9 +829,7 @@ class ModeloAlmacenamiento {
                         EsVerificado: Data.EsVerificado === true,
                         FotoPerfil: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
                         FotoPerfilUrl: Data.FotoPerfilUrl || Data.FotoPerfil || "Logo1.png",
-                        FotoPortada: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
-                        FotoPortadaUrl: Data.FotoPortadaUrl || Data.FotoPortada || "Logo1.png",
-                        Rol: Data.Rol || "Usuario",
+                        Rol: Data.Rol || "User",
                         Activo: Data.Activo !== undefined ? Data.Activo : true,
                         Ciudad: Data.Ciudad || "Trinidad, Beni",
                         CorreoElectronico: Data.CorreoElectronico || "",
@@ -884,6 +880,87 @@ class ModeloAlmacenamiento {
     // #endregion
 
     // #region Metodos POST (Creacion)
+    async RegistrarUsuarioNuevo(DatosNuevoUsuario) {
+        if (!DatosNuevoUsuario.NombreCompleto || !DatosNuevoUsuario.CorreoElectronico || !DatosNuevoUsuario.Contrasena) {
+            return { Exito: false, Mensaje: "Por favor completa todos los campos requeridos." };
+        }
+
+        const CorreoLimpio = DatosNuevoUsuario.CorreoElectronico.trim().toLowerCase();
+        const NombreLimpio = DatosNuevoUsuario.NombreCompleto.trim();
+
+        // 1. Verificar si el correo ya existe en cache local
+        const YaExisteLocal = (this.Usuarios || []).some(U => 
+            U.CorreoElectronico && U.CorreoElectronico.trim().toLowerCase() === CorreoLimpio
+        );
+        if (YaExisteLocal) {
+            return { Exito: false, Mensaje: "El correo electrónico ya se encuentra registrado." };
+        }
+
+        const FotoPerfilFinal = DatosNuevoUsuario.FotoPerfilUrl || "Logo1.png";
+        const CiudadFinal = (DatosNuevoUsuario.Ciudad && DatosNuevoUsuario.Ciudad.trim())
+            ? DatosNuevoUsuario.Ciudad.trim()
+            : "Trinidad, Beni";
+
+        // Objeto según requisitos estrictos: SOLO FotoPerfilUrl (sin atributo FotoPerfil duplicado)
+        const ObjetoGuardar = {
+            NombreCompleto: NombreLimpio,
+            CorreoElectronico: CorreoLimpio,
+            Contrasena: DatosNuevoUsuario.Contrasena,
+            Ciudad: CiudadFinal,
+            FotoPerfilUrl: FotoPerfilFinal,
+            Activo: true,
+            EsVerificado: false,
+            Rol: "User",
+            FechaRegistro: new Date().toISOString()
+        };
+
+        let IdFinal = "usr_" + Date.now();
+
+        if (this.ServicioFirebase && this.ServicioFirebase.ObtenerFirestore()) {
+            try {
+                // Verificar en Firestore si ya existe el correo
+                const SnapEmail = await this.ServicioFirebase.ColeccionUsuarios()
+                    .where("CorreoElectronico", "==", CorreoLimpio)
+                    .get();
+
+                if (!SnapEmail.empty) {
+                    return { Exito: false, Mensaje: "El correo electrónico ya está registrado en la base de datos." };
+                }
+
+                const DocFirestore = {
+                    NombreCompleto: NombreLimpio,
+                    CorreoElectronico: CorreoLimpio,
+                    Contrasena: DatosNuevoUsuario.Contrasena,
+                    Ciudad: CiudadFinal,
+                    FotoPerfilUrl: FotoPerfilFinal,
+                    Activo: true,
+                    EsVerificado: false,
+                    Rol: "User",
+                    FechaRegistro: this.ServicioFirebase.MarcaDeTiempoServidor()
+                };
+
+                const DocRef = await this.ServicioFirebase.ColeccionUsuarios().add(DocFirestore);
+                if (DocRef && DocRef.id) {
+                    IdFinal = DocRef.id;
+                }
+            } catch (ErrFirestore) {
+                console.error("[ModeloAlmacenamiento] Error al registrar usuario en Firestore:", ErrFirestore);
+                return { Exito: false, Mensaje: "No se pudo conectar con Firestore: " + ErrFirestore.message };
+            }
+        }
+
+        const UsuarioCreado = {
+            IdUsuario: IdFinal,
+            ...ObjetoGuardar
+        };
+
+        if (!this.Usuarios) this.Usuarios = [];
+        this.Usuarios.push(UsuarioCreado);
+        localStorage.setItem(this.ClaveAlmacenamientoUsuarios, JSON.stringify(this.Usuarios));
+
+        return { Exito: true, Usuario: UsuarioCreado };
+    }
+
     async GuardarCancionNueva(ObjetoCancion) {
         let IdFinal = Date.now().toString();
 
@@ -1243,43 +1320,68 @@ class ModeloAlmacenamiento {
     async LimpiarCamposObsoletosEnFirestore() {
         if (!this.ServicioFirebase || !this.ServicioFirebase.ObtenerFirestore()) return;
         try {
-            const SnapCanciones = await this.ServicioFirebase.ColeccionCanciones().get();
-            if (SnapCanciones.empty) return;
-
             const FieldValue = window.firebase ? window.firebase.firestore.FieldValue : null;
             if (!FieldValue) return;
 
             const Promesas = [];
-            SnapCanciones.forEach(Doc => {
-                const Data = Doc.data();
-                const CamposAjustar = {};
 
-                // 1. Si existe ImagenPartitura (campo redundante), migrar a ImagenPartituraUrl y eliminarlo
-                if (Data.ImagenPartitura !== undefined) {
-                    if (!Data.ImagenPartituraUrl && Data.ImagenPartitura && Data.ImagenPartitura !== "IFAEL.jpg") {
-                        CamposAjustar.ImagenPartituraUrl = Data.ImagenPartitura;
+            // 1. Limpieza en colección Canciones
+            const SnapCanciones = await this.ServicioFirebase.ColeccionCanciones().get();
+            if (!SnapCanciones.empty) {
+                SnapCanciones.forEach(Doc => {
+                    const Data = Doc.data();
+                    const CamposAjustar = {};
+
+                    if (Data.ImagenPartitura !== undefined) {
+                        if (!Data.ImagenPartituraUrl && Data.ImagenPartitura && Data.ImagenPartitura !== "IFAEL.jpg") {
+                            CamposAjustar.ImagenPartituraUrl = Data.ImagenPartitura;
+                        }
+                        CamposAjustar.ImagenPartitura = FieldValue.delete();
                     }
-                    CamposAjustar.ImagenPartitura = FieldValue.delete();
-                }
 
-                // 2. Si ImagenPartituraUrl es "IFAEL.jpg", limpiarlo a vacío
-                if (Data.ImagenPartituraUrl === "IFAEL.jpg") {
-                    CamposAjustar.ImagenPartituraUrl = "";
-                }
+                    if (Data.ImagenPartituraUrl === "IFAEL.jpg") {
+                        CamposAjustar.ImagenPartituraUrl = "";
+                    }
 
-                // 3. Si existe SecuenciaNotasMelodia, eliminarlo
-                if (Data.SecuenciaNotasMelodia !== undefined) {
-                    CamposAjustar.SecuenciaNotasMelodia = FieldValue.delete();
-                }
+                    if (Data.SecuenciaNotasMelodia !== undefined) {
+                        CamposAjustar.SecuenciaNotasMelodia = FieldValue.delete();
+                    }
 
-                if (Object.keys(CamposAjustar).length > 0) {
-                    Promesas.push(Doc.ref.update(CamposAjustar));
-                }
-            });
+                    if (Object.keys(CamposAjustar).length > 0) {
+                        Promesas.push(Doc.ref.update(CamposAjustar));
+                    }
+                });
+            }
+
+            // 2. Limpieza en colección Usuarios (eliminar FotoPerfil redundante o FotoPortadaUrl si existen)
+            const SnapUsuarios = await this.ServicioFirebase.ColeccionUsuarios().get();
+            if (!SnapUsuarios.empty) {
+                SnapUsuarios.forEach(Doc => {
+                    const Data = Doc.data();
+                    const CamposAjustarUser = {};
+
+                    if (Data.FotoPerfil !== undefined) {
+                        if (!Data.FotoPerfilUrl && Data.FotoPerfil) {
+                            CamposAjustarUser.FotoPerfilUrl = Data.FotoPerfil;
+                        }
+                        CamposAjustarUser.FotoPerfil = FieldValue.delete();
+                    }
+                    if (Data.FotoPortadaUrl !== undefined) {
+                        CamposAjustarUser.FotoPortadaUrl = FieldValue.delete();
+                    }
+                    if (Data.FotoPortada !== undefined) {
+                        CamposAjustarUser.FotoPortada = FieldValue.delete();
+                    }
+
+                    if (Object.keys(CamposAjustarUser).length > 0) {
+                        Promesas.push(Doc.ref.update(CamposAjustarUser));
+                    }
+                });
+            }
 
             if (Promesas.length > 0) {
                 await Promise.all(Promesas);
-                console.log(`[ModeloAlmacenamiento] Limpieza en Firestore completada: ${Promesas.length} canciones migradas/limpiadas.`);
+                console.log(`[ModeloAlmacenamiento] Limpieza en Firestore completada: ${Promesas.length} documentos migrados/limpiados.`);
             }
         } catch (ErrLimpieza) {
             console.warn("[ModeloAlmacenamiento] Aviso durante la limpieza de campos obsoletos en Firestore:", ErrLimpieza);

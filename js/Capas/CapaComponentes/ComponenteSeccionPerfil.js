@@ -90,7 +90,6 @@ class ComponenteSeccionPerfil {
         const Ciudad = Usuario.Ciudad || "Trinidad, Beni";
         const EsVerificado = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.EsUsuarioVerificado(NombreCompleto, Usuario.EsVerificado === true));
         const FotoPerfil = Usuario.FotoPerfilUrl || Usuario.FotoPerfil || "Logo1.png";
-        const FotoPortada = Usuario.FotoPortadaUrl || Usuario.FotoPortada || "Logo1.png";
         const FechaRegistroTexto = this.FormatearFecha(Usuario.FechaRegistro || Usuario.createTime);
 
         // Contabilizar publicaciones aportadas por este usuario en el muro / feed
@@ -120,23 +119,19 @@ class ComponenteSeccionPerfil {
 
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionPerfil">
-            <!-- 1. Cabecera y Portada de Perfil Estilo Facebook -->
-            <div class="TarjetaPerfilIFAEL">
-                <div class="PortadaInstitucionIFAEL">
-                    <img src="${FotoPortada}" alt="Portada de ${NombreCompleto}" class="ImagenPortadaInstitucion" onerror="this.src='Logo1.png'">
-                </div>
-
-                <div class="CuerpoPerfilInstitucion">
-                    <div class="FilaAvatarYDatosPrincipales">
-                        <div class="ContenedorAvatarFlotantePerfil">
-                            <img src="${FotoPerfil}" alt="${NombreCompleto}" class="AvatarInstitucionGrande" onerror="this.src='Logo1.png'">
+            <!-- 1. Cabecera de Perfil Limpia (Sin Portada) -->
+            <div class="TarjetaPerfilIFAEL" style="background-color: var(--ColorFondoSuperficie); border-radius: var(--RadioGrande); border: 1px solid var(--ColorBordeSuave); box-shadow: var(--SombraNivelUno); overflow: hidden;">
+                <div class="CuerpoPerfilInstitucion" style="padding: 24px;">
+                    <div class="FilaAvatarYDatosPrincipales" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                        <div class="ContenedorAvatarFlotantePerfil" style="margin-top: 0; width: 90px; height: 90px; border-radius: 50%; box-shadow: var(--SombraNivelDos); flex-shrink: 0;">
+                            <img src="${FotoPerfil}" alt="${NombreCompleto}" class="AvatarInstitucionGrande" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--ColorFondoSuperficie);" onerror="this.src='Logo1.png'">
                         </div>
-                        <div class="DatosTextoInstitucion">
-                            <h1 class="NombreInstitucionGrande">
+                        <div class="DatosTextoInstitucion" style="flex: 1; min-width: 220px;">
+                            <h1 class="NombreInstitucionGrande" style="margin: 0; font-size: 22px; font-weight: 700; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
                                 <span>${NombreCompleto}</span>
-                                ${EsVerificado ? '<span class="InsigniaVerificada" title="Cuenta Verificada en Letras Mi Poblau"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
+                                ${EsVerificado ? '<span class="InsigniaVerificada" title="Cuenta Verificada en Letras de mi Poblao"><i class="fa-solid fa-circle-check" style="color: var(--ColorPrimarioAzul);"></i></span>' : ''}
                             </h1>
-                            <div class="MetaDetalleInstitucion" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 4px;">
+                            <div class="MetaDetalleInstitucion" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 6px; font-size: 13px; color: var(--ColorTextoSecundario);">
                                 <span><i class="fa-solid fa-location-dot" style="color: var(--ColorVerdeBeni); margin-right: 5px;"></i>${Ciudad}</span>
                                 ${FechaRegistroTexto ? `
                                 <span><i class="fa-solid fa-calendar-check" style="color: var(--ColorPrimarioAzul); margin-right: 5px;"></i>Miembro desde: ${FechaRegistroTexto}</span>
@@ -188,12 +183,11 @@ class ComponenteSeccionPerfil {
     RenderizarSkeleton() {
         return `
         <div class="ContenedorVistaSeccion" id="ContenedorVistaSeccionPerfil">
-            <div class="TarjetaPerfilIFAEL">
-                <div class="PortadaInstitucionIFAEL ElementoShimmerLMP" style="height: 200px;"></div>
-                <div class="CuerpoPerfilInstitucion">
-                    <div class="FilaAvatarYDatosPrincipales">
-                        <div class="ContenedorAvatarFlotantePerfil">
-                            <div class="AvatarInstitucionGrande ElementoShimmerLMP" style="border-radius: 50%;"></div>
+            <div class="TarjetaPerfilIFAEL" style="background-color: var(--ColorFondoSuperficie); border-radius: var(--RadioGrande); border: 1px solid var(--ColorBordeSuave); padding: 24px;">
+                <div class="CuerpoPerfilInstitucion" style="padding: 0;">
+                    <div class="FilaAvatarYDatosPrincipales" style="display: flex; gap: 20px; align-items: center;">
+                        <div class="ContenedorAvatarFlotantePerfil" style="margin-top: 0; width: 90px; height: 90px; border-radius: 50%;">
+                            <div class="AvatarInstitucionGrande ElementoShimmerLMP" style="width: 100%; height: 100%; border-radius: 50%;"></div>
                         </div>
                         <div class="DatosTextoInstitucion" style="flex: 1;">
                             <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 50%; height: 22px; margin-bottom: 8px;"></div>

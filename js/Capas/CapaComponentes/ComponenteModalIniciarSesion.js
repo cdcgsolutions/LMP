@@ -16,10 +16,10 @@ class ComponenteModalIniciarSesion {
                 <!-- Encabezado del Modal -->
                 <div class="EncabezadoVentanaModal" style="border-bottom: 1px solid var(--ColorBordeDivisor);">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="LogoInicialesSinFondoNegro.png" alt="LMP" style="width: 32px; height: 32px; object-fit: contain;" onerror="this.src='Logo1.png'">
+                        <img src="LogoIniciales.png" alt="LMP" style="width: 32px; height: 32px; object-fit: contain;" onerror="this.src='Logo1.png'">
                         <div>
                             <div class="TituloModalTexto" style="font-size: 17px;">Iniciar Sesión en LMP</div>
-                            <div style="font-size: 12px; color: var(--ColorTextoSecundario);">Letras Mi Poblau • Cancionero Beniano</div>
+                            <div style="font-size: 12px; color: var(--ColorTextoSecundario);">Letras Mi Poblao </div>
                         </div>
                     </div>
                     <button class="BotonCerrarModal" id="BotonCerrarModalLogin" title="Cerrar ventana"><i class="fa-solid fa-xmark"></i></button>
@@ -47,7 +47,6 @@ class ComponenteModalIniciarSesion {
                                 id="CampoEmailLogin" 
                                 name="correo_acceso_lmp"
                                 class="CampoEntradaFormulario" 
-                                placeholder="correo@ejemplo.com" 
                                 value=""
                                 autocomplete="off"
                                 readonly
@@ -57,18 +56,27 @@ class ComponenteModalIniciarSesion {
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 5px;">
                             <label style="font-size: 13px; font-weight: 600; color: var(--ColorTextoPrincipal);">Contraseña:</label>
-                            <input 
-                                type="password" 
-                                id="CampoPasswordLogin" 
-                                name="clave_acceso_lmp"
-                                class="CampoEntradaFormulario" 
-                                placeholder="••••••••" 
-                                value=""
-                                autocomplete="new-password"
-                                readonly
-                                onfocus="this.removeAttribute('readonly');"
-                                style="padding: 10px 12px; font-size: 13.5px; border-radius: 8px;"
-                            >
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input 
+                                    type="password" 
+                                    id="CampoPasswordLogin" 
+                                    name="clave_acceso_lmp"
+                                    class="CampoEntradaFormulario" 
+                                    value=""
+                                    autocomplete="new-password"
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                    style="padding: 10px 40px 10px 12px; font-size: 13.5px; border-radius: 8px; width: 100%; box-sizing: border-box;"
+                                >
+                                <button 
+                                    type="button" 
+                                    id="BotonAlternarVisibilidadPasswordLogin" 
+                                    style="position: absolute; right: 10px; background: none; border: none; color: var(--ColorTextoSecundario); cursor: pointer; padding: 4px; font-size: 14px; display: flex; align-items: center; justify-content: center;"
+                                    title="Mostrar u ocultar contraseña"
+                                >
+                                    <i class="fa-solid fa-eye" id="IconoVisibilidadPasswordLogin"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div id="MensajeErrorLoginModal" style="display: none; font-size: 12.5px; color: var(--ColorPeligroRojo); background-color: rgba(239, 68, 68, 0.08); padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--ColorPeligroRojo);"></div>
@@ -82,6 +90,14 @@ class ComponenteModalIniciarSesion {
                             <i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 6px;"></i> Iniciar Sesión
                         </button>
                     </form>
+
+                    <!-- Enlace para Crear Cuenta -->
+                    <div style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--ColorTextoSecundario);">
+                        ¿No tienes cuenta? 
+                        <a href="javascript:void(0)" id="BotonIrARegistroModal" style="color: var(--ColorPrimarioAzul); font-weight: 700; text-decoration: none; margin-left: 4px;">
+                            Crea tu Cuenta
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Pie del Modal -->
@@ -89,7 +105,7 @@ class ComponenteModalIniciarSesion {
                     <button class="BotonAccionSecundario" id="BotonContinuarComoInvitado" style="font-size: 12.5px; border: none; background: transparent; color: var(--ColorTextoSecundario);">
                         <i class="fa-solid fa-eye" style="margin-right: 4px;"></i> Seguir como Invitado
                     </button>
-                    <span style="font-size: 11px; color: var(--ColorTextoSecundario);">IFAEL Trinidad ⓒ ${new Date().getFullYear()}</span>
+                    <span style="font-size: 11px; color: var(--ColorTextoSecundario);">ⓒ ${new Date().getFullYear()}</span>
                 </div>
             </div>
         </div>

@@ -119,11 +119,10 @@ class ServicioEstado {
             EsInvitado: false,
             IdUsuario: DatosUsuario.IdUsuario || "",
             Nombre: DatosUsuario.NombreCompleto || DatosUsuario.Nombre || "Usuario",
-            Rol: DatosUsuario.Rol || "Usuario",
+            Rol: DatosUsuario.Rol || "User",
             Carrera: DatosUsuario.Carrera || "",
             Avatar: DatosUsuario.FotoPerfilUrl || DatosUsuario.FotoPerfil || DatosUsuario.Avatar || "Logo1.png",
             FotoPerfil: DatosUsuario.FotoPerfilUrl || DatosUsuario.FotoPerfil || DatosUsuario.Avatar || "Logo1.png",
-            FotoPortada: DatosUsuario.FotoPortadaUrl || DatosUsuario.FotoPortada || "Logo1.png",
             EsVerificado: DatosUsuario.EsVerificado === true,
             CorreoElectronico: DatosUsuario.CorreoElectronico || ""
         };
@@ -152,7 +151,6 @@ class ServicioEstado {
             UsuarioActual.Nombre = UsuarioFresco.NombreCompleto || UsuarioActual.Nombre;
             UsuarioActual.FotoPerfil = UsuarioFresco.FotoPerfil || UsuarioFresco.FotoPerfilUrl || UsuarioActual.FotoPerfil;
             UsuarioActual.Avatar = UsuarioActual.FotoPerfil;
-            UsuarioActual.FotoPortada = UsuarioFresco.FotoPortada || UsuarioFresco.FotoPortadaUrl || UsuarioActual.FotoPortada;
             UsuarioActual.Rol = UsuarioFresco.Rol || UsuarioActual.Rol;
             UsuarioActual.Carrera = UsuarioFresco.Carrera || UsuarioActual.Carrera;
             UsuarioActual.EsVerificado = UsuarioFresco.EsVerificado === true;

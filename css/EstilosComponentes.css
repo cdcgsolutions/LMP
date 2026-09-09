@@ -3520,4 +3520,42 @@ body.ModoOscuroActivo .ChipSugerenciaCompas {
     background-color: var(--ColorFondoHover);
 }
 
+/* --------------------------------------------------------------------------
+   AUTOCOMPLETE MODAL REGISTRO: CIUDADES / PROVINCIAS
+   -------------------------------------------------------------------------- */
+.ContenedorSugerenciasCiudad {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 220px;
+    overflow-y: auto;
+    background-color: var(--ColorFondoSuperficie);
+    border: 1px solid var(--ColorBordeDivisor);
+    border-radius: 8px;
+    box-shadow: var(--SombraNivelTres);
+    z-index: 100;
+    display: none;
+}
 
+.ItemSugerenciaCiudad {
+    padding: 9px 14px;
+    font-size: 13px;
+    color: var(--ColorTextoPrincipal);
+    cursor: pointer;
+    border-bottom: 1px solid var(--ColorBordeSuave);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ItemSugerenciaCiudad:last-child {
+    border-bottom: none;
+}
+
+.ItemSugerenciaCiudad:hover,
+.ItemSugerenciaCiudad.ItemSugerenciaSeleccionado {
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorPrimarioAzul);
+}

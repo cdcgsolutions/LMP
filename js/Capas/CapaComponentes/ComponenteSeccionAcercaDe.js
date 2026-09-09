@@ -163,28 +163,6 @@ class ComponenteSeccionAcercaDe {
                 </div>
             </div>
             ` : ''}
-
-            <!-- Bloque Institucional y Contexto Académico -->
-            <div class="TarjetaInstitucionalAcercaDe">
-                <div class="IconoInstitucionalGrande">
-                    <i class="fa-solid fa-building-columns"></i>
-                </div>
-                <div class="ContenidoInstitucionalAcercaDe">
-                    <h3 class="TituloInstitucional">Instituto de Formación Artística "Edelmira Limpias" (IFAEL)</h3>
-                    <p class="TextoInstitucional">
-                        Este proyecto nace en el seno del IFAEL (Trinidad, Beni) como parte de la formación académica en la carrera de <strong>Técnico Superior en Música Boliviana</strong>. Nuestro propósito es proveer a músicos, estudiantes, docentes y a la comunidad en general una herramienta moderna para explorar las letras con acordes, ritmos benianos tradicionales (Taquirari, Chovena, Machetero, Polca, Caluyo) y partituras de nuestros grandes maestros compositores.
-                    </p>
-                    <div class="AccionesInstitucionalesAcercaDe">
-                        <button class="BotonAccionAcercaDe BotonIrCanciones" data-pestana="canciones">
-                            <i class="fa-solid fa-scroll"></i> Explorar Cancionero
-                        </button>
-                        <button class="BotonAccionAcercaDe BotonIrIFAEL" data-pestana="ifael">
-                            <i class="fa-solid fa-building-columns"></i> Ver Perfil IFAEL
-                        </button>
-                    </div>
-                </div>
-            </div>
-
         </div>
         `;
     }

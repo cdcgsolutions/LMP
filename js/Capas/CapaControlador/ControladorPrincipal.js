@@ -32,6 +32,7 @@ class ControladorPrincipal {
         this.ComponenteModalPartitura = new ComponenteModalPartitura(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalCrearAporte = new ComponenteModalCrearAporte(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalIniciarSesion = new ComponenteModalIniciarSesion(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteModalRegistroUsuario = new ComponenteModalRegistroUsuario(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalDetalleGenero = new ComponenteModalDetalleGenero(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalCrearArtista = new ComponenteModalCrearArtista();
         this.ComponenteModalCrearGenero = new ComponenteModalCrearGenero();
@@ -711,8 +712,105 @@ class ControladorPrincipal {
             return;
         }
 
-        // Si se hace clic en el fondo del modal de login, no hacer nada (evitar cierre al hacer clic afuera)
-        if (Objetivo.id === "ModalIniciarSesionFondo" || Objetivo.closest("#ModalIniciarSesionFondo") === Objetivo) {
+        // Eventos del Modal de Registro de Usuario
+        if (Objetivo.closest("#BotonIrARegistroModal")) {
+            this.AbrirModalRegistroUsuario();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonIrALoginDesdeRegistro")) {
+            this.AbrirModalIniciarSesion();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonCerrarModalRegistro") || Objetivo.closest("#BotonRegistroContinuarInvitado")) {
+            this.CerrarModales();
+            return;
+        }
+
+        if (Objetivo.closest("#ContenedorClickFotoRegistro")) {
+            const InputFoto = document.getElementById("InputFotoPerfilRegistro");
+            if (InputFoto) InputFoto.click();
+            return;
+        }
+
+        if (Objetivo.closest("#BotonConfirmarRegistroUsuario")) {
+            this.ProcesarRegistroUsuarioFormulario();
+            return;
+        }
+
+        // Alternar Visibilidad de Contraseñas
+        if (Objetivo.closest("#BotonAlternarVisibilidadPasswordLogin")) {
+            const InputPass = document.getElementById("CampoPasswordLogin");
+            const Icono = document.getElementById("IconoVisibilidadPasswordLogin");
+            if (InputPass) {
+                const EsPassword = InputPass.type === "password";
+                InputPass.type = EsPassword ? "text" : "password";
+                if (Icono) {
+                    Icono.className = EsPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+                }
+            }
+            return;
+        }
+
+        if (Objetivo.closest("#BotonAlternarVisibilidadPasswordRegistro")) {
+            const InputPass = document.getElementById("CampoRegistroPassword");
+            const Icono = document.getElementById("IconoVisibilidadPasswordRegistro");
+            if (InputPass) {
+                const EsPassword = InputPass.type === "password";
+                InputPass.type = EsPassword ? "text" : "password";
+                if (Icono) {
+                    Icono.className = EsPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+                }
+            }
+            return;
+        }
+
+        // Eventos de Autocomplete de Ciudad
+        const ItemSugerenciaCiudad = Objetivo.closest(".ItemSugerenciaCiudad");
+        if (ItemSugerenciaCiudad) {
+            const Ciudad = ItemSugerenciaCiudad.dataset.ciudad;
+            const InputCiudad = document.getElementById("CampoRegistroCiudad");
+            const CajaSugerencias = document.getElementById("ContenedorSugerenciasCiudad");
+            if (InputCiudad) {
+                InputCiudad.value = Ciudad;
+            }
+            if (CajaSugerencias) {
+                CajaSugerencias.style.display = "none";
+            }
+            return;
+        }
+
+        if (Objetivo.closest("#CampoRegistroCiudad") || Objetivo.closest("#BotonDisparadorSugerenciasCiudad")) {
+            const InputCiudad = document.getElementById("CampoRegistroCiudad");
+            const CajaSugerencias = document.getElementById("ContenedorSugerenciasCiudad");
+            if (CajaSugerencias && typeof ComponenteModalRegistroUsuario !== "undefined") {
+                const YaAbierto = CajaSugerencias.style.display === "block";
+                if (Objetivo.closest("#BotonDisparadorSugerenciasCiudad") && YaAbierto) {
+                    CajaSugerencias.style.display = "none";
+                } else {
+                    const Valor = InputCiudad ? InputCiudad.value : "";
+                    const Lista = ComponenteModalRegistroUsuario.FiltrarCiudades(Valor);
+                    CajaSugerencias.innerHTML = ComponenteModalRegistroUsuario.RenderizarOpcionesSugerencias(Lista);
+                    CajaSugerencias.style.display = "block";
+                }
+            }
+            return;
+        }
+
+        // Si se hace clic fuera del grupo de ciudad, cerrar el menú de sugerencias
+        if (!Objetivo.closest("#ContenedorGrupoCiudadRegistro")) {
+            const CajaSugerencias = document.getElementById("ContenedorSugerenciasCiudad");
+            if (CajaSugerencias) {
+                CajaSugerencias.style.display = "none";
+            }
+        }
+
+        // Si se hace clic en el fondo de los modales de autenticación, no hacer nada
+        if (
+            Objetivo.id === "ModalIniciarSesionFondo" || Objetivo.closest("#ModalIniciarSesionFondo") === Objetivo ||
+            Objetivo.id === "ModalRegistroUsuarioFondo" || Objetivo.closest("#ModalRegistroUsuarioFondo") === Objetivo
+        ) {
             return;
         }
 
@@ -761,6 +859,17 @@ class ControladorPrincipal {
             return;
         }
 
+        // Autocomplete de Ciudad en Registro
+        if (Objetivo.id === "CampoRegistroCiudad") {
+            const CajaSugerencias = document.getElementById("ContenedorSugerenciasCiudad");
+            if (CajaSugerencias && typeof ComponenteModalRegistroUsuario !== "undefined") {
+                const Lista = ComponenteModalRegistroUsuario.FiltrarCiudades(Objetivo.value);
+                CajaSugerencias.innerHTML = ComponenteModalRegistroUsuario.RenderizarOpcionesSugerencias(Lista);
+                CajaSugerencias.style.display = "block";
+            }
+            return;
+        }
+
         // Slider de progreso de audio
         if (Objetivo.id === "DeslizadorProgresoAudio") {
             const Porcentaje = Number(Objetivo.value);
@@ -792,6 +901,26 @@ class ControladorPrincipal {
         }
         if (Objetivo.id === "SelectorFiltroTono") {
             this.ServicioEstado.EstablecerFiltrosCanciones(undefined, Objetivo.value);
+        }
+        if (Objetivo.id === "InputFotoPerfilRegistro") {
+            const Archivo = Objetivo.files && Objetivo.files[0];
+            if (Archivo) {
+                if (!Archivo.type.startsWith("image/")) {
+                    this.ServicioNotificaciones.MostrarMensajeToast(
+                        "La foto de perfil debe ser un archivo de imagen (JPG, PNG o WEBP).",
+                        '<i class="fa-solid fa-triangle-exclamation" style="color: #e67e22;"></i>'
+                    );
+                    Objetivo.value = "";
+                    return;
+                }
+                if (this.ComponenteModalRegistroUsuario) {
+                    this.ComponenteModalRegistroUsuario.ArchivoFotoSeleccionada = Archivo;
+                }
+                const VistaPrevia = document.getElementById("VistaPreviaFotoRegistro");
+                if (VistaPrevia) {
+                    VistaPrevia.src = URL.createObjectURL(Archivo);
+                }
+            }
         }
     }
 
@@ -1876,18 +2005,19 @@ class ControladorPrincipal {
         this.ContenedorModales.innerHTML = this.ComponenteModalIniciarSesion.Renderizar(MensajeMotivo);
 
         // Limpieza estricta de inputs para evitar autollenado por el navegador
-        setTimeout(() => {
+        const LimpiarCamposLogin = () => {
             const InputEmail = document.getElementById("CampoEmailLogin");
             const InputPass = document.getElementById("CampoPasswordLogin");
             const Form = document.getElementById("FormularioInicioSesionModal");
             if (Form) Form.reset();
-            if (InputEmail) {
-                InputEmail.value = "";
-            }
-            if (InputPass) {
-                InputPass.value = "";
-            }
-        }, 50);
+            if (InputEmail) InputEmail.value = "";
+            if (InputPass) InputPass.value = "";
+        };
+
+        LimpiarCamposLogin();
+        setTimeout(LimpiarCamposLogin, 50);
+        setTimeout(LimpiarCamposLogin, 150);
+        setTimeout(LimpiarCamposLogin, 300);
     }
 
     async ProcesarIniciarSesionFormulario() {
@@ -1956,6 +2086,151 @@ class ControladorPrincipal {
             if (BotonSubmit) {
                 BotonSubmit.disabled = false;
                 BotonSubmit.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 6px;"></i> Iniciar Sesión';
+            }
+        }
+    }
+
+    AbrirModalRegistroUsuario() {
+        if (!this.ContenedorModales) return;
+        if (this.ComponenteModalRegistroUsuario) {
+            this.ComponenteModalRegistroUsuario.ArchivoFotoSeleccionada = null;
+        }
+        this.ContenedorModales.innerHTML = this.ComponenteModalRegistroUsuario.Renderizar();
+
+        const LimpiarCamposRegistro = () => {
+            const Form = document.getElementById("FormularioRegistroUsuarioModal");
+            if (Form) Form.reset();
+            ["CampoRegistroNombreCompleto", "CampoRegistroEmail", "CampoRegistroPassword", "CampoRegistroCiudad"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = "";
+            });
+        };
+
+        LimpiarCamposRegistro();
+        setTimeout(LimpiarCamposRegistro, 50);
+        setTimeout(LimpiarCamposRegistro, 150);
+        setTimeout(LimpiarCamposRegistro, 300);
+    }
+
+    async ProcesarRegistroUsuarioFormulario() {
+        const InputNombre = document.getElementById("CampoRegistroNombreCompleto");
+        const InputEmail = document.getElementById("CampoRegistroEmail");
+        const InputPassword = document.getElementById("CampoRegistroPassword");
+        const InputCiudad = document.getElementById("CampoRegistroCiudad");
+        const CajaError = document.getElementById("MensajeErrorRegistroModal");
+        const BotonSubmit = document.getElementById("BotonConfirmarRegistroUsuario");
+
+        const NombreCompleto = InputNombre ? InputNombre.value.trim() : "";
+        const Email = InputEmail ? InputEmail.value.trim() : "";
+        const Password = InputPassword ? InputPassword.value : "";
+        const Ciudad = InputCiudad ? InputCiudad.value.trim() : "Trinidad, Beni";
+
+        if (CajaError) {
+            CajaError.style.display = "none";
+            CajaError.textContent = "";
+        }
+
+        if (!NombreCompleto) {
+            if (CajaError) {
+                CajaError.textContent = "Por favor ingresa tu nombre completo.";
+                CajaError.style.display = "block";
+            }
+            if (InputNombre) InputNombre.focus();
+            return;
+        }
+
+        if (!Email) {
+            if (CajaError) {
+                CajaError.textContent = "Por favor ingresa tu correo electrónico.";
+                CajaError.style.display = "block";
+            }
+            if (InputEmail) InputEmail.focus();
+            return;
+        }
+
+        const RegexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!RegexEmail.test(Email)) {
+            if (CajaError) {
+                CajaError.textContent = "Ingresa un formato de correo electrónico válido (ejemplo@dominio.com).";
+                CajaError.style.display = "block";
+            }
+            if (InputEmail) InputEmail.focus();
+            return;
+        }
+
+        if (!Password || Password.length < 4) {
+            if (CajaError) {
+                CajaError.textContent = "La contraseña debe tener al menos 4 caracteres.";
+                CajaError.style.display = "block";
+            }
+            if (InputPassword) InputPassword.focus();
+            return;
+        }
+
+        if (BotonSubmit) {
+            BotonSubmit.disabled = true;
+            BotonSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando usuario...';
+        }
+
+        try {
+            let UrlFotoPerfil = "Logo1.png";
+            const ArchivoFoto = this.ComponenteModalRegistroUsuario ? this.ComponenteModalRegistroUsuario.ArchivoFotoSeleccionada : null;
+
+            if (ArchivoFoto && this.ServicioCloudinary) {
+                if (BotonSubmit) {
+                    BotonSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subiendo foto de perfil...';
+                }
+                try {
+                    const UrlSubida = await this.ServicioCloudinary.SubirImagen(ArchivoFoto);
+                    if (UrlSubida) {
+                        UrlFotoPerfil = UrlSubida;
+                    }
+                } catch (ErrFoto) {
+                    console.warn("[ControladorPrincipal] Error al subir foto a Cloudinary, usando por defecto:", ErrFoto);
+                }
+            }
+
+            if (BotonSubmit) {
+                BotonSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando en base de datos...';
+            }
+
+            const Resultado = await this.ModeloAlmacenamiento.RegistrarUsuarioNuevo({
+                NombreCompleto: NombreCompleto,
+                CorreoElectronico: Email,
+                Contrasena: Password,
+                Ciudad: Ciudad || "Trinidad, Beni",
+                FotoPerfilUrl: UrlFotoPerfil
+            });
+
+            if (!Resultado.Exito) {
+                if (CajaError) {
+                    CajaError.textContent = Resultado.Mensaje || "No se pudo registrar la cuenta. Intenta de nuevo.";
+                    CajaError.style.display = "block";
+                }
+                if (BotonSubmit) {
+                    BotonSubmit.disabled = false;
+                    BotonSubmit.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Registrarme y Entrar';
+                }
+                return;
+            }
+
+            // Iniciar sesión inmediatamente con el nuevo usuario
+            this.ServicioEstado.IniciarSesion(Resultado.Usuario);
+            this.CerrarModales();
+            this.ActualizarVistaCentral();
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `¡Cuenta creada con éxito! Bienvenida/o, ${Resultado.Usuario.NombreCompleto || Resultado.Usuario.Nombre}!`,
+                '<i class="fa-solid fa-circle-check"></i>'
+            );
+        } catch (ErrorRegistro) {
+            console.error("[ControladorPrincipal] Error en ProcesarRegistroUsuarioFormulario:", ErrorRegistro);
+            if (CajaError) {
+                CajaError.textContent = "Ocurrió un error inesperado al procesar el registro.";
+                CajaError.style.display = "block";
+            }
+            if (BotonSubmit) {
+                BotonSubmit.disabled = false;
+                BotonSubmit.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Registrarme y Entrar';
             }
         }
     }
