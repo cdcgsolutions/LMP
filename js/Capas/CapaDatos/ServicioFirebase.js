@@ -94,6 +94,10 @@ class ServicioFirebase {
         return this.BaseDatosFirestore.collection("IFAEL");
     }
 
+    ColeccionAcercaDeNosotros() {
+        return this.BaseDatosFirestore.collection("AcercaDeNosotros");
+    }
+
     ColeccionPartiturasDigitales() {
         return this.BaseDatosFirestore.collection("PartiturasDigitales");
     }

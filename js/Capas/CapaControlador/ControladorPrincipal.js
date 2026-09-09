@@ -26,6 +26,7 @@ class ControladorPrincipal {
         this.ComponenteSeccionGeneros = new ComponenteSeccionGeneros(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionArtistas = new ComponenteSeccionArtistas(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionIFAEL = new ComponenteSeccionIFAEL(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteSeccionAcercaDe = new ComponenteSeccionAcercaDe(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionPerfil = new ComponenteSeccionPerfil(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalLetra = new ComponenteModalLetra(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteModalPartitura = new ComponenteModalPartitura(this.ServicioEstado, this.ModeloAlmacenamiento);
@@ -135,6 +136,9 @@ class ControladorPrincipal {
                 return this.ComponenteSeccionArtistas.Renderizar();
             case "ifael":
                 return this.ComponenteSeccionIFAEL.Renderizar();
+            case "acerca-de":
+            case "acercadenosotros":
+                return this.ComponenteSeccionAcercaDe.Renderizar();
             case "perfil":
                 return this.ComponenteSeccionPerfil.Renderizar();
             default:

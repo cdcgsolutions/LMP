@@ -67,6 +67,10 @@ class ComponenteBarraLateralIzquierda {
                     <div class="IconoCirculoColor IconoRojo"><i class="fa-solid fa-building-columns"></i></div>
                     <span>Instituto IFAEL (Trinidad)</span>
                 </li>
+                <li class="ElementoAccesoDirecto ${PestanaActiva === 'acerca-de' ? 'AccesoActivo' : ''}" data-pestana="acerca-de">
+                    <div class="IconoCirculoColor IconoTeal"><i class="fa-solid fa-circle-info"></i></div>
+                    <span>Acerca de Nosotros</span>
+                </li>
             </ul>
 
             <div class="SeparadorBarraLateral"></div>
@@ -88,7 +92,7 @@ class ComponenteBarraLateralIzquierda {
             <div class="SeparadorBarraLateral"></div>
 
             <footer class="PiePaginaLateralCreditos">
-                <p><strong>Letras Mi Poblau (LMP)</strong></p>
+                <p><strong>Letras de mi Poblao (LMP)</strong></p>
                 <p>Proyecto de Grado Académico - IFAEL</p>
                 <p>Carrera: Técnico Superior en Música Boliviana</p>
                 <p style="margin-top: 6px; color: var(--ColorTextoSecundario);">By: Ing. Daniel ⓒ <span id="year">${new Date().getFullYear()}</span></p>

@@ -13,6 +13,7 @@ class ModeloAlmacenamiento {
         this.ClaveAlmacenamientoGeneros = "LMP_Generos_v1";
         this.ClaveAlmacenamientoArtistas = "LMP_Artistas_v1";
         this.ClaveAlmacenamientoIFAEL = "LMP_IFAEL_v1";
+        this.ClaveAlmacenamientoAcercaDeNosotros = "LMP_AcercaDeNosotros_v1";
         this.ClaveAlmacenamientoTemaOscuro = "LMP_ModoOscuro_v1";
         this.ClaveAlmacenamientoUsuarios = "LMP_Usuarios_v1";
 
@@ -22,6 +23,7 @@ class ModeloAlmacenamiento {
         this.Artistas = [];
         this.Usuarios = [];
         this.DatosIFAEL = null;
+        this.DatosAcercaDeNosotros = null;
         this.DatosCargadosDesdeFirestore = false;
         this.EstaCargandoFirestore = true;
 
@@ -116,6 +118,13 @@ class ModeloAlmacenamiento {
             this.DatosIFAEL = IFAELEnBruto ? JSON.parse(IFAELEnBruto) : null;
         } catch (Error) {
             this.DatosIFAEL = null;
+        }
+
+        try {
+            const AcercaEnBruto = localStorage.getItem(this.ClaveAlmacenamientoAcercaDeNosotros);
+            this.DatosAcercaDeNosotros = AcercaEnBruto ? JSON.parse(AcercaEnBruto) : null;
+        } catch (Error) {
+            this.DatosAcercaDeNosotros = null;
         }
     }
 
@@ -270,6 +279,18 @@ class ModeloAlmacenamiento {
                 const DocIFAEL = SnapIFAEL.docs[0];
                 this.DatosIFAEL = { IdIFAEL: DocIFAEL.id, ...DocIFAEL.data() };
                 localStorage.setItem(this.ClaveAlmacenamientoIFAEL, JSON.stringify(this.DatosIFAEL));
+            }
+
+            // 4.5. Acerca de Nosotros
+            try {
+                const SnapAcerca = await this.ServicioFirebase.ColeccionAcercaDeNosotros().get();
+                if (!SnapAcerca.empty) {
+                    const DocAcerca = SnapAcerca.docs[0];
+                    this.DatosAcercaDeNosotros = { IdAcercaDeNosotros: DocAcerca.id, ...DocAcerca.data() };
+                    localStorage.setItem(this.ClaveAlmacenamientoAcercaDeNosotros, JSON.stringify(this.DatosAcercaDeNosotros));
+                }
+            } catch (ErrAcerca) {
+                console.warn("[ModeloAlmacenamiento] Error al cargar colección AcercaDeNosotros:", ErrAcerca);
             }
 
             // 5. Publicaciones, Comentarios y Reacciones
@@ -711,6 +732,10 @@ class ModeloAlmacenamiento {
 
     ObtenerDatosIFAEL() {
         return this.DatosIFAEL;
+    }
+
+    ObtenerDatosAcercaDeNosotros() {
+        return this.DatosAcercaDeNosotros;
     }
 
     ObtenerTodosLosUsuarios() {

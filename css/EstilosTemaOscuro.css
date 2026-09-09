@@ -147,4 +147,51 @@ body.ModoOscuroActivo .MiniInsigniaReaccionUsuario {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* Modo Oscuro: Sección Acerca de Nosotros */
+body.ModoOscuroActivo .HeroSeccionAcercaDe {
+    background: linear-gradient(135deg, #115e59 0%, #042f2e 50%, #0c4a6e 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.ModoOscuroActivo .TarjetaIntegranteAcercaDe {
+    background-color: #242526;
+    border-color: #393a3b;
+}
+
+body.ModoOscuroActivo .TarjetaIntegranteAcercaDe:hover {
+    border-color: #0d9488;
+}
+
+body.ModoOscuroActivo .PieTarjetaIntegrante {
+    background-color: #18191a;
+    border-top-color: #393a3b;
+}
+
+body.ModoOscuroActivo .TagItem {
+    background-color: #242526;
+    border-color: #393a3b;
+    color: #b0b3b8;
+}
+
+body.ModoOscuroActivo .TarjetaInstitucionalAcercaDe {
+    background-color: #242526;
+    border-color: #393a3b;
+}
+
+body.ModoOscuroActivo .InsigniaEstadoVerificado,
+body.ModoOscuroActivo .InsigniaEstadoPendiente {
+    background-color: #242526;
+}
+
+body.ModoOscuroActivo .BotonIrIFAEL {
+    background-color: #3a3b3c;
+    border-color: #4e4f50;
+    color: #e4e6eb;
+}
+
+body.ModoOscuroActivo .BotonIrIFAEL:hover {
+    background-color: #4e4f50;
+}
+
+
 
