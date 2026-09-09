@@ -79,6 +79,8 @@ class ComponenteSeccionIFAEL {
         const ContactoTelefono = DatosIFAEL.ContactoTelefono || '';
         const LogoUrl = DatosIFAEL.LogoUrl || 'IFAEL.jpg';
         const PortadaUrl = DatosIFAEL.FotoPortadaUrl || 'Logo1.png';
+        const UrlGoogleMaps = DatosIFAEL.UbicacionMapsUrl || DatosIFAEL.UbicacionMaps || DatosIFAEL.GoogleMapsUrl || DatosIFAEL.MapaUrl || "https://maps.app.goo.gl/7x4KijRxw8PaGzoYA";
+        const UrlIframeMaps = DatosIFAEL.UbicacionMapsIframe || "https://maps.google.com/maps?q=-14.820114,-64.8840641&hl=es&z=17&output=embed";
 
         const TelefonoLimpio = ContactoTelefono ? ContactoTelefono.replace(/[^0-9+]/g, '') : '';
         const TelefonoWhatsApp = ContactoTelefono ? ContactoTelefono.replace(/[^0-9]/g, '') : '';
@@ -106,9 +108,11 @@ class ComponenteSeccionIFAEL {
                                 ${Ciudad ? ` • <i class="fa-solid fa-location-dot" style="margin-left: 2px; margin-right: 3px;"></i>${Ciudad}` : ''}
                             </div>
                             ${Direccion ? `
-                            <div class="MetaDetalleInstitucion">
-                                <i class="fa-solid fa-map-location-dot" style="margin-right: 5px; color: var(--ColorTextoSecundario);"></i>${Direccion}
-                            </div>
+                            <a href="${UrlGoogleMaps}" target="_blank" rel="noopener noreferrer" class="MetaDetalleInstitucion" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center;" title="Ver en Google Maps">
+                                <i class="fa-solid fa-map-location-dot" style="margin-right: 5px; color: var(--ColorPrimarioAzul);"></i>
+                                <span>${Direccion}</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px; margin-left: 6px; color: var(--ColorPrimarioAzul);"></i>
+                            </a>
                             ` : ''}
                             ${ContactoTelefono ? `
                             <div class="MetaDetalleInstitucion">
@@ -146,7 +150,7 @@ class ComponenteSeccionIFAEL {
                     </div>
                     ` : ''}
 
-                    <!-- 2. Información y Ubicación Institucional -->
+                    <!-- 2. Información Institucional y Contacto -->
                     <div style="margin-top: 16px; padding: 20px 22px; background-color: var(--ColorFondoSecundario); border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeDivisor);">
                         <div style="font-weight: 700; font-size: 15.5px; margin-bottom: 14px; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
                             <i class="fa-solid fa-circle-info" style="color: var(--ColorPrimarioAzul);"></i>
@@ -167,7 +171,7 @@ class ComponenteSeccionIFAEL {
                             ` : ''}
 
                             ${Direccion ? `
-                            <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--ColorFondoSuperficie); padding: 12px 16px; border-radius: var(--RadioPequeno); border: 1px solid var(--ColorBordeSuave);">
+                            <a href="${UrlGoogleMaps}" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: flex-start; gap: 12px; background: var(--ColorFondoSuperficie); padding: 12px 16px; border-radius: var(--RadioPequeno); border: 1px solid var(--ColorBordeSuave); text-decoration: none; transition: transform 0.15s ease;">
                                 <div style="width: 38px; height: 38px; border-radius: 50%; background: rgba(46, 125, 50, 0.12); color: var(--ColorVerdeBeni); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;">
                                     <i class="fa-solid fa-map-location-dot"></i>
                                 </div>
@@ -175,7 +179,7 @@ class ComponenteSeccionIFAEL {
                                     <span style="font-size: 11.5px; font-weight: 700; color: var(--ColorTextoSecundario); text-transform: uppercase;">Dirección</span>
                                     <span style="font-size: 13.5px; font-weight: 600; color: var(--ColorTextoPrincipal);">${Direccion}</span>
                                 </div>
-                            </div>
+                            </a>
                             ` : ''}
 
                             ${ContactoTelefono ? `
@@ -187,7 +191,7 @@ class ComponenteSeccionIFAEL {
                                     <span style="font-size: 11.5px; font-weight: 700; color: var(--ColorTextoSecundario); text-transform: uppercase;">Teléfono de Contacto</span>
                                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                         <a href="tel:${TelefonoLimpio}" style="font-size: 13.5px; font-weight: 700; color: var(--ColorPrimarioAzul); text-decoration: none;">
-                                            ${ContactoTelefono}
+                                             ${ContactoTelefono}
                                         </a>
                                         <a href="https://wa.me/${TelefonoWhatsApp}?text=Hola%2C%20quisiera%20recibir%20informaci%C3%B3n%20sobre%20el%20IFAEL" target="_blank" rel="noopener noreferrer" style="font-size: 11px; font-weight: 700; color: #166534; background-color: #dcfce7; padding: 2px 8px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
                                             <i class="fa-brands fa-whatsapp"></i> Chat WhatsApp
@@ -196,6 +200,36 @@ class ComponenteSeccionIFAEL {
                                 </div>
                             </div>
                             ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- 3. Mapa y Ubicación Geográfica IFAEL -->
+                    <div style="margin-top: 16px; padding: 20px 22px; background-color: var(--ColorFondoSecundario); border-radius: var(--RadioMediano); border: 1px solid var(--ColorBordeDivisor);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+                            <div style="font-weight: 700; font-size: 15.5px; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-map-location-dot" style="color: #ea4335;"></i>
+                                <span>Mapa de Ubicación</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <a href="${UrlGoogleMaps}" target="_blank" rel="noopener noreferrer" class="BotonAccionPrimario" id="BotonAbrirGoogleMapsIFAEL" style="text-decoration: none; padding: 8px 16px; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; border-radius: var(--RadioBotonPill);">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    <span>Abrir en Google Maps</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Mapa Interactivo Embebido -->
+                        <div style="width: 100%; height: 380px; border-radius: var(--RadioMediano); overflow: hidden; border: 1px solid var(--ColorBordeSuave); box-shadow: var(--SombraNivelUno); margin-bottom: 14px; position: relative; background-color: var(--ColorFondoSuperficie);">
+                            <iframe 
+                                title="Mapa Interactivo de IFAEL en Google Maps"
+                                src="${UrlIframeMaps}" 
+                                width="100%" 
+                                height="100%" 
+                                style="border: 0; display: block;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
                         </div>
                     </div>
                 </div>
