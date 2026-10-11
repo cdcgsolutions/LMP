@@ -104,21 +104,25 @@
         padding: 12px 8px;
     }
 
+    .SeccionEncabezadoIzquierda {
+        display: flex;
+        align-items: center;
+        width: auto !important;
+        flex: 0 0 auto !important;
+        min-width: 0;
+        gap: 8px;
+    }
+
     .SeccionEncabezadoCentro {
-        display: none;
+        display: flex !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        margin: 0 8px !important;
+        max-width: none !important;
     }
 
     .EncabezadoSuperiorPrincipal {
         padding: 0 10px;
-        gap: 8px;
-    }
-
-    .SeccionEncabezadoIzquierda {
-        display: flex;
-        align-items: center;
-        width: 100% !important;
-        flex: 1 1 auto;
-        min-width: 0;
         gap: 8px;
     }
 
@@ -129,7 +133,8 @@
         width: 100% !important;
         min-width: 0 !important;
         max-width: none !important;
-        height: 40px;
+        height: 38px;
+        position: relative;
     }
 
     .ContenedorBuscadorSuperior:focus-within {
@@ -141,6 +146,19 @@
         width: 100% !important;
         min-width: 0 !important;
         flex: 1 !important;
+        font-size: 13px !important;
+        padding: 6px 30px 6px 32px !important;
+        height: 36px;
+    }
+
+    .IconoBuscadorSuperior {
+        left: 10px;
+        font-size: 13px;
+    }
+
+    .BotonLimpiarBusqueda {
+        right: 8px;
+        font-size: 13px;
     }
 
     .SeccionEncabezadoDerecha {
@@ -508,7 +526,7 @@
     }
 
     .EncabezadoSuperiorPrincipal {
-        padding: 0 6px !important;
+        padding: 0 8px !important;
         gap: 6px !important;
     }
 
@@ -522,10 +540,22 @@
     .SeccionEncabezadoIzquierda {
         display: flex;
         align-items: center;
-        width: 100% !important;
+        width: auto !important;
+        flex: 0 0 auto !important;
+        min-width: 0 !important;
+        gap: 4px !important;
+    }
+
+    .IndicadorSeccionEncabezado {
+        display: none !important;
+    }
+
+    .SeccionEncabezadoCentro {
+        display: flex !important;
         flex: 1 1 auto !important;
         min-width: 0 !important;
-        gap: 6px !important;
+        margin: 0 4px !important;
+        max-width: none !important;
     }
 
     .ContenedorBuscadorSuperior {
@@ -535,8 +565,9 @@
         flex: 1 1 auto !important;
         min-width: 0 !important;
         max-width: none !important;
-        height: 38px;
-        padding: 0 12px;
+        height: 36px;
+        padding: 0 !important;
+        position: relative;
     }
 
     .ContenedorBuscadorSuperior:focus-within {
@@ -545,22 +576,34 @@
     }
 
     .CampoEntradaBuscador {
-        font-size: 13.5px;
+        font-size: 12.5px !important;
         width: 100% !important;
         min-width: 0 !important;
         flex: 1 !important;
+        padding: 6px 26px 6px 30px !important;
+        height: 34px !important;
+    }
+
+    .IconoBuscadorSuperior {
+        left: 9px !important;
+        font-size: 12px !important;
+    }
+
+    .BotonLimpiarBusqueda {
+        right: 6px !important;
+        font-size: 12px !important;
     }
 
     .SeccionEncabezadoDerecha {
         width: auto !important;
-        gap: 6px !important;
+        gap: 4px !important;
         flex-shrink: 0 !important;
     }
 
     .SeccionEncabezadoDerecha .BotonCircularIcono {
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 14.5px !important;
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 14px !important;
         flex-shrink: 0 !important;
     }
 

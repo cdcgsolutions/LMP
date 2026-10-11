@@ -1,6 +1,6 @@
 /* ==========================================================================
-   ESTILOS BASE Y MAQUETACIÓN PRINCIPAL (N-CAPAS)
-   Nombres en PascalCase - Letras Mi Poblau
+   ESTILOS BASE Y MAQUETACIÓN ARQUITECTÓNICA: LETRAS DE MI POBLAO (LMP)
+   Diseño Editorial, Académico y Moderno para Portal Web
    ========================================================================== */
 
 *, *::before, *::after {
@@ -9,27 +9,44 @@
     padding: 0;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
 html {
     font-size: 15px;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 body {
-    font-family: var(--FuentePrincipal);
-    background-color: var(--ColorFondoPrincipal);
+    font-family: var(--FuenteCuerpo);
+    background-color: var(--ColorFondoCanvas);
     color: var(--ColorTextoPrincipal);
-    line-height: 1.34;
+    line-height: 1.55;
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    letter-spacing: -0.01em;
 }
 
-/* Scrollbars personalizadas estilo Facebook */
+/* Tipografía de Encabezados con Personalidad Web */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--FuenteTitulos);
+    color: var(--ColorTextoPrincipal);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+}
+
+/* Scrollbars Modernas y Discretas */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -37,16 +54,16 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--ColorTextoAtenuado);
+    background: rgba(148, 163, 184, 0.4);
     border-radius: var(--RadioBotonPill);
-    opacity: 0.5;
+    transition: background var(--TransicionRapida);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--ColorTextoSecundario);
+    background: rgba(100, 116, 139, 0.7);
 }
 
-/* Enlaces y Botones Generales */
+/* Enlaces y Acciones */
 a {
     color: var(--ColorTextoEnlace);
     text-decoration: none;
@@ -54,7 +71,7 @@ a {
 }
 
 a:hover {
-    text-decoration: underline;
+    color: var(--ColorVerdeBeniHover);
 }
 
 button {
@@ -68,13 +85,14 @@ button {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: background-color var(--TransicionRapida), transform var(--TransicionRapida);
+    transition: all var(--TransicionRapida);
 }
 
 button:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
+/* Soporte Universal para Botones Adaptativos (Evita duplicidad de textos) */
 .TextoBotonLargo {
     display: inline;
 }
@@ -83,12 +101,13 @@ button:active {
     display: none;
 }
 
+/* Formularios y Entradas */
 input, textarea, select {
     font-family: inherit;
     font-size: 14px;
     color: var(--ColorTextoPrincipal);
     background-color: var(--ColorFondoEntrada);
-    border: 1px solid transparent;
+    border: 1px solid var(--ColorBordeDivisor);
     border-radius: var(--RadioPequeno);
     padding: 10px 14px;
     outline: none;
@@ -96,12 +115,16 @@ input, textarea, select {
 }
 
 input:focus, textarea:focus, select:focus {
-    border-color: var(--ColorPrimarioAzul);
+    border-color: var(--ColorVerdeBeni);
     background-color: var(--ColorFondoSuperficie);
-    box-shadow: 0 0 0 2px var(--ColorPrimarioAzulSuave);
+    box-shadow: 0 0 0 3px var(--ColorVerdeBeniSuave);
 }
 
-/* Contenedor Maestro de 3 Columnas */
+/* ==========================================================================
+   MAQUETACIÓN MAESTRA DEL PORTAL WEB
+   ========================================================================== */
+
+/* Contenedor Principal (Flexbox de 2 Columnas: Menú Lateral + Contenido) */
 .ContenedorPrincipalAplicacion {
     display: flex;
     margin-top: var(--AlturaEncabezado);
@@ -116,138 +139,140 @@ body.ConReproductorActivo .ContenedorPrincipalAplicacion {
     padding-bottom: var(--AlturaReproductorInferior);
 }
 
-/* Columnas Laterales */
+/* Menú Lateral Izquierdo de Navegación */
 .ColumnaLateralIzquierda {
-    width: var(--AnchoBarraLateralIzquierda);
+    width: var(--AnchoMenuLateral);
     position: fixed;
     top: var(--AlturaEncabezado);
     left: 0;
     bottom: 0;
     overflow-y: auto;
-    padding: 16px 8px;
-    background-color: transparent;
-    z-index: 10;
-    transition: bottom var(--TransicionMedia);
+    padding: 22px 16px;
+    background-color: var(--ColorFondoSuperficie);
+    border-right: 1px solid var(--ColorBordeDivisor);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--SombraNivelUno);
+    transition: transform var(--TransicionMedia), bottom var(--TransicionMedia);
 }
 
 body.ConReproductorActivo .ColumnaLateralIzquierda {
     bottom: var(--AlturaReproductorInferior);
 }
 
+/* Columna Derecha Oculta (no necesaria en portal de consulta) */
 .ColumnaLateralDerecha {
-    width: var(--AnchoBarraLateralDerecha);
-    position: fixed;
-    top: var(--AlturaEncabezado);
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
-    padding: 16px 8px;
-    background-color: transparent;
-    z-index: 10;
-    transition: bottom var(--TransicionMedia);
+    display: none !important;
 }
 
-body.ConReproductorActivo .ColumnaLateralDerecha {
-    bottom: var(--AlturaReproductorInferior);
-}
-
-/* Muro Central y Área de Contenido */
+/* Área Central de Contenido */
 .AreaContenidoCentral {
     flex: 1;
-    margin-left: var(--AnchoBarraLateralIzquierda);
-    margin-right: var(--AnchoBarraLateralDerecha);
+    margin-left: var(--AnchoMenuLateral);
+    margin-right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 16px;
+    padding: 32px 36px 60px 36px;
     min-height: calc(100vh - var(--AlturaEncabezado));
+    width: calc(100% - var(--AnchoMenuLateral));
+    box-sizing: border-box;
 }
 
-.ContenedorMuroMaximo {
+/* Contenedor Maximo de las Vistas */
+.ContenedorMuroMaximo,
+.ContenedorVistaSeccion {
     width: 100%;
     max-width: var(--AnchoMaximoMuroCentral);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 28px;
+    animation: AnimacionAparicionSuave 0.25s ease-out;
 }
 
-/* Clases Utilitarias */
-.OcultoElemento {
-    display: none !important;
+@keyframes AnimacionAparicionSuave {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.TextoNegrita {
-    font-weight: 600;
-}
-
-.TextoSecundario {
-    color: var(--ColorTextoSecundario);
-    font-size: 13px;
-}
-
-.InsigniaVerificada {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ColorPrimarioAzul);
-    font-size: 14px;
-    margin-left: 4px;
-}
-
-.InsigniaRitmo {
-    display: inline-block;
-    background-color: var(--ColorVerdeBeniClaro);
-    color: var(--ColorVerdeBeni);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--RadioPequeno);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-}
-
-body.ModoOscuroActivo .InsigniaRitmo {
-    background-color: rgba(46, 125, 50, 0.25);
-    color: #81c784;
-}
+/* ==========================================================================
+   COMPONENTES ATÓMICOS & BOTONES REUTILIZABLES
+   ========================================================================== */
 
 .BotonAccionPrimario {
-    background-color: var(--ColorPrimarioAzul);
+    background-color: var(--ColorVerdeBeni);
     color: var(--ColorTextoBlanco);
     font-weight: 600;
+    font-size: 13.5px;
     padding: 9px 18px;
-    border-radius: var(--RadioPequeno);
+    border-radius: var(--RadioBotonPill);
+    box-shadow: 0 2px 6px rgba(27, 107, 62, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .BotonAccionPrimario:hover {
-    background-color: var(--ColorPrimarioAzulHover);
+    background-color: var(--ColorVerdeBeniHover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(27, 107, 62, 0.35);
 }
 
 .BotonAccionSecundario {
     background-color: var(--ColorFondoSecundario);
     color: var(--ColorTextoPrincipal);
     font-weight: 600;
-    padding: 9px 16px;
-    border-radius: var(--RadioPequeno);
+    font-size: 13.5px;
+    padding: 9px 18px;
+    border-radius: var(--RadioBotonPill);
+    border: 1px solid var(--ColorBordeDivisor);
 }
 
 .BotonAccionSecundario:hover {
     background-color: var(--ColorFondoActivo);
+    border-color: rgba(148, 163, 184, 0.4);
+    transform: translateY(-1px);
 }
 
 .BotonCircularIcono {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: var(--RadioCircular);
     background-color: var(--ColorFondoSecundario);
     color: var(--ColorTextoPrincipal);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    transition: background-color var(--TransicionRapida);
+    font-size: 16px;
+    border: 1px solid var(--ColorBordeDivisor);
+    transition: all var(--TransicionRapida);
 }
 
 .BotonCircularIcono:hover {
     background-color: var(--ColorFondoActivo);
+    transform: scale(1.05);
+}
+
+/* Insignias / Pills */
+.InsigniaPillGenerica {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--RadioBotonPill);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.OcultoElemento {
+    display: none !important;
 }

@@ -59,11 +59,10 @@ class ComponenteSeccionCanciones {
                             Repertorio y partituras del Beni
                         </p>
                     </div>
-                    <button class="BotonAccionPrimario BotonAportarLetraEncabezado" id="BotonAportarNuevaCancionEnSeccion" title="Aportar nueva letra">
-                        <i class="fa-solid fa-plus"></i>
-                        <span class="TextoBotonLargo">Aportar Nueva Letra</span>
-                        <span class="TextoBotonCorto">Aportar</span>
-                    </button>
+                    <div class="InsigniaConteoCanciones" style="background: var(--ColorFondoVerdeSuave); color: var(--ColorVerdeBeni); padding: 6px 14px; border-radius: var(--RadioBotonPill); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(46, 125, 50, 0.25);">
+                        <i class="fa-solid fa-music"></i>
+                        <span>${Canciones.length} Registradas</span>
+                    </div>
                 </div>
             </div>
 
@@ -111,20 +110,19 @@ class ComponenteSeccionCanciones {
                         ${Cancion.CompasRitmo ? `<span class="InsigniaCompasMusical" title="Compás / Ritmo"><strong>Compás:</strong> ${Cancion.CompasRitmo}</span>` : ''}
                     </div>
 
-                    <div style="display: flex; gap: 8px; margin-top: 16px; align-items: center;">
-                        <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Reproducir audio">
-                            <i class="fa-solid fa-play" style="margin-right: 6px;"></i>
-                            <span class="TextoBotonLargo">Escuchar</span>
-                            <span class="TextoBotonCorto">Escuchar</span>
+                    <div class="FilaAccionesTarjetaCancion" style="display: flex; gap: 8px; margin-top: 16px; align-items: center; width: 100%;">
+                        <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12.5px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Reproducir audio">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Escuchar</span>
                         </button>
-                        <button class="BotonAccionSecundario BotonAbrirModalLetra" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 13px; padding: 7px 10px;" title="Ver letra y acordes">
-                            <i class="fa-solid fa-scroll" style="margin-right: 6px;"></i>
-                            <span class="TextoBotonLargo">Ver Letra</span>
-                            <span class="TextoBotonCorto">Letra</span>
+                        <button class="BotonAccionSecundario BotonAbrirModalLetra" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12.5px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Ver letra y acordes">
+                            <i class="fa-solid fa-scroll"></i>
+                            <span>Letra</span>
                         </button>
                         ${(Cancion.ImagenPartituraUrl && Cancion.ImagenPartituraUrl !== 'IFAEL.jpg') ? `
-                        <button class="BotonCircularIcono BotonAbrirModalPartitura" data-cancion-id="${Cancion.IdCancion}" style="width: 34px; height: 34px; font-size: 14px;" title="Ver partitura">
+                        <button class="BotonAccionSecundario BotonAbrirModalPartitura" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12.5px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Ver partitura digital">
                             <i class="fa-solid fa-file-lines"></i>
+                            <span>Partitura</span>
                         </button>
                         ` : ''}
                     </div>

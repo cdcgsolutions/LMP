@@ -71,13 +71,11 @@ class ComponenteModalPartitura {
                 <div class="PieVentanaModal">
                     <button class="BotonAccionSecundario" id="BotonImprimirPartitura" ${!TienePartitura ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
                         <i class="fa-solid fa-print"></i>
-                        <span class="TextoBotonLargo">Imprimir Partitura</span>
-                        <span class="TextoBotonCorto">Imprimir</span>
+                        <span>Imprimir Partitura</span>
                     </button>
                     <button class="BotonAccionPrimario" id="BotonDescargarPartitura" ${!TienePartitura ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
                         <i class="fa-solid fa-download"></i>
-                        <span class="TextoBotonLargo">Descargar Copia</span>
-                        <span class="TextoBotonCorto">Descargar</span>
+                        <span>Descargar Copia</span>
                     </button>
                 </div>
             </div>

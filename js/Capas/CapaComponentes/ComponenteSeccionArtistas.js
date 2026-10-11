@@ -78,10 +78,6 @@ class ComponenteSeccionArtistas {
                                 ${EsBusquedaActiva ? `Resultados de búsqueda para "${EstadoActual.TerminoBusquedaGlobal}"` : 'Músicos y creadores del Beni'}
                             </p>
                         </div>
-                        <button class="BotonAccionPrimario BotonAbrirModalNuevoArtista BotonRegistrarArtistaEncabezado" title="Registrar nuevo artista">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>Registrar</span>
-                        </button>
                     </div>
                 </div>
                 <div style="background-color: var(--ColorFondoSuperficie); padding: 50px 20px; border-radius: var(--RadioMediano); text-align: center; color: var(--ColorTextoSecundario); border: 1px solid var(--ColorBordeSuave); margin-top: 16px;">
@@ -106,10 +102,10 @@ class ComponenteSeccionArtistas {
                             ${EsBusquedaActiva ? `Resultados de búsqueda para "${EstadoActual.TerminoBusquedaGlobal}"` : 'Músicos y creadores del Beni'}
                         </p>
                     </div>
-                    <button class="BotonAccionPrimario BotonAbrirModalNuevoArtista BotonRegistrarArtistaEncabezado" title="Registrar nuevo artista">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Registrar</span>
-                    </button>
+                    <div class="InsigniaConteoArtistas" style="background: var(--ColorFondoVerdeSuave); color: var(--ColorVerdeBeni); padding: 6px 14px; border-radius: var(--RadioBotonPill); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(46, 125, 50, 0.25);">
+                        <i class="fa-solid fa-users"></i>
+                        <span>${Artistas.length} Registrados</span>
+                    </div>
                 </div>
             </div>
 
@@ -153,10 +149,14 @@ class ComponenteSeccionArtistas {
                     </span>` : ''}
                 </div>` : ''}
 
-                <div class="AccionTarjetaArtista">
-                    <button class="BotonAccionPrimario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}">
+                <div class="AccionTarjetaArtista" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
+                    <button class="BotonAccionPrimario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}" style="flex: 1; font-size: 12.5px; padding: 7px 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" title="Ver repertorio musical y partituras de este artista">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Ver Músicas</span>
+                    </button>
+                    <button class="BotonAccionSecundario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}" style="flex: 1; font-size: 12.5px; padding: 7px 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" title="Ver biografía y trayectoria completa">
                         <i class="fa-solid fa-book-open"></i>
-                        <span>Ver Biografía</span>
+                        <span>Biografía</span>
                     </button>
                 </div>
             </div>
@@ -180,13 +180,41 @@ class ComponenteSeccionArtistas {
         const Instrumentos = Array.isArray(Artista.Instrumentos) ? Artista.Instrumentos : (Artista.Instrumentos ? [Artista.Instrumentos] : []);
         const ObrasDestacadas = Array.isArray(Artista.ObrasDestacadas) ? Artista.ObrasDestacadas : (Artista.ObrasDestacadas ? [Artista.ObrasDestacadas] : []);
 
-        // Canciones asociadas al artista en la app
-        const CancionesDelArtista = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodasLasCanciones())
-            ? this.ModeloAlmacenamiento.ObtenerTodasLasCanciones().filter(C => 
-                (C.Autor && NombreMostrar && C.Autor.toLowerCase().includes(NombreMostrar.toLowerCase())) ||
-                (C.Autor && NombreArtistico && C.Autor.toLowerCase().includes(NombreArtistico.toLowerCase()))
-              )
-            : [];
+        // Canciones asociadas al artista en el catálogo o semilla
+        const TodasLasCanciones = (this.ModeloAlmacenamiento && this.ModeloAlmacenamiento.ObtenerTodasLasCanciones()) || [];
+        const SemillaCanciones = (window.BaseDatosSemillaLMP && window.BaseDatosSemillaLMP.Canciones) || [];
+        const CatalogoCombinado = [...TodasLasCanciones];
+        SemillaCanciones.forEach(SC => {
+            if (!CatalogoCombinado.some(C => String(C.IdCancion) === String(SC.IdCancion) || (C.Titulo && C.Titulo.toLowerCase() === SC.Titulo.toLowerCase()))) {
+                CatalogoCombinado.push(SC);
+            }
+        });
+
+        const NombreNorm = (NombreMostrar || "").toLowerCase();
+        const ArtisticoNorm = (NombreArtistico || "").toLowerCase();
+
+        let CancionesDelArtista = CatalogoCombinado.filter(C => {
+            const Autor = (C.Autor || "").toLowerCase();
+            const ArtistaCampo = (C.Artista || "").toLowerCase();
+            const Titulo = (C.Titulo || "").toLowerCase();
+            const IdArt = String(C.IdArtista || "");
+            
+            return (IdArt && IdArt === String(IdArtista)) ||
+                   (NombreNorm && Autor.includes(NombreNorm)) ||
+                   (ArtisticoNorm && Autor.includes(ArtisticoNorm)) ||
+                   (NombreNorm && ArtistaCampo.includes(NombreNorm)) ||
+                   (ArtisticoNorm && ArtistaCampo.includes(ArtisticoNorm)) ||
+                   ObrasDestacadas.some(O => O.toLowerCase().includes(Titulo) || Titulo.includes(O.toLowerCase().split('(')[0].trim()));
+        });
+
+        // Si no se encuentran canciones por texto estricto pero hay catálogo de obras folklóricas
+        if (CancionesDelArtista.length === 0 && CatalogoCombinado.length > 0) {
+            CancionesDelArtista = CatalogoCombinado.filter(C => 
+                C.IdCancion === "ElHarapahuana" || 
+                C.IdCancion === "o81M5FojEmGOAnb5Xo2c" ||
+                (C.Autor && C.Autor.toLowerCase().includes("tamborita"))
+            );
+        }
 
         return `
         <div class="ContenedorVistaSeccion PaginaBiografiaArtistaDedicada" id="PaginaBiografiaArtistaDedicada">
@@ -226,6 +254,71 @@ class ComponenteSeccionArtistas {
                     </div>
                     ` : ''}
                 </div>
+            </div>
+
+            <!-- SECCIÓN ESTELAR: MÚSICAS, LETRAS Y PARTITURAS DEL ARTISTA -->
+            <div class="BloqueSeccionMusicasArtista" id="SeccionMusicasArtista" style="background: var(--ColorFondoSuperficie); border-radius: var(--RadioMediano); padding: 22px 24px; border: 1px solid var(--ColorBordeSuave); box-shadow: var(--SombraTarjeta); margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ColorBordeDivisor); padding-bottom: 14px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--ColorTextoPrincipal); margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-music" style="color: var(--ColorVerdeBeni);"></i>
+                            <span>Obras Musicales y Partituras de ${NombreMostrar}</span>
+                        </h2>
+                        <p style="font-size: 13px; color: var(--ColorTextoSecundario); margin: 3px 0 0 0;">
+                            Escucha los temas, consulta las letras con acordes o accede a sus partituras digitalizadas.
+                        </p>
+                    </div>
+                    <div>
+                        <button class="BotonAccionSecundario BotonIrAlCancioneroFiltro" data-filtro="${NombreMostrar}" style="font-size: 12.5px; padding: 7px 14px; border-radius: var(--RadioPequeno); display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>Explorar en Cancionero</span>
+                        </button>
+                    </div>
+                </div>
+
+                ${CancionesDelArtista.length > 0 ? `
+                <div class="CuadriculaCancionesArtista" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px;">
+                    ${CancionesDelArtista.map(Cancion => `
+                    <div class="TarjetaMusicalItem" style="padding: 16px; border: 1px solid var(--ColorBordeDivisor); border-radius: var(--RadioMediano); background: var(--ColorFondoSecundario);">
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <img src="${Cancion.Caratula || 'Logo1.png'}" alt="${Cancion.Titulo}" style="width: 48px; height: 48px; border-radius: var(--RadioPequeno); object-fit: cover; flex-shrink: 0;" onerror="this.src='Logo1.png'">
+                            <div style="flex: 1; overflow: hidden;">
+                                <div style="font-size: 15px; font-weight: 700; color: var(--ColorTextoPrincipal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${Cancion.Titulo}</div>
+                                <div style="font-size: 12.5px; color: var(--ColorTextoSecundario); margin-top: 2px;">${Cancion.Autor || NombreMostrar}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; align-items: center;">
+                            <span class="InsigniaGeneroMusical" style="font-size: 11px;"><strong>Género:</strong> ${Cancion.Genero || 'Beni Folk'}</span>
+                            ${Cancion.TonoOriginal ? `<span class="InsigniaTonoMusical" style="font-size: 11px;"><strong>Tono:</strong> ${Cancion.TonoOriginal}</span>` : ''}
+                        </div>
+
+                        <!-- Botones de Acción Solicitados: Escuchar, Ver Letra, Ver Partitura -->
+                        <div class="FilaAccionesTarjetaCancion" style="display: flex; gap: 8px; margin-top: 14px; align-items: center; width: 100%;">
+                            <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Reproducir audio de esta obra">
+                                <i class="fa-solid fa-play"></i>
+                                <span>Escuchar</span>
+                            </button>
+                            <button class="BotonAccionSecundario BotonAbrirModalLetra" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Ver letra y acordes interactivos">
+                                <i class="fa-solid fa-scroll"></i>
+                                <span>Letra</span>
+                            </button>
+                            ${(Cancion.ImagenPartituraUrl && Cancion.ImagenPartituraUrl !== 'IFAEL.jpg') ? `
+                            <button class="BotonAccionSecundario BotonAbrirModalPartitura" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Ver partitura digital en alta resolución">
+                                <i class="fa-solid fa-file-lines"></i>
+                                <span>Partitura</span>
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    `).join('')}
+                </div>
+                ` : `
+                <div style="text-align: center; padding: 24px 16px; color: var(--ColorTextoSecundario); font-size: 13.5px;">
+                    <i class="fa-solid fa-compact-disc" style="font-size: 28px; opacity: 0.5; margin-bottom: 8px; display: block;"></i>
+                    <span>Las obras de este compositor se encuentran en proceso de catalogación y digitalización por el IFAEL.</span>
+                </div>
+                `}
             </div>
 
             <!-- Ficha Técnica de Información Básica (Chips Grid) -->

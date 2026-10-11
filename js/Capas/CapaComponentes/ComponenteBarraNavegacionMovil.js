@@ -1,5 +1,5 @@
 /* ==========================================================================
-   COMPONENTE: BARRA DE NAVEGACIÓN MÓVIL INFERIOR (ESTILO FACEBOOK APP)
+   COMPONENTE: BARRA DE NAVEGACIÓN MÓVIL INFERIOR (PORTAL EDUCATIVO)
    Nombres en PascalCase - Letras Mi Poblau (LMP)
    ========================================================================== */
 
@@ -9,14 +9,11 @@ class ComponenteBarraNavegacionMovil {
     }
 
     Renderizar() {
-        const PestanaActiva = this.ServicioEstado.ObtenerEstado("PestanaActiva");
-        const UsuarioActual = this.ServicioEstado ? this.ServicioEstado.ObtenerUsuarioActual() : null;
-        const EsInvitado = !UsuarioActual || UsuarioActual.EsInvitado === true || UsuarioActual.Nombre === "Usuario";
-        const FotoPerfil = (UsuarioActual && (UsuarioActual.FotoPerfilUrl || UsuarioActual.FotoPerfil)) || "";
+        const PestanaActiva = this.ServicioEstado.ObtenerEstado("PestanaActiva") || "inicio";
 
         return `
         <nav class="BarraNavegacionMovilInferior" id="BarraNavegacionMovilInferior" aria-label="Navegación Móvil">
-            <div class="ElementoNavegacionMovil ${PestanaActiva === 'muro' ? 'MovilActivo' : ''}" data-pestana="muro">
+            <div class="ElementoNavegacionMovil ${PestanaActiva === 'inicio' || PestanaActiva === 'muro' ? 'MovilActivo' : ''}" data-pestana="inicio">
                 <i class="fa-solid fa-house"></i>
                 <span>Inicio</span>
             </div>
@@ -24,21 +21,17 @@ class ComponenteBarraNavegacionMovil {
                 <i class="fa-solid fa-scroll"></i>
                 <span>Letras</span>
             </div>
+            <div class="ElementoNavegacionMovil ${PestanaActiva === 'partituras' ? 'MovilActivo' : ''}" data-pestana="partituras">
+                <i class="fa-solid fa-file-audio"></i>
+                <span>Partituras</span>
+            </div>
             <div class="ElementoNavegacionMovil ${PestanaActiva === 'generos' ? 'MovilActivo' : ''}" data-pestana="generos">
                 <i class="fa-solid fa-guitar"></i>
-                <span>Ritmos</span>
+                <span>Géneros</span>
             </div>
-            <div class="ElementoNavegacionMovil ${PestanaActiva === 'artistas' ? 'MovilActivo' : ''}" data-pestana="artistas">
-                <i class="fa-solid fa-users"></i>
-                <span>Artistas</span>
-            </div>
-            <div class="ElementoNavegacionMovil ${PestanaActiva === 'perfil' ? 'MovilActivo' : ''}" data-pestana="perfil" id="BotonNavegacionMovilPerfil">
-                ${(!EsInvitado && FotoPerfil) ? `
-                <img src="${FotoPerfil}" alt="Perfil" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: ${PestanaActiva === 'perfil' ? '2px solid var(--ColorPrimarioAzul)' : '1px solid var(--ColorBordeDivisor)'};" onerror="this.src='Logo1.png'">
-                ` : `
-                <i class="fa-solid fa-user"></i>
-                `}
-                <span>Perfil</span>
+            <div class="ElementoNavegacionMovil" id="BotonMenuMovilDrawer" title="Abrir Menú Completo">
+                <i class="fa-solid fa-bars"></i>
+                <span>Menú</span>
             </div>
         </nav>
         `;

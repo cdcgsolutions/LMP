@@ -26,7 +26,7 @@ class ServicioEstado {
         };
 
         this.EstadoInterno = {
-            PestanaActiva: "muro", // muro | canciones | generos | artistas | ifael
+            PestanaActiva: "inicio", // inicio | canciones | partituras | generos | artistas | ifael | acerca-de
             TerminoBusquedaGlobal: "",
             FiltroGeneroCanciones: "Todos",
             FiltroTonoCanciones: "Todos",
@@ -56,14 +56,25 @@ class ServicioEstado {
         return Clave ? this.EstadoInterno[Clave] : this.EstadoInterno;
     }
 
+    EstablecerEstado(Clave, Valor) {
+        this.EstadoInterno[Clave] = Valor;
+        this.NotificarEvento(`Cambio_${Clave}`, Valor);
+        this.NotificarEvento("CambioEstado", { Clave, Valor });
+    }
+
     EstablecerPestanaActiva(NuevaPestana) {
-        this.EstadoInterno.PestanaActiva = NuevaPestana;
-        this.NotificarEvento("CambioPestanaActiva", NuevaPestana);
+        const Normalizada = (NuevaPestana === "muro" || NuevaPestana === "menu") ? "inicio" : NuevaPestana;
+        this.EstadoInterno.PestanaActiva = Normalizada;
+        this.NotificarEvento("CambioPestanaActiva", Normalizada);
     }
 
     EstablecerTerminoBusqueda(NuevoTermino) {
-        this.EstadoInterno.TerminoBusquedaGlobal = NuevoTermino.trim().toLowerCase();
+        this.EstadoInterno.TerminoBusquedaGlobal = NuevoTermino ? NuevoTermino.trim().toLowerCase() : "";
         this.NotificarEvento("CambioTerminoBusqueda", this.EstadoInterno.TerminoBusquedaGlobal);
+    }
+
+    EstablecerTerminoBusquedaGlobal(NuevoTermino) {
+        this.EstablecerTerminoBusqueda(NuevoTermino);
     }
 
     EstablecerFiltrosCanciones(Genero, Tono) {

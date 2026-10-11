@@ -32,12 +32,17 @@
 
     <!-- Configuración PWA (Progressive Web App) -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1877f2">
+    <meta name="theme-color" content="#2e7d32">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="LMP">
     <link rel="apple-touch-icon" href="Logo1.png">
+
+    <!-- Tipografías Web Profesionales (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Librería de Iconos Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -45,11 +50,11 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Capa de Estilos (N-Capas) -->
-    <link rel="stylesheet" href="css/VariablesEstilos.css">
-    <link rel="stylesheet" href="css/EstilosBase.css">
-    <link rel="stylesheet" href="css/EstilosComponentes.css">
-    <link rel="stylesheet" href="css/EstilosTemaOscuro.css">
-    <link rel="stylesheet" href="css/EstilosResponsivos.css">
+    <link rel="stylesheet" href="css/VariablesEstilos.css?v=62">
+    <link rel="stylesheet" href="css/EstilosBase.css?v=62">
+    <link rel="stylesheet" href="css/EstilosComponentes.css?v=62">
+    <link rel="stylesheet" href="css/EstilosTemaOscuro.css?v=62">
+    <link rel="stylesheet" href="css/EstilosResponsivos.css?v=62">
 </head>
 
 <body>
@@ -65,7 +70,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
 
-    <!-- 1. Capa de Datos y Modelos (100% Firestore) -->
+    <!-- 1. Capa de Datos y Modelos (Semilla Local + Firestore en Tiempo Real) -->
+    <script src="js/Capas/CapaDatos/BaseDatosSemilla.js"></script>
     <script src="js/Capas/CapaDatos/ServicioFirebase.js"></script>
     <script src="js/Capas/CapaDatos/ModeloAlmacenamiento.js"></script>
 
@@ -75,13 +81,15 @@
     <script src="js/Capas/CapaServicios/ServicioReproductor.js"></script>
     <script src="js/Capas/CapaServicios/ServicioNotificaciones.js"></script>
 
-    <!-- 3. Capa de Componentes (Componentes sobre Componentes) -->
+    <!-- 3. Capa de Componentes (Diseño Portal Académico LMP) -->
     <script src="js/Capas/CapaComponentes/ComponenteEncabezado.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteBarraLateralIzquierda.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteBarraLateralDerecha.js"></script>
+    <script src="js/Capas/CapaComponentes/ComponenteSeccionInicio.js"></script>
+    <script src="js/Capas/CapaComponentes/ComponenteSeccionPartituras.js"></script>
+    <script src="js/Capas/CapaComponentes/ComponenteMuroPrincipal.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteCrearPublicacion.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteTarjetaPublicacion.js"></script>
-    <script src="js/Capas/CapaComponentes/ComponenteMuroPrincipal.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteSeccionCanciones.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteSeccionGeneros.js"></script>
     <script src="js/Capas/CapaComponentes/ComponenteSeccionArtistas.js"></script>

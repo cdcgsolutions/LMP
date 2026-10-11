@@ -45,10 +45,10 @@ class ComponenteSeccionGeneros {
                             ${EsBusquedaActiva ? `Resultados de búsqueda para "${EstadoActual.TerminoBusquedaGlobal}"` : 'Guía histórica y compases tradicionales del Beni'}
                         </p>
                     </div>
-                    <button class="BotonAccionPrimario BotonAbrirModalNuevoGenero BotonRegistrarGeneroEncabezado" id="BotonAbrirModalCrearGenero" title="Registrar nuevo ritmo tradicional">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Registrar</span>
-                    </button>
+                    <div class="InsigniaConteoGeneros" style="background: var(--ColorFondoVerdeSuave); color: var(--ColorVerdeBeni); padding: 6px 14px; border-radius: var(--RadioBotonPill); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(46, 125, 50, 0.25);">
+                        <i class="fa-solid fa-guitar"></i>
+                        <span>${Generos.length} Ritmos</span>
+                    </div>
                 </div>
             </div>
 

@@ -1,6 +1,6 @@
 /* ==========================================================================
-   COMPONENTE: MODAL VISOR DE LETRA Y TRANSPOSITOR
-   Nombres en PascalCase - Letras Mi Poblau (LMP)
+   COMPONENTE: MODAL VISOR DE LETRA Y TRANSPOSITOR TONAL (ESTUDIO PROFESIONAL)
+   Letras de Mi Poblau (LMP)
    ========================================================================== */
 
 class ComponenteModalLetra {
@@ -48,7 +48,7 @@ class ComponenteModalLetra {
         this.CancionSeleccionada = this.ModeloAlmacenamiento.ObtenerCancionPorId(IdCancion);
         if (!this.CancionSeleccionada) return "";
 
-        let LetraProcesada = this.CancionSeleccionada.LetraConAcordes;
+        let LetraProcesada = this.CancionSeleccionada.LetraConAcordes || this.CancionSeleccionada.LetraLimpia || "";
         if (this.DesplazamientoSemitonos !== 0) {
             LetraProcesada = this.TransponerTextoConAcordes(LetraProcesada, this.DesplazamientoSemitonos);
         }
@@ -60,70 +60,81 @@ class ComponenteModalLetra {
             LetraFinalHtml = LetraProcesada.replace(/\[([^\]]+)\]/g, '');
         }
 
+        const DespTexto = this.DesplazamientoSemitonos === 0 
+            ? "Tono Original" 
+            : (this.DesplazamientoSemitonos > 0 ? `+${this.DesplazamientoSemitonos} st` : `${this.DesplazamientoSemitonos} st`);
+
         return `
         <div class="CapaFondoModalOscuro" id="ModalVisorLetraFondo">
-            <div class="ContenedorVentanaModal ModalAnchoExtraGrande" id="ContenedorVentanaModalLetra">
-                <!-- Encabezado del Modal -->
+            <div class="ContenedorVentanaModal" id="ContenedorVentanaModalLetra" style="max-width: 860px;">
+                <!-- 1. Encabezado del Modal con Identidad de Obra -->
                 <div class="EncabezadoVentanaModal">
                     <div>
-                        <div class="TituloModalTexto"><i class="fa-solid fa-scroll" style="color: var(--ColorPrimarioAzul); margin-right: 8px;"></i>${this.CancionSeleccionada.Titulo}</div>
-                        <div style="font-size: 13px; color: var(--ColorTextoSecundario); margin-top: 2px;">
-                            ${this.CancionSeleccionada.Autor} • ${this.CancionSeleccionada.Genero}
+                        <div class="TituloModalTexto">
+                            <i class="fa-solid fa-scroll" style="color: var(--ColorVerdeBeni);"></i>
+                            <span>${this.CancionSeleccionada.Titulo}</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--ColorTextoSecundario); margin-top: 3px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <span>${this.CancionSeleccionada.Autor}</span>
+                            <span>•</span>
+                            <span class="InsigniaGeneroMusical" style="padding: 2px 8px; font-size: 11px;">${this.CancionSeleccionada.Genero}</span>
+                            <span>•</span>
+                            <span class="InsigniaTonoMusical" style="padding: 2px 8px; font-size: 11px;">${this.CancionSeleccionada.TonoOriginal}</span>
                         </div>
                     </div>
-                    <button class="BotonCerrarModal" id="BotonCerrarModalLetra" title="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="BotonCerrarModal" id="BotonCerrarModalLetra" title="Cerrar ventana"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
-                <!-- Barra de Herramientas de Músico -->
-                <div style="background-color: var(--ColorFondoSecundario); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--ColorBordeDivisor);">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="font-size: 12.5px; font-weight: 700;">Tono:</span>
-                        <button class="BotonAccionSecundario" id="BotonBajarSemitono" style="padding: 4px 8px; font-size: 12px;" title="Bajar semitono">
+                <!-- 2. Barra de Herramientas de Transposición y Ejecución -->
+                <div class="BarraControlesLetraModal" style="margin: 0; border-radius: 0; border-left: none; border-right: none;">
+                    <!-- Transpositor Tonal -->
+                    <div class="GrupoTranspositorTonal">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--ColorTextoSecundario); text-transform: uppercase; letter-spacing: 0.04em;">Transponer:</span>
+                        <button class="BotonSemitono" id="BotonBajarSemitono" title="Bajar 1 semitono (-1 st)">
                             <i class="fa-solid fa-minus"></i>
-                            <span class="TextoBotonLargo">1 Semitono</span>
-                            <span class="TextoBotonCorto">-1 st</span>
                         </button>
-                        <span style="font-size: 13px; font-weight: 800; color: var(--ColorPrimarioAzul); padding: 0 2px;" id="EtiquetaTonoActual">
-                            ${this.DesplazamientoSemitonos >= 0 ? `+${this.DesplazamientoSemitonos}` : this.DesplazamientoSemitonos} st
-                        </span>
-                        <button class="BotonAccionSecundario" id="BotonSubirSemitono" style="padding: 4px 8px; font-size: 12px;" title="Subir semitono">
+                        <span class="BadgeTonoActual" id="EtiquetaTonoActual">${DespTexto}</span>
+                        <button class="BotonSemitono" id="BotonSubirSemitono" title="Subir 1 semitono (+1 st)">
                             <i class="fa-solid fa-plus"></i>
-                            <span class="TextoBotonLargo">1 Semitono</span>
-                            <span class="TextoBotonCorto">+1 st</span>
                         </button>
                     </div>
 
+                    <!-- Controles de Visualización y Auto-Scroll -->
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="BotonAccionSecundario" id="BotonAlternarAcordes" style="padding: 6px 10px; font-size: 12px;">
+                        <button class="BotonAccionSecundario" id="BotonAlternarAcordes" style="padding: 6px 12px; font-size: 12.5px;" title="Alternar visibilidad de acordes">
                             ${this.MostrarAcordes ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-guitar"></i>'}
-                            <span class="TextoBotonLargo">${this.MostrarAcordes ? 'Ocultar Acordes' : 'Mostrar Acordes'}</span>
-                            <span class="TextoBotonCorto">Acordes</span>
+                            <span>${this.MostrarAcordes ? 'Ocultar Acordes' : 'Mostrar Acordes'}</span>
                         </button>
-                        <button class="BotonAccionSecundario" id="BotonAutoScrollKaraoke" style="padding: 6px 10px; font-size: 12px;">
-                            ${this.EstaDesplazandoAuto ? '<i class="fa-solid fa-stop"></i>' : '<i class="fa-solid fa-arrow-down"></i>'}
-                            <span class="TextoBotonLargo">${this.EstaDesplazandoAuto ? 'Detener Scroll' : 'Auto-Scroll'}</span>
-                            <span class="TextoBotonCorto">Scroll</span>
+                        <button class="BotonAccionSecundario" id="BotonAutoScrollKaraoke" style="padding: 6px 12px; font-size: 12.5px;" title="Desplazamiento automático para acompañamiento">
+                            ${this.EstaDesplazandoAuto ? '<i class="fa-solid fa-circle-pause" style="color: #ef4444;"></i>' : '<i class="fa-solid fa-circle-play" style="color: var(--ColorVerdeBeni);"></i>'}
+                            <span>${this.EstaDesplazandoAuto ? 'Pausar Scroll' : 'Auto-Scroll'}</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Cuerpo de la Letra -->
-                <div class="CuerpoVentanaModal" id="CuerpoLetraScrollable" style="max-height: 480px; overflow-y: auto;">
-                    <pre style="font-family: var(--FuenteMusical); font-size: 14.5px; line-height: 1.8; white-space: pre-wrap; color: var(--ColorTextoPrincipal);" id="TextoLetraPreformateada">${LetraFinalHtml}</pre>
+                <!-- 3. Contenedor de la Letra y Acordes -->
+                <div class="CuerpoVentanaModal" id="CuerpoLetraScrollable" style="padding: 20px 24px;">
+                    <div class="ContenedorLetraConAcordes" id="TextoLetraPreformateada">${LetraFinalHtml}</div>
                 </div>
 
-                <!-- Pie de Modal con Acciones -->
-                <div class="PieVentanaModal">
+                <!-- 4. Pie de Modal con Acciones -->
+                <div style="padding: 14px 24px; border-top: 1px solid var(--ColorBordeDivisor); display: flex; justify-content: space-between; align-items: center; background-color: var(--ColorFondoSuperficie); gap: 10px; flex-wrap: wrap;">
                     <button class="BotonAccionSecundario" id="BotonCopiarLetraPortapapeles">
                         <i class="fa-solid fa-copy"></i>
-                        <span class="TextoBotonLargo">Copiar Letra</span>
-                        <span class="TextoBotonCorto">Copiar</span>
+                        <span>Copiar al Portapapeles</span>
                     </button>
-                    <button class="BotonAccionPrimario BotonReproducirTarjeta" data-cancion-id="${this.CancionSeleccionada.IdCancion}">
-                        <i class="fa-solid fa-play"></i>
-                        <span class="TextoBotonLargo">Reproducir Melodía</span>
-                        <span class="TextoBotonCorto">Reproducir</span>
-                    </button>
+                    <div style="display: flex; gap: 8px;">
+                        ${(this.CancionSeleccionada.ImagenPartituraUrl && this.CancionSeleccionada.ImagenPartituraUrl !== 'IFAEL.jpg') ? `
+                        <button class="BotonAccionSecundario BotonAbrirModalPartitura" data-cancion-id="${this.CancionSeleccionada.IdCancion}">
+                            <i class="fa-solid fa-file-lines" style="color: var(--ColorVerdeBeni);"></i>
+                            <span>Ver Partitura</span>
+                        </button>
+                        ` : ''}
+                        <button class="BotonAccionPrimario BotonReproducirTarjeta" data-cancion-id="${this.CancionSeleccionada.IdCancion}">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Escuchar Audio</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

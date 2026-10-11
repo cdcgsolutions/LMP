@@ -1,0 +1,244 @@
+{
+  "InformacionBackup": {
+    "FechaCreacion": "2026-10-10T17:01:52.686562",
+    "ProyectoId": "lmp-7ed0e",
+    "Plataforma": "Letras de Mi Poblao (LMP) - IFAEL Trinidad, Beni",
+    "Descripcion": "Copia de seguridad integra de la base de datos Firestore en formato JSON (abrible con Bloc de Notas o cualquier editor)."
+  },
+  "Colecciones": {
+    "Canciones": [
+      {
+        "IdDocumento": "HimnoAlBeni",
+        "FechaCreacion": "2026-09-08T11:56:59.561Z",
+        "Titulo": "Himno al Beni",
+        "Autor": "Letra: Alfredo Pereyra L. • Música: Rafael Seghers",
+        "ImagenPartituraUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788911026/Partituras_Himno_al_Beni.jpg",
+        "TempoBPM": 112,
+        "Genero": "Himno Cívico y Patriótico",
+        "EsEstudianteIFAEL": false,
+        "LetraConAcordes": "[C] Canta victorioso pueblo de leyenda\n[G7] tu himno de trabajo, libertad y [C] unión;\ny en el misterioso rumor de su [F] selva,\ncon eco vi- [G7] brante, suena tu can- [C] ción.\n\nEl verde que fla- [G7] mea en mi ban- [C] dera,\nemblema de espe- [G7] ranza y de gran- [C] deza,\nes la imagen del [F] Beni, la riqueza\nde esta [G7] tierra feliz de promi- [C] sión.\n\nY como el Sol que [G7] surge en el ori- [C] ente\ne ilumina los [G7] llanos y la [C] sierra,\nserá para Boli- [F] via nuestra tierra,\npromesa de ven- [G7] tura, paz y u- [C] nión.\n\nSi la ambición bas- [G7] tarda de un ve- [C] cino\nbajo el verde listón [G7] de mi ban- [C] dera\nhumillar a mi pa- [F] tria pretendiera\niremos con or- [G7] gullo a comba- [C] tir.\n\nY nuestro himno de [G7] paz y traba- [C] jo\ntornaráse en ru- [G7] gido de venzan- [C] za\ny puesta en la vic- [F] toria la esperanza\ngritaremos ser [G7] libres o mo- [C] rir.\n",
+        "Descripcion": "Himno oficial del Departamento del Beni. Símbolo cívico y memoria histórica que ensalza el valor y la libertad de los pueblos benianos.",
+        "AudioUrl": "HimnoAlBeni.mp3",
+        "CaratulaUrl": "Logo1.png",
+        "LetraLimpia": "Canta victorioso pueblo de leyenda\nTu himno de trabajo, libertad y unión\nY en el misterioso rumor de su selva\nCon eco vibrante, suena tu canción.\n\nEl verde que flamea en mi bandera\nEmblema de esperanza y de grandeza\nEs la imagen del Beni, la riqueza\nDe está sierra feliz de promisión\n\nY como el sol que surge en el oriente\nE ilumina los llanos y la sierra\nSerá para Bolivia nuestra tierra\nPromesa de ventura, paz y unión\n\nSi la ambición bastarda de un vecino\nHumillar a mi patria pretendiera\nBajo el verde listón de mi bandera\nMarcharemos con orgullo a combatir\n\nY nuestro himno de paz y de trabajo\nTornarase en rugido de venganza\nY puesta en la victoria la esperanza\nGritaremos ser libres o morir",
+        "Activa": true,
+        "TonoOriginal": "Mi Bemol Mayor (Eb)"
+      },
+      {
+        "IdDocumento": "o81M5FojEmGOAnb5Xo2c",
+        "LetraConAcordes": "[G] [G] [D7] [D7]\n\n[D7] [D7] [G] [G]",
+        "Descripcion": "Composición beniana registrada en Letras Mi Poblau en ritmo de Taquirari.",
+        "Activa": true,
+        "EsEstudianteIFAEL": true,
+        "CaratulaUrl": "Logo1.png",
+        "TempoBPM": 115,
+        "LetraLimpia": "   \n\n   ",
+        "Genero": "Chovena",
+        "AudioUrl": "https://res.cloudinary.com/pjmt8rts/video/upload/v1788811767/lmp_audios/kyrnhewt3eue9bblqqez.mp3",
+        "Autor": "La Tamborita.",
+        "TonoOriginal": "Sol Mayor",
+        "Titulo": "Larguen al Toro",
+        "FechaCreacion": "2026-09-07T20:09:31.196Z",
+        "ImagenPartituraUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788912130/Partituras_Chovenas.png"
+      }
+    ],
+    "Generos": [
+      {
+        "IdDocumento": "BOYboEHVaYF92ZCwGISL",
+        "FechaCreacion": "2026-09-07T19:15:16.193Z",
+        "IconoClase": "fa-solid fa-guitar",
+        "Origen": "Trinidad - Llanos de Moxos, Beni",
+        "Descripcion": "El ritmo insigne del oriente boliviano. Tiene raíces indígenas mojeñas y chiquitanas con compás binario cadencioso, alegre y romántico.",
+        "Compas": "2/4 o 4/4 Sincopado",
+        "Nombre": "Taquirari",
+        "Color": "#1877f2",
+        "InstrumentosTipicos": [
+          "Guitarra",
+          "Bombos mojeños",
+          "Flauta de caña o bajón",
+          "Violín"
+        ]
+      },
+      {
+        "IdDocumento": "BPPeI5brLxjklWy6pmBb",
+        "Compas": "4/4 Marcial y Solemne",
+        "Descripcion": "Composición solemne y marcial que exalta los valores patrióticos, la libertad y el orgullo cívico del pueblo beniano.",
+        "Origen": "Departamento del Beni, Bolivia",
+        "Color": "#047857",
+        "Caracter": "Solemne y Patriótico",
+        "TempoTipico": "112 BPM (Marcial)",
+        "Nombre": "Himno Cívico y Patriótico",
+        "InstrumentosTipicos": [
+          "Banda Sinfónica / Militar",
+          "Vientos y Metales (Trompetas, Trombones)",
+          "Percusión Marcial (Redoblante, Bombo, Platillos)",
+          "Coro Polifónico"
+        ],
+        "IconoClase": "fa-solid fa-flag",
+        "FechaCreacion": "2026-09-08T15:31:22.237Z"
+      },
+      {
+        "IdDocumento": "U1JhvT0Vm9GtNlf2wonK",
+        "Color": "#2e7d32",
+        "Compas": "2/4 Rápido y Festivo",
+        "Nombre": "Chovena",
+        "Descripcion": "Danza prehispánica y colonial de las misiones jesuíticas. Se baila en rueda y trenzados con gran algarabía y zapateo alegre.",
+        "InstrumentosTipicos": [
+          "Flauta de Pan",
+          "Tamboril",
+          "Violines jesuíticos",
+          "Maracas"
+        ],
+        "Origen": "Región Mojeña y Chiquitana",
+        "IconoClase": "fa-solid fa-leaf",
+        "FechaCreacion": "2026-09-07T19:15:16.523Z"
+      },
+      {
+        "IdDocumento": "rMrk3JpyZd5YOLNAZJiS",
+        "Descripcion": "Música de fiesta y confraternidad, caracterizada por su carácter enérgico, saltos festivos y versos costumbristas.",
+        "InstrumentosTipicos": [
+          "Caja",
+          "Charango / Guitarra",
+          "Quena / Flauta",
+          "Pífano"
+        ],
+        "Nombre": "Carnavalito",
+        "Compas": "2/4 Alegre y Dinámico",
+        "FechaCreacion": "2026-09-07T19:15:16.849Z",
+        "Color": "#d97706",
+        "Origen": "Llanos y Valles Bolivianos",
+        "IconoClase": "fa-solid fa-masks-theater"
+      },
+      {
+        "IdDocumento": "rRmKiGayviv2aCuJywHM",
+        "InstrumentosTipicos": [
+          "Bajón Mojeño (aerófono gigante de hojas de palma)",
+          "Caja y Tambora",
+          "Cascabeles de semillas de Paichachí"
+        ],
+        "Descripcion": "Máxima expresión del sincretismo y la dignidad mojeña. Los danzantes visten plumajes semicirculares (prosa) y machetes de madera.",
+        "IconoClase": "fa-solid fa-feather-pointed",
+        "Origen": "San Ignacio de Moxos y Trinidad",
+        "Color": "#7c3aed",
+        "FechaCreacion": "2026-09-07T19:15:17.204Z",
+        "Compas": "Ritmo Ceremonial y Devocional",
+        "Nombre": "Danza de Macheteros (Sarao)"
+      }
+    ],
+    "Artistas": [
+      {
+        "IdDocumento": "vqXKtjPbC4ncrF9gc2VH",
+        "LugarOrigen": "Trinidad, Beni, Bolivia",
+        "NombreCompleto": "Reynaldo Revollo Hurtado",
+        "RolTitulo": "Músico, Compositor & Educador Normalista",
+        "FotoPerfilUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788889742/chiki.png",
+        "Institucion": "Colegio De La Salle & Formación Artística Musical",
+        "FechaCreacion": "2026-09-08T17:58:13.849Z",
+        "ObrasDestacadas": [
+          "Utopía (Canción representante de Bolivia en el Festival OTI México)",
+          "El Harapahuana / Yorebabasté (Fusión folclórica ganadora del Sombrero de Saó 1986)",
+          "Repertorio con Los Trovadores de Paitití (Pa' la Trinidad, Moperita, Camba Viejo)",
+          "Composiciones y arreglos orquestales litúrgicos"
+        ],
+        "Inicios": "Su vocación musical fluyó en la sangre por herencia directa de su abuelo paterno, Don Luis Revollo Medina, concertista de violín formado en el prestigioso Instituto Laredo de Cochabamba. Desde su infancia en el barrio Bolívar, Reynaldo no recuerda un solo momento sin música; de muy pequeño participaba en pijama en las veladas nocturnas de tertulia vecinal organizadas por el creativo carpintero Don José Acosta. A sus 7 años aprendió a tocar la guitarra y cantar; su primer gran escenario fue el Coliseo de La Salle en 1972, acontecimiento que fijó el inicio oficial de su vida artística. Sus primeras agrupaciones de barrio surgieron junto a Kilo Zabala, Negro Arroyo y Pilo en Pompeya, conformando luego el emblemático Trío La Salle (1975) junto a Eduardo Saucedo y Jañiño Bánzer Chávez.",
+        "Legado": "Con medio siglo de trayectoria ininterrumpida, el maestro Reynaldo Revollo Hurtado encarna la identidad sonora y pedagógica del Beni. Ha formado a múltiples promociones de músicos, proyectando la riqueza folclórica oriental más allá de nuestras fronteras. Ha sido condecorado como Hijo Predilecto del Beni por la Casa de la Cultura del Beni, el Gobierno Autónomo Departamental del Beni, el Gobierno Autónomo Municipal de Trinidad y la Asamblea Legislativa Departamental.",
+        "Trayectoria": "En 1979 integró Los Trovadores de Paitití (nueva generación tutelada por Don Hugo Mercado y Don Oscar Velarde), ganando en Santa Cruz, Potosí y el 1er lugar en el Festival Lauro de Cochabamba (1981) grabando su primer disco. En su época universitaria en Cochabamba y La Paz integró el Grupo Amaru y La Zafra. En 1986, con Los del Güiri (junto a Celín Álvarez, Miguelito Azad y Chilo Roca), creó la célebre fusión de El Harapahuana y El Yorebabasté, ganando el primer lugar del Festival Sombrero de Saó. Como bajista de Los Catedráticos recibió la bendición de su padre para dedicarse plenamente a la música. Ganó la eliminatoria nacional con su tema Utopía, representando a Bolivia en el Festival OTI en México. Desde 1988 ejerce la docencia musical en La Salle, habiéndose graduado como maestro normalista con posgrados. A sus 55 años asumió la dirección de orquesta litúrgica en la Renovación Carismática Católica.",
+        "Biografia": "Reynaldo Revollo Hurtado, cariñosamente conocido en toda Bolivia como \"Chiqui\", nació el 16 de diciembre de 1964 en la ciudad de Trinidad, en los ambientes de la antigua casa de sus padres en el histórico barrio que un día se llamó Bolívar y que actualmente es el barrio San Vicente. Hijo del profesor Reynaldo Revollo Justiniano y de la señora Teresa Hurtado Ibernegaray, creció en un ambiente familiar de profundo afecto, sencillez de campo y entrega en amor por la familia, moldeado por el testimonio docente de su padre. Es el menor de cinco hermanos (Marcial, Jesús, Luis y María Esther). A lo largo de más de medio siglo de carrera musical, ha sido bajista, compositor, educador normalista y director musical, siendo distinguido por la Casa de la Cultura del Beni, el Gobierno Departamental, la Alcaldía de Trinidad y la Asamblea Legislativa como Hijo Predilecto del Beni.",
+        "TrayectoriaAnos": 50,
+        "Especialidad": "Compositor, Bajista y Docente Normalista de Música",
+        "CitaCelebre": "No me imagino mi vida sin música, desde que comienzo el día; es mi vida, Dios me preparó desde siempre para ser músico.",
+        "LugarNacimiento": "Trinidad, Beni, Bolivia",
+        "GeneroMusical": "Música Tradicional Beniana, Folclore Oriental, Canción de Autor y Música Litúrgica",
+        "Instrumentos": [
+          "Bajo eléctrico y acústico",
+          "Guitarra acústica",
+          "Canto / Voz"
+        ],
+        "NombreArtistico": "Chiqui Revollo",
+        "FechaNacimiento": "16 de diciembre de 1964",
+        "Activo": true
+      }
+    ],
+    "IFAEL": [
+      {
+        "IdDocumento": "v7TcQzF37lWsXEcOVY9W",
+        "LogoUrl": "IFAEL.jpg",
+        "FotoPortadaUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788898312/IFAELestructura.png",
+        "FechaCreacion": "2026-09-07T19:15:19.824Z",
+        "Ciudad": "Trinidad, Beni - Bolivia",
+        "Nombre": "Instituto de Formación Artística 'Edelmira Limpias' (IFAEL)",
+        "Descripcion": "El IFAEL es la institución emblemática de educación musical en el departamento del Beni. Dedicada a la formación técnica y profesional de artistas, compositores e instrumentistas con profunda identidad nacional y rescate de la música mojeño-trinitaria.",
+        "ContactoTelefono": "+591 72812453",
+        "Direccion": "Calle San Ignacio, 4.ª entrada de Paitití, esquina Perequije"
+      }
+    ],
+    "AcercaDeNosotros": [
+      {
+        "IdDocumento": "zJYy9K2tvoxmsNzToazP",
+        "NombreLuci": "",
+        "DescripcionLuci": "",
+        "DescripcionPagina": "Esta página, LetrasMiPoblao (LMP) , ha sido creada como parte de nuestro Proyecto Artístico de Grado, con el firme propósito de recopilar, preservar y difundir la música tradicional de nuestra querida ciudad de Trinidad, capital del departamento del Beni.\n\nNuestro objetivo es poner al alcance de todos —músicos, investigadores, estudiantes, cultores y público en general— un archivo digital accesible que reúna partituras, letras, grabaciones de audio, fotografías y datos históricos de los géneros emblemáticos de nuestra región: el taquirari, la chovena, y muchas otras expresiones que forman parte de nuestra identidad trinitaria.\n\nSabemos que gran parte de este valioso patrimonio se encuentra disperso y en riesgo de desaparecer. Por ello, hemos asumido el compromiso de tender un puente entre las tradiciones orales de nuestra ciudad y las nuevas tecnologías, asegurando que este legado no solo perdure, sino que siga inspirando a las futuras generaciones.\n\nTe invitamos a explorar este espacio, a conocer nuestra música, a descargar las partituras, a escuchar las grabaciones y a sumarte a esta iniciativa. Juntos y juntas podemos mantener viva la memoria musical de Trinidad.",
+        "NombreEdna": "Edna Miriam Edgley Cuellar",
+        "FotoLuci": "",
+        "DescripcionEdna": "Soy estudiante de la carrera de Técnico Superior en Música Boliviana del Instituto de Formación Artística \"Edelmira Limpias\" (IFAEL), apasionada por nuestra cultura y nuestras tradiciones musicales.",
+        "TituloPagina": "Acerca de Nosotros",
+        "FotoEdna": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788815172/lmp_partituras/n8tmlqvdnp9hxmgsoubv.png"
+      }
+    ],
+    "Usuarios": [
+      {
+        "IdDocumento": "2rMKtl1UhhxG6dHaK0TR",
+        "Rol": "User",
+        "Activo": true,
+        "EsVerificado": false,
+        "FotoPerfilUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788963831/lmp_imagenes/zi8fqarrpaaskagmzqek.png",
+        "Ciudad": "Cercado, Beni",
+        "Contrasena": "123456",
+        "CorreoElectronico": "amilkar.maisman@gmail.com",
+        "NombreCompleto": "Amilkar Maisman",
+        "FechaRegistro": "2026-09-09T14:23:52.579Z"
+      },
+      {
+        "IdDocumento": "6KkajXy8FyJgGIc50bjI",
+        "Activo": true,
+        "NombreCompleto": "Edna Miriam Edgley Cuellar",
+        "FotoPerfilUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788815172/lmp_partituras/n8tmlqvdnp9hxmgsoubv.png",
+        "Ciudad": "Cercado, Beni",
+        "Rol": "Admin",
+        "FechaRegistro": "2026-09-07T19:15:14.361Z",
+        "Contrasena": "123456",
+        "CorreoElectronico": "edna.edgley@gmail.com",
+        "EsVerificado": true
+      },
+      {
+        "IdDocumento": "N03n7SdAm23Pk0gaUke1",
+        "CorreoElectronico": "daniel.cuellar@gmail.com",
+        "EsVerificado": true,
+        "Contrasena": "123456",
+        "Rol": "Admin",
+        "FotoPerfilUrl": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788870045/FotoDaniel.jpg",
+        "NombreCompleto": "Carlos Daniel Cuellar Guasde",
+        "Ciudad": "Cercado, Beni",
+        "FechaRegistro": "2026-09-08T12:20:13Z",
+        "Activo": true
+      }
+    ],
+    "Publicaciones": [
+      {
+        "IdDocumento": "FLXVZMmcvqAHAlh6PoZo",
+        "AvatarAutor": "https://res.cloudinary.com/pjmt8rts/image/upload/v1788815172/lmp_partituras/n8tmlqvdnp9hxmgsoubv.png",
+        "EsVerificado": true,
+        "EsEditada": true,
+        "TextoPublicacion": "Publicación de 'Larguen al Toro'",
+        "CantidadCompartidos": 0,
+        "IdCancionAsociada": "o81M5FojEmGOAnb5Xo2c",
+        "NombreAutor": "Edna Miriam Edgley Cuellar",
+        "FechaCreacion": "2026-09-07T20:09:31.289Z",
+        "Activa": true,
+        "CantidadMeGusta": 3,
+        "SubcoleccionComentarios": [],
+        "SubcoleccionReacciones": []
+      }
+    ]
+  }
+}

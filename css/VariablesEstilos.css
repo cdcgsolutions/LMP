@@ -1,93 +1,129 @@
 /* ==========================================================================
-   VARIABLES DE ESTILOS Y SISTEMA DE DISEÑO (ESTILO FACEBOOK / META)
-   Nombres en PascalCase - Letras Mi Poblau (LMP)
+   SISTEMA DE DISEÑO & VARIABLES: LETRAS DE MI POBLAO (LMP)
+   Diseño Editorial, Académico y Musical de Nivel Profesional
    ========================================================================== */
 
 :root {
-    /* Paleta Principal Meta / Facebook */
-    --ColorPrimarioAzul: #1877f2;
-    --ColorPrimarioAzulHover: #166fe5;
-    --ColorPrimarioAzulClaro: #e7f3ff;
-    --ColorPrimarioAzulSuave: rgba(24, 119, 242, 0.12);
+    /* 1. Tipografías Web */
+    --FuenteTitulos: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --FuenteCuerpo: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --FuenteMusical: 'JetBrains Mono', 'Courier New', Courier, monospace;
+    --FuentePrincipal: var(--FuenteCuerpo);
 
-    /* Acentos Tradicionales Benianos / Bolivianos */
-    --ColorVerdeBeni: #2e7d32;
-    --ColorVerdeBeniClaro: #e8f5e9;
-    --ColorDoradoFolklore: #f59e0b;
-    --ColorRojoReaccion: #f02849;
-    --ColorAmarilloReaccion: #f7b125;
+    /* 2. Paleta Institucional Beni & Folclore */
+    --ColorVerdeBeni: #1b6b3e;
+    --ColorVerdeBeniHover: #134e2c;
+    --ColorVerdeBeniOscuro: #092e18;
+    --ColorVerdeBeniClaro: #e8f5ed;
+    --ColorVerdeBeniSuave: rgba(27, 107, 62, 0.08);
+    --ColorVerdeBeniGlow: rgba(27, 107, 62, 0.25);
 
-    /* Superficies y Fondos Modo Claro */
-    --ColorFondoPrincipal: #f0f2f5;
+    /* Acentos Dorados Patrimoniales */
+    --ColorDoradoPatrimonio: #c59b27;
+    --ColorDoradoHover: #a67c14;
+    --ColorDoradoClaro: #fefce8;
+    --ColorDoradoSuave: rgba(197, 155, 39, 0.12);
+
+    /* Compatibilidad con código previo */
+    --ColorPrimarioAzul: var(--ColorVerdeBeni);
+    --ColorPrimarioAzulHover: var(--ColorVerdeBeniHover);
+    --ColorPrimarioAzulClaro: var(--ColorVerdeBeniClaro);
+    --ColorPrimarioAzulSuave: var(--ColorVerdeBeniSuave);
+    --ColorDoradoFolklore: var(--ColorDoradoPatrimonio);
+
+    /* 3. Superficies y Fondos Modo Claro (Limpio, Nítido, Tipo Revista/Museo) */
+    --ColorFondoCanvas: #f8fafc;
+    --ColorFondoPrincipal: #f8fafc;
     --ColorFondoSuperficie: #ffffff;
-    --ColorFondoSecundario: #f0f2f5;
-    --ColorFondoHover: #f2f2f2;
-    --ColorFondoActivo: #e4e6eb;
-    --ColorFondoEntrada: #f0f2f5;
+    --ColorFondoSuperficieTranslucida: rgba(255, 255, 255, 0.85);
+    --ColorFondoSecundario: #f1f5f9;
+    --ColorFondoHover: #eef2f6;
+    --ColorFondoActivo: #e2e8f0;
+    --ColorFondoEntrada: #f8fafc;
+    --ColorFondoModalOverlay: rgba(15, 23, 42, 0.65);
 
-    /* Colores de Texto Modo Claro */
-    --ColorTextoPrincipal: #050505;
-    --ColorTextoSecundario: #65676b;
-    --ColorTextoAtenuado: #8a8d91;
-    --ColorTextoEnlace: #1877f2;
+    /* 4. Jerarquía Tipográfica y Textos Modo Claro */
+    --ColorTextoPrincipal: #0f172a;       /* Slate 900 */
+    --ColorTextoSecundario: #475569;      /* Slate 600 */
+    --ColorTextoAtenuado: #94a3b8;       /* Slate 400 */
+    --ColorTextoEnlace: #1b6b3e;
     --ColorTextoBlanco: #ffffff;
 
-    /* Bordes y Divisores */
-    --ColorBordeDivisor: #ced0d4;
-    --ColorBordeSuave: #e4e6eb;
-    --ColorBordeTarjeta: #dadee3;
+    /* 5. Bordes y Divisores Ultra-Sutiles */
+    --ColorBordeDivisor: #e2e8f0;
+    --ColorBordeSuave: #f1f5f9;
+    --ColorBordeTarjeta: rgba(226, 232, 240, 0.8);
+    --ColorBordeEnfoque: #1b6b3e;
 
-    /* Sombras Elevación Facebook */
-    --SombraNivelUno: 0 1px 2px rgba(0, 0, 0, 0.1);
-    --SombraNivelDos: 0 2px 8px rgba(0, 0, 0, 0.12);
-    --SombraNivelTres: 0 8px 24px rgba(0, 0, 0, 0.16);
-    --SombraTarjetaHover: 0 4px 12px rgba(0, 0, 0, 0.15);
-    --SombraReacciones: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    /* 6. Sombras y Elevación Arquitectónica */
+    --SombraNivelCero: none;
+    --SombraNivelUno: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+    --SombraNivelDos: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --SombraNivelTres: 0 10px 15px -3px rgba(15, 23, 42, 0.06), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+    --SombraNivelCuatro: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    --SombraTarjetaHover: 0 16px 32px -4px rgba(27, 107, 62, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.03);
+    --SombraModal: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    --SombraReacciones: var(--SombraNivelDos);
 
-    /* Radios de Bordes */
-    --RadioPequeno: 6px;
-    --RadioMediano: 10px;
-    --RadioGrande: 16px;
+    /* 7. Radios y Esquinas Suaves */
+    --RadioPequeno: 8px;
+    --RadioMediano: 14px;
+    --RadioGrande: 20px;
+    --RadioExtraGrande: 28px;
     --RadioCircular: 50%;
     --RadioBotonPill: 9999px;
 
-    /* Dimensiones de Maquetación */
-    --AlturaEncabezado: 56px;
-    --AnchoBarraLateralIzquierda: 340px;
-    --AnchoBarraLateralDerecha: 340px;
-    --AnchoMaximoMuroCentral: 680px;
-    --AlturaReproductorInferior: 64px;
+    /* 8. Dimensiones de Maquetación */
+    --AlturaEncabezado: 64px;
+    --AnchoMenuLateral: 280px;
+    --AnchoBarraLateralIzquierda: 280px;
+    --AnchoBarraLateralDerecha: 0px;
+    --AnchoMaximoMuroCentral: 1140px;
+    --AlturaReproductorInferior: 72px;
 
-    /* Tipografías */
-    --FuentePrincipal: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    --FuenteMusical: 'Courier New', Courier, monospace;
-
-    /* Transiciones */
-    --TransicionRapida: 0.15s ease;
-    --TransicionMedia: 0.25s ease;
-    --TransicionSuave: cubic-bezier(0.4, 0, 0.2, 1);
+    /* 9. Transiciones y Curvas Bézier */
+    --TransicionRapida: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --TransicionMedia: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --TransicionLenta: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Modo Oscuro (Estilo Facebook Dark Mode) */
+/* ==========================================================================
+   MODO OSCURO: OBSIDIANA & ESMERALDA DE ALTO CONTRASTE (LUXURY DARK)
+   ========================================================================== */
 body.ModoOscuroActivo {
-    --ColorFondoPrincipal: #18191a;
-    --ColorFondoSuperficie: #242526;
-    --ColorFondoSecundario: #3a3b3c;
-    --ColorFondoHover: #3a3b3c;
-    --ColorFondoActivo: #4e4f50;
-    --ColorFondoEntrada: #3a3b3c;
+    /* Superficies y Fondos Modo Oscuro */
+    --ColorFondoCanvas: #080d15;
+    --ColorFondoPrincipal: #080d15;
+    --ColorFondoSuperficie: #0f172a;
+    --ColorFondoSuperficieTranslucida: rgba(15, 23, 42, 0.88);
+    --ColorFondoSecundario: #151f33;
+    --ColorFondoHover: #1c2a44;
+    --ColorFondoActivo: #233454;
+    --ColorFondoEntrada: #151f33;
+    --ColorFondoModalOverlay: rgba(0, 0, 0, 0.78);
 
-    --ColorTextoPrincipal: #e4e6eb;
-    --ColorTextoSecundario: #b0b3b8;
-    --ColorTextoAtenuado: #8a8d91;
-    --ColorTextoEnlace: #4599ff;
+    /* Textos Modo Oscuro */
+    --ColorTextoPrincipal: #f8fafc;
+    --ColorTextoSecundario: #94a3b8;
+    --ColorTextoAtenuado: #64748b;
+    --ColorTextoEnlace: #4ade80;
 
-    --ColorBordeDivisor: #393a3b;
-    --ColorBordeSuave: #2f3031;
-    --ColorBordeTarjeta: #3e4042;
+    /* Bordes Modo Oscuro */
+    --ColorBordeDivisor: rgba(255, 255, 255, 0.08);
+    --ColorBordeSuave: rgba(255, 255, 255, 0.05);
+    --ColorBordeTarjeta: rgba(255, 255, 255, 0.09);
+    --ColorBordeEnfoque: #4ade80;
 
-    --ColorPrimarioAzulClaro: rgba(24, 119, 242, 0.2);
-    --SombraNivelUno: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --SombraNivelDos: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --SombraNivelTres: 0 12px 28px rgba(0, 0, 0, 0.6);
+    /* Acentos en Modo Oscuro */
+    --ColorVerdeBeniClaro: rgba(34, 197, 94, 0.15);
+    --ColorVerdeBeniSuave: rgba(34, 197, 94, 0.1);
+    --ColorDoradoClaro: rgba(234, 179, 8, 0.15);
+    --ColorDoradoSuave: rgba(234, 179, 8, 0.1);
+
+    /* Sombras Modo Oscuro */
+    --SombraNivelUno: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+    --SombraNivelDos: 0 4px 8px -1px rgba(0, 0, 0, 0.5);
+    --SombraNivelTres: 0 10px 20px -3px rgba(0, 0, 0, 0.6);
+    --SombraTarjetaHover: 0 16px 32px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(34, 197, 94, 0.15);
+    --SombraModal: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
 }

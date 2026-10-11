@@ -2,7 +2,7 @@
    SERVICE WORKER: LETRAS MI POBLAU (LMP) - PWA
    ========================================================================== */
 
-const CACHE_NAME = 'lmp-pwa-cache-v54';
+const CACHE_NAME = 'lmp-pwa-cache-v62';
 const RECURSOS_PRECACHE = [
   './',
   './index.html',
@@ -20,6 +20,7 @@ const RECURSOS_PRECACHE = [
   './css/EstilosTemaOscuro.css',
   './css/EstilosResponsivos.css',
   './js/AplicacionPrincipal.js',
+  './js/Capas/CapaDatos/BaseDatosSemilla.js',
   './js/Capas/CapaDatos/ServicioFirebase.js',
   './js/Capas/CapaDatos/ModeloAlmacenamiento.js',
   './js/Capas/CapaServicios/ServicioCloudinary.js',
@@ -30,6 +31,8 @@ const RECURSOS_PRECACHE = [
   './js/Capas/CapaComponentes/ComponenteHistorias.js',
   './js/Capas/CapaComponentes/ComponenteBarraLateralIzquierda.js',
   './js/Capas/CapaComponentes/ComponenteBarraLateralDerecha.js',
+  './js/Capas/CapaComponentes/ComponenteSeccionInicio.js',
+  './js/Capas/CapaComponentes/ComponenteSeccionPartituras.js',
   './js/Capas/CapaComponentes/ComponenteCrearPublicacion.js',
   './js/Capas/CapaComponentes/ComponenteTarjetaPublicacion.js',
   './js/Capas/CapaComponentes/ComponenteMuroPrincipal.js',
@@ -81,13 +84,17 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  const url = event.request.url;
+  // Solo procesar peticiones web http/https (ignora chrome-extension, ws, blob, data, etc.)
+  if (!url.startsWith('http://') && !url.startsWith('https://')) return;
+
   event.respondWith(
     fetch(event.request)
       .then((respuestaRed) => {
         if (respuestaRed && respuestaRed.status === 200) {
           const respuestaClonada = respuestaRed.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, respuestaClonada);
+            cache.put(event.request, respuestaClonada).catch(() => {});
           });
         }
         return respuestaRed;

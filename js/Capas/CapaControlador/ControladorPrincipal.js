@@ -21,7 +21,9 @@ class ControladorPrincipal {
         this.ComponenteEncabezado = new ComponenteEncabezado(this.ServicioEstado);
         this.ComponenteBarraLateralIzquierda = new ComponenteBarraLateralIzquierda(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteBarraLateralDerecha = new ComponenteBarraLateralDerecha(this.ServicioEstado);
-        this.ComponenteMuroPrincipal = new ComponenteMuroPrincipal(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteSeccionInicio = new ComponenteSeccionInicio(this.ServicioEstado, this.ModeloAlmacenamiento);
+        this.ComponenteMuroPrincipal = this.ComponenteSeccionInicio;
+        this.ComponenteSeccionPartituras = new ComponenteSeccionPartituras(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionCanciones = new ComponenteSeccionCanciones(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionGeneros = new ComponenteSeccionGeneros(this.ServicioEstado, this.ModeloAlmacenamiento);
         this.ComponenteSeccionArtistas = new ComponenteSeccionArtistas(this.ServicioEstado, this.ModeloAlmacenamiento);
@@ -58,8 +60,12 @@ class ControladorPrincipal {
             this.ServicioEstado.AlternarModoOscuro(true);
         }
 
-        // Sincronizar sesión activa con la base de datos de usuarios en Firestore
-        this.ServicioEstado.SincronizarUsuarioConBaseDatos(this.ModeloAlmacenamiento.ObtenerTodosLosUsuarios());
+        // Modo Galería Abierta: acceso libre para todos los visitantes
+        this.ServicioEstado.EstablecerEstado("UsuarioActual", {
+            Nombre: "Visitante",
+            Rol: "Invitado",
+            EsInvitado: true
+        });
 
         this.SuscribirEventosDelEstado();
         this.RenderizarTodaLaAplicacion();
@@ -125,12 +131,16 @@ class ControladorPrincipal {
     }
 
     ObtenerHtmlSegunPestanaActiva() {
-        const Pestana = this.ServicioEstado.ObtenerEstado("PestanaActiva");
+        const Pestana = this.ServicioEstado.ObtenerEstado("PestanaActiva") || "inicio";
         switch (Pestana) {
+            case "inicio":
             case "muro":
-                return this.ComponenteMuroPrincipal.Renderizar();
+            case "menu":
+                return this.ComponenteSeccionInicio.Renderizar();
             case "canciones":
                 return this.ComponenteSeccionCanciones.Renderizar();
+            case "partituras":
+                return this.ComponenteSeccionPartituras.Renderizar();
             case "generos":
                 return this.ComponenteSeccionGeneros.Renderizar();
             case "artistas":
@@ -141,9 +151,9 @@ class ControladorPrincipal {
             case "acercadenosotros":
                 return this.ComponenteSeccionAcercaDe.Renderizar();
             case "perfil":
-                return this.ComponenteSeccionPerfil.Renderizar();
+                return this.ComponenteSeccionInicio.Renderizar();
             default:
-                return this.ComponenteMuroPrincipal.Renderizar();
+                return this.ComponenteSeccionInicio.Renderizar();
         }
     }
 
@@ -160,27 +170,49 @@ class ControladorPrincipal {
     }
 
     ActualizarEstadosPestanasUI(PestanaActiva) {
-        // Pestañas superiores
+        const PestanaNormalizada = (PestanaActiva === "muro" || PestanaActiva === "menu") ? "inicio" : PestanaActiva;
+
+        // Pestañas y enlaces del Menú Lateral
+        document.querySelectorAll(".ItemEnlaceMenuLateral, .ElementoAccesoDirecto").forEach(Item => {
+            const ItemPestana = Item.dataset.pestana;
+            if (ItemPestana === PestanaActiva || ItemPestana === PestanaNormalizada || 
+                (PestanaNormalizada === "inicio" && (ItemPestana === "muro" || ItemPestana === "inicio"))) {
+                Item.classList.add("EnlaceMenuActivo", "AccesoActivo");
+            } else {
+                Item.classList.remove("EnlaceMenuActivo", "AccesoActivo");
+            }
+        });
+
+        // Pestañas superiores (si existen)
         document.querySelectorAll(".PestanaNavegacionSuperior").forEach(Btn => {
-            if (Btn.dataset.pestana === PestanaActiva) {
+            if (Btn.dataset.pestana === PestanaActiva || Btn.dataset.pestana === PestanaNormalizada) {
                 Btn.classList.add("PestanaActiva");
             } else {
                 Btn.classList.remove("PestanaActiva");
             }
         });
 
-        // Barra lateral
-        document.querySelectorAll(".ElementoAccesoDirecto").forEach(Item => {
-            if (Item.dataset.pestana === PestanaActiva) {
-                Item.classList.add("AccesoActivo");
-            } else {
-                Item.classList.remove("AccesoActivo");
-            }
-        });
+        // Actualizar título indicador en encabezado
+        const NombresPestana = {
+            "inicio": "Inicio / Menú",
+            "muro": "Inicio / Menú",
+            "canciones": "Cancionero & Letras",
+            "partituras": "Archivo de Partituras",
+            "generos": "Géneros & Ritmos Benianos",
+            "artistas": "Compositores & Artistas",
+            "ifael": "Instituto IFAEL (Trinidad)",
+            "acerca-de": "Acerca de Nosotros",
+            "perfil": "Perfil de Usuario"
+        };
+        const TituloTexto = NombresPestana[PestanaNormalizada] || "Letras de Mi Poblao";
+        const IndicadorEncabezado = document.querySelector(".NombreSeccionTextoEncabezado");
+        if (IndicadorEncabezado) {
+            IndicadorEncabezado.textContent = TituloTexto;
+        }
 
         // Barra móvil inferior
         document.querySelectorAll(".ElementoNavegacionMovil").forEach(MovilItem => {
-            if (MovilItem.dataset.pestana === PestanaActiva) {
+            if (MovilItem.dataset.pestana === PestanaActiva || MovilItem.dataset.pestana === PestanaNormalizada) {
                 MovilItem.classList.add("MovilActivo");
             } else {
                 MovilItem.classList.remove("MovilActivo");
@@ -243,14 +275,15 @@ class ControladorPrincipal {
             return;
         }
 
-        // 2. Click en Logotipo Inicio
-        if (Objetivo.closest("#BotonLogotipoInicio")) {
-            this.ServicioEstado.EstablecerPestanaActiva("muro");
+        // 2. Click en Logotipo Inicio (Header o Sidebar)
+        if (Objetivo.closest("#BotonLogotipoInicio, #BotonLogotipoInicioLateral")) {
+            this.ServicioEstado.EstablecerPestanaActiva("inicio");
+            this.CerrarMenuLateralMovil();
             return;
         }
 
-        // 3. Alternar Modo Oscuro
-        if (Objetivo.closest("#BotonAlternarModoOscuro")) {
+        // 3. Alternar Modo Oscuro (Header o Sidebar)
+        if (Objetivo.closest("#BotonAlternarModoOscuro, #BotonAlternarModoOscuroSidebar")) {
             const EstadoActual = this.ServicioEstado.ObtenerEstado("ModoOscuro");
             this.ServicioEstado.AlternarModoOscuro(!EstadoActual);
             this.ServicioNotificaciones.MostrarMensajeToast(
@@ -258,6 +291,45 @@ class ControladorPrincipal {
                 !EstadoActual ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>'
             );
             return;
+        }
+
+        // Limpiar Buscador Global
+        if (Objetivo.closest("#BotonLimpiarBuscadorGlobal")) {
+            this.ServicioEstado.EstablecerTerminoBusquedaGlobal("");
+            const InputBuscador = document.getElementById("CampoEntradaBuscadorPrincipal");
+            if (InputBuscador) {
+                InputBuscador.value = "";
+                InputBuscador.focus();
+            }
+            return;
+        }
+
+        // Reproducir Himno desde encabezado o inicio
+        if (Objetivo.closest("#BotonReproducirHimnoEncabezado, #BotonReproducirHimnoDesdeInicio")) {
+            this.ReproducirHimnoAlBeni();
+            return;
+        }
+
+        // Ver Letra del Himno desde Inicio
+        if (Objetivo.closest("[data-accion='ver-letra-himno']")) {
+            this.AbrirModalLetra("HimnoAlBeni");
+            return;
+        }
+
+        // Ver Partitura del Himno desde Inicio
+        if (Objetivo.closest("[data-accion='ver-partitura-himno']")) {
+            this.AbrirModalPartitura("HimnoAlBeni");
+            return;
+        }
+
+        // Abrir Partitura desde Catálogo de Partituras
+        const DisparadorPartitura = Objetivo.closest(".BotonAbrirModalPartituraDirecto, .PrevisualizacionMiniaturaPartitura");
+        if (DisparadorPartitura) {
+            const IdCancion = DisparadorPartitura.dataset.idCancion || DisparadorPartitura.dataset.cancionId;
+            if (IdCancion) {
+                this.AbrirModalPartitura(IdCancion);
+                return;
+            }
         }
 
         // Compartir Perfil IFAEL
@@ -609,10 +681,12 @@ class ControladorPrincipal {
             Objetivo.closest("#BotonAbrirModalCrearPublicacion") ||
             Objetivo.closest("#BotonRapidoLetraAcordes") ||
             Objetivo.closest("#BotonAportarNuevaCancionEnSeccion") ||
-            (Objetivo.closest("[data-accion='crear-aporte']"))
+            Objetivo.closest("#BotonAportarLetraSidebar") ||
+            (Objetivo.closest("[data-accion='crear-aporte']")) ||
+            (Objetivo.closest("[data-accion='abrir-modal-aporte']"))
         ) {
             if (!this.ServicioEstado.EstaAutenticado()) {
-                this.AbrirModalIniciarSesion("Inicia sesión para aportar y publicar nuevas letras del Beni.");
+                this.AbrirModalIniciarSesion("Inicia sesión para aportar y registrar nuevas letras del Beni.");
                 return;
             }
             this.AbrirModalCrearAporte();
@@ -640,6 +714,17 @@ class ControladorPrincipal {
             if (this.ComponenteSeccionArtistas) {
                 this.ComponenteSeccionArtistas.LimpiarArtistaActivo();
                 this.ActualizarVistaCentral();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            return;
+        }
+
+        const BotonIrCancionero = Objetivo.closest(".BotonIrAlCancioneroFiltro");
+        if (BotonIrCancionero) {
+            const Filtro = BotonIrCancionero.dataset.filtro || "";
+            if (this.ServicioEstado) {
+                this.ServicioEstado.EstablecerTerminoBusquedaGlobal(Filtro);
+                this.ServicioEstado.EstablecerPestanaActiva("canciones");
                 window.scrollTo({ top: 0, behavior: "smooth" });
             }
             return;
@@ -855,7 +940,13 @@ class ControladorPrincipal {
 
         // Buscador superior
         if (Objetivo.id === "CampoEntradaBuscadorPrincipal") {
-            this.ServicioEstado.EstablecerTerminoBusqueda(Objetivo.value);
+            const Termino = Objetivo.value;
+            const EstadoActual = this.ServicioEstado.ObtenerEstado();
+            const PestanasEstaticas = ["inicio", "muro", "menu", "acerca-de", "acercadenosotros", "ifael", "perfil"];
+            if (PestanasEstaticas.includes(EstadoActual.PestanaActiva) && Termino.trim().length > 0) {
+                this.ServicioEstado.EstablecerPestanaActiva("canciones");
+            }
+            this.ServicioEstado.EstablecerTerminoBusqueda(Termino);
             return;
         }
 
@@ -2001,115 +2092,17 @@ class ControladorPrincipal {
     }
 
     AbrirModalIniciarSesion(MensajeMotivo = "") {
-        if (!this.ContenedorModales) return;
-        this.ContenedorModales.innerHTML = this.ComponenteModalIniciarSesion.Renderizar(MensajeMotivo);
-
-        // Limpieza estricta de inputs para evitar autollenado por el navegador
-        const LimpiarCamposLogin = () => {
-            const InputEmail = document.getElementById("CampoEmailLogin");
-            const InputPass = document.getElementById("CampoPasswordLogin");
-            const Form = document.getElementById("FormularioInicioSesionModal");
-            if (Form) Form.reset();
-            if (InputEmail) InputEmail.value = "";
-            if (InputPass) InputPass.value = "";
-        };
-
-        LimpiarCamposLogin();
-        setTimeout(LimpiarCamposLogin, 50);
-        setTimeout(LimpiarCamposLogin, 150);
-        setTimeout(LimpiarCamposLogin, 300);
+        // Modo Galería: Acceso libre sin inicio de sesión
+        return;
     }
 
     async ProcesarIniciarSesionFormulario() {
-        const InputEmail = document.getElementById("CampoEmailLogin");
-        const InputPass = document.getElementById("CampoPasswordLogin");
-        const CajaError = document.getElementById("MensajeErrorLoginModal");
-        const BotonSubmit = document.getElementById("BotonConfirmarIniciarSesion");
-
-        const Email = InputEmail ? InputEmail.value.trim() : "";
-        const Password = InputPass ? InputPass.value : "";
-
-        if (CajaError) {
-            CajaError.style.display = "none";
-            CajaError.textContent = "";
-        }
-
-        if (!Email) {
-            if (CajaError) {
-                CajaError.textContent = "Por favor ingresa tu correo electrónico.";
-                CajaError.style.display = "block";
-            }
-            return;
-        }
-
-        if (!Password) {
-            if (CajaError) {
-                CajaError.textContent = "Por favor ingresa tu contraseña.";
-                CajaError.style.display = "block";
-            }
-            return;
-        }
-
-        if (BotonSubmit) {
-            BotonSubmit.disabled = true;
-            BotonSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando credenciales...';
-        }
-
-        try {
-            const Resultado = await this.ModeloAlmacenamiento.AutenticarUsuarioEnBaseDatos(Email, Password);
-
-            if (!Resultado.Exito) {
-                if (CajaError) {
-                    CajaError.textContent = Resultado.Mensaje || "Credenciales incorrectas.";
-                    CajaError.style.display = "block";
-                }
-                if (BotonSubmit) {
-                    BotonSubmit.disabled = false;
-                    BotonSubmit.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 6px;"></i> Iniciar Sesión';
-                }
-                return;
-            }
-
-            // Inicio de sesión exitoso con datos de Firestore
-            this.ServicioEstado.IniciarSesion(Resultado.Usuario);
-            this.CerrarModales();
-            this.ServicioNotificaciones.MostrarMensajeToast(
-                `¡Bienvenida/o, ${Resultado.Usuario.NombreCompleto || Resultado.Usuario.Nombre}!`,
-                '<i class="fa-solid fa-circle-check"></i>'
-            );
-        } catch (ErrorAuth) {
-            console.error("[ControladorPrincipal] Error al autenticar:", ErrorAuth);
-            if (CajaError) {
-                CajaError.textContent = "Ocurrió un error al verificar credenciales. Inténtalo de nuevo.";
-                CajaError.style.display = "block";
-            }
-            if (BotonSubmit) {
-                BotonSubmit.disabled = false;
-                BotonSubmit.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 6px;"></i> Iniciar Sesión';
-            }
-        }
+        return;
     }
 
     AbrirModalRegistroUsuario() {
-        if (!this.ContenedorModales) return;
-        if (this.ComponenteModalRegistroUsuario) {
-            this.ComponenteModalRegistroUsuario.ArchivoFotoSeleccionada = null;
-        }
-        this.ContenedorModales.innerHTML = this.ComponenteModalRegistroUsuario.Renderizar();
-
-        const LimpiarCamposRegistro = () => {
-            const Form = document.getElementById("FormularioRegistroUsuarioModal");
-            if (Form) Form.reset();
-            ["CampoRegistroNombreCompleto", "CampoRegistroEmail", "CampoRegistroPassword", "CampoRegistroCiudad"].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = "";
-            });
-        };
-
-        LimpiarCamposRegistro();
-        setTimeout(LimpiarCamposRegistro, 50);
-        setTimeout(LimpiarCamposRegistro, 150);
-        setTimeout(LimpiarCamposRegistro, 300);
+        // Modo Galería: Acceso libre sin registro
+        return;
     }
 
     async ProcesarRegistroUsuarioFormulario() {

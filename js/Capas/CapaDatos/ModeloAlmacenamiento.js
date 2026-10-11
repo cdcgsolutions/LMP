@@ -126,6 +126,26 @@ class ModeloAlmacenamiento {
         } catch (Error) {
             this.DatosAcercaDeNosotros = null;
         }
+
+        // Respaldo de datos semilla en caso de que cache local este vacio
+        if (typeof window !== "undefined" && window.BaseDatosSemillaLMP) {
+            const Semilla = window.BaseDatosSemillaLMP;
+            if ((!this.Canciones || this.Canciones.length === 0) && Array.isArray(Semilla.Canciones)) {
+                this.Canciones = [...Semilla.Canciones];
+            }
+            if ((!this.Generos || this.Generos.length === 0) && Array.isArray(Semilla.Generos)) {
+                this.Generos = [...Semilla.Generos];
+            }
+            if ((!this.Artistas || this.Artistas.length === 0) && Array.isArray(Semilla.Artistas)) {
+                this.Artistas = [...Semilla.Artistas];
+            }
+            if (!this.DatosIFAEL && Semilla.IFAEL) {
+                this.DatosIFAEL = { ...Semilla.IFAEL };
+            }
+            if (!this.DatosAcercaDeNosotros && Semilla.AcercaDeNosotros) {
+                this.DatosAcercaDeNosotros = { ...Semilla.AcercaDeNosotros };
+            }
+        }
     }
 
     async CargarDatosDesdeFirestore() {
@@ -162,9 +182,13 @@ class ModeloAlmacenamiento {
                     });
                     this.Usuarios = UsuariosLeidos;
                     localStorage.setItem(this.ClaveAlmacenamientoUsuarios, JSON.stringify(this.Usuarios));
+                } else {
+                    this.Usuarios = [];
+                    localStorage.removeItem(this.ClaveAlmacenamientoUsuarios);
                 }
             } catch (ErrUsuarios) {
                 console.warn("[ModeloAlmacenamiento] Error al cargar colección Usuarios:", ErrUsuarios);
+                this.Usuarios = [];
             }
 
             // 1. Canciones
@@ -291,142 +315,9 @@ class ModeloAlmacenamiento {
                 console.warn("[ModeloAlmacenamiento] Error al cargar colección AcercaDeNosotros:", ErrAcerca);
             }
 
-            // 5. Publicaciones, Comentarios y Reacciones
-            let SnapPublicaciones;
-            try {
-                SnapPublicaciones = await this.ServicioFirebase.ColeccionPublicaciones().orderBy("FechaCreacion", "desc").get();
-            } catch (ErrOrden) {
-                SnapPublicaciones = await this.ServicioFirebase.ColeccionPublicaciones().get();
-            }
-
-            if (!SnapPublicaciones.empty) {
-                const PublicacionesLeidas = [];
-                for (const Doc of SnapPublicaciones.docs) {
-                    const Data = Doc.data();
-                    const IdPublicacion = Doc.id;
-
-                    let Comentarios = [];
-                    try {
-                        const SnapComentarios = await this.ServicioFirebase.SubcoleccionComentarios(IdPublicacion).get();
-                        const DocsCom = SnapComentarios.docs || SnapComentarios;
-                        if (DocsCom && typeof DocsCom.forEach === "function") {
-                            DocsCom.forEach(DocCom => {
-                                const ComData = DocCom.data();
-                                const FechaComentario = ComData.FechaCreacion || ComData.createTime || null;
-                                const UsuariosLikes = Array.isArray(ComData.UsuariosLikes) ? ComData.UsuariosLikes : [];
-                                const CantidadLikes = (typeof ComData.CantidadLikes === "number")
-                                    ? Math.max(ComData.CantidadLikes, UsuariosLikes.length)
-                                    : UsuariosLikes.length;
-                                Comentarios.push({
-                                    IdComentario: DocCom.id,
-                                    NombreUsuario: ComData.NombreUsuario || "Usuario LMP",
-                                    AvatarUsuario: ComData.AvatarUsuario || "Logo1.png",
-                                    TextoComentario: ComData.TextoComentario || "",
-                                    FechaCreacion: FechaComentario,
-                                    Tiempo: this.FormatearTiempoRelativo(FechaComentario),
-                                    CantidadLikes: CantidadLikes,
-                                    UsuariosLikes: UsuariosLikes
-                                });
-                            });
-                        }
-                    } catch (ErrCom) {
-                        console.warn(ErrCom);
-                    }
-
-                    let ReaccionesDetalle = { MeGusta: 0, MeEncanta: 0, VivaBeni: 0, Aplausos: 0, BuenRitmo: 0 };
-                    let TotalReacciones = 0;
-                    let UsuariosReacciones = [];
-
-                    try {
-                        const SnapReacciones = await this.ServicioFirebase.SubcoleccionReacciones(IdPublicacion).get();
-                        const DocsReac = SnapReacciones.docs || SnapReacciones;
-                        if (DocsReac && typeof DocsReac.forEach === "function") {
-                            const TiposValidos = ["MeGusta", "MeEncanta", "VivaBeni", "Aplausos", "BuenRitmo"];
-                            DocsReac.forEach(DocReac => {
-                                const ReacData = DocReac.data();
-                                const Tipo = ReacData.TipoReaccion;
-                                const Cantidad = Number(ReacData.CantidadTotal) || 1;
-                                const NombreUsuarioReac = (ReacData.NombreUsuario || "").trim();
-
-                                if (Cantidad > 0 && Tipo && TiposValidos.includes(Tipo) && NombreUsuarioReac) {
-                                    const YaExiste = UsuariosReacciones.some(u => 
-                                        u.NombreUsuario && u.NombreUsuario.trim().toLowerCase() === NombreUsuarioReac.toLowerCase()
-                                    );
-                                    if (!YaExiste) {
-                                        ReaccionesDetalle[Tipo] = (ReaccionesDetalle[Tipo] || 0) + 1;
-                                        TotalReacciones++;
-                                        UsuariosReacciones.push({
-                                            IdReaccion: DocReac.id,
-                                            NombreUsuario: NombreUsuarioReac,
-                                            TipoReaccion: Tipo
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    } catch (ErrReac) {
-                        console.warn(ErrReac);
-                    }
-
-                    let IdCancionAsociada = Data.IdCancionAsociada || null;
-                    const CancionAsociadaExiste = IdCancionAsociada && this.Canciones.some(C => String(C.IdCancion) === String(IdCancionAsociada));
-                    if (!CancionAsociadaExiste && this.Canciones.length > 0) {
-                        const TextoPub = Data.TextoPublicacion || "";
-                        const CancionEncontrada = this.Canciones.find(C =>
-                            (C.Titulo && TextoPub.includes(C.Titulo)) || (C.Titulo && TextoPub.toLowerCase().includes(C.Titulo.toLowerCase()))
-                        );
-                        if (CancionEncontrada) {
-                            IdCancionAsociada = CancionEncontrada.IdCancion;
-                        }
-                    }
-
-                    let TipoPredominante = null;
-                    let MaxVotos = 0;
-                    for (const [Tipo, Cant] of Object.entries(ReaccionesDetalle)) {
-                        if (Cant > MaxVotos) {
-                            MaxVotos = Cant;
-                            TipoPredominante = Tipo;
-                        }
-                    }
-
-                    const NombrePublicadorPub = Data.NombrePublicador || Data.NombreAutor || "Usuario LMP";
-                    let EsVerificadoAutor = false;
-                    const UsuarioAutor = this.Usuarios.find(U => 
-                        U.NombreCompleto && (
-                            U.NombreCompleto.trim().toLowerCase() === NombrePublicadorPub.trim().toLowerCase() ||
-                            NombrePublicadorPub.trim().toLowerCase().includes(U.NombreCompleto.trim().toLowerCase())
-                        )
-                    );
-                    if (UsuarioAutor && UsuarioAutor.EsVerificado !== undefined) {
-                        EsVerificadoAutor = UsuarioAutor.EsVerificado === true;
-                    } else if (Data.EsVerificado !== undefined) {
-                        EsVerificadoAutor = Data.EsVerificado === true;
-                    }
-
-                    const FechaPublicacion = Data.FechaCreacion || Data.createTime || null;
-                    PublicacionesLeidas.push({
-                        IdPublicacion: IdPublicacion,
-                        NombrePublicador: NombrePublicadorPub,
-                        NombreAutor: NombrePublicadorPub,
-                        AvatarAutor: Data.AvatarAutor || "Logo1.png",
-                        FechaCreacion: FechaPublicacion,
-                        TiempoTranscurrido: this.FormatearTiempoRelativo(FechaPublicacion),
-                        EsVerificado: EsVerificadoAutor,
-                        TextoPublicacion: Data.TextoPublicacion || "",
-                        IdCancionAsociada: IdCancionAsociada,
-                        CantidadMeGusta: TotalReacciones,
-                        TipoReaccionPredominante: TipoPredominante,
-                        MiReaccionUsuario: null,
-                        UsuariosReacciones: UsuariosReacciones,
-                        ReaccionesDetalle: ReaccionesDetalle,
-                        CantidadCompartidos: Data.CantidadCompartidos || 0,
-                        Comentarios: Comentarios
-                    });
-                }
-
-                this.Publicaciones = PublicacionesLeidas;
-                localStorage.setItem(this.ClaveAlmacenamientoPublicaciones, JSON.stringify(this.Publicaciones));
-            }
+            // 5. Publicaciones y Muro retirados de la arquitectura (Modo Galería / Portal)
+            this.Publicaciones = [];
+            localStorage.removeItem(this.ClaveAlmacenamientoPublicaciones);
 
             this.DatosCargadosDesdeFirestore = true;
             return true;
@@ -545,12 +436,40 @@ class ModeloAlmacenamiento {
         return this.Canciones || [];
     }
 
+    ObtenerTodasLasPartituras() {
+        const Todas = this.ObtenerTodasLasCanciones();
+        return Todas.filter(C => {
+            const url = C.ImagenPartituraUrl || C.PartituraUrl || C.ImagenPartitura;
+            return url && url.trim() !== "" && url !== "IFAEL.jpg";
+        });
+    }
+
     ObtenerCancionPorId(IdCancionBuscada) {
         if (!IdCancionBuscada) return null;
-        if (String(IdCancionBuscada).toLowerCase() === "himnoalbeni" || String(IdCancionBuscada).toLowerCase() === "himno-al-beni") {
+        const IdStr = String(IdCancionBuscada).trim();
+        const IdLower = IdStr.toLowerCase();
+
+        if (IdLower === "himnoalbeni" || IdLower === "himno-al-beni") {
             return this.ObtenerHimnoAlBeni();
         }
-        return this.Canciones.find(CancionItem => String(CancionItem.IdCancion) === String(IdCancionBuscada));
+        
+        // 1. Buscar en lista activa por IdCancion o IdDocumento
+        let Encontrada = this.Canciones.find(C => String(C.IdCancion || C.IdDocumento) === IdStr);
+        if (Encontrada) return Encontrada;
+
+        // 2. Buscar por título coincidente
+        Encontrada = this.Canciones.find(C => C.Titulo && C.Titulo.toLowerCase() === IdLower);
+        if (Encontrada) return Encontrada;
+
+        // 3. Fallback a la semilla oficial
+        if (window.BaseDatosSemillaLMP && Array.isArray(window.BaseDatosSemillaLMP.Canciones)) {
+            Encontrada = window.BaseDatosSemillaLMP.Canciones.find(C => 
+                String(C.IdCancion) === IdStr || 
+                (C.Titulo && C.Titulo.toLowerCase() === IdLower)
+            );
+            if (Encontrada) return Encontrada;
+        }
+        return null;
     }
 
     ObtenerHimnoAlBeni() {
