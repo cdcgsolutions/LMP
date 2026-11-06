@@ -174,6 +174,7 @@ class PanelGestionLMP {
                                 NombreCompleto: Datos.NombreCompleto || Datos.Nombre || "Administrador",
                                 CorreoElectronico: Datos.CorreoElectronico,
                                 Rol: Datos.Rol || "Admin",
+                                Activo: Datos.Activo !== undefined ? Datos.Activo : true,
                                 FotoPerfilUrl: Datos.FotoPerfilUrl || Datos.FotoPerfil || ""
                             };
                             break;
@@ -186,6 +187,26 @@ class PanelGestionLMP {
 
             // 2. Si no se encontró en Firestore, validar lista autorizada
             if (!UsuarioAutenticado) {
+                // Verificar si existe en la base de datos marcado como inactivo
+                let EstaDesactivadoEnBD = false;
+                try {
+                    const SnapCheck = await db.collection("Usuarios")
+                        .where("CorreoElectronico", "==", Correo)
+                        .get();
+                    if (!SnapCheck.empty) {
+                        for (const Doc of SnapCheck.docs) {
+                            if (Doc.data().Activo === false) {
+                                EstaDesactivadoEnBD = true;
+                                break;
+                            }
+                        }
+                    }
+                } catch (e) {}
+
+                if (EstaDesactivadoEnBD) {
+                    throw new Error("Esta cuenta ha sido desactivada. Ya no tienes acceso al panel de administración.");
+                }
+
                 const CoincidenciaPredefinida = UsuariosPredefinidos.find(
                     U => U.CorreoElectronico.toLowerCase() === Correo && U.Contrasena === Clave
                 );
@@ -196,6 +217,11 @@ class PanelGestionLMP {
 
             if (!UsuarioAutenticado) {
                 throw new Error("Credenciales incorrectas. Revisa tu correo y contraseña.");
+            }
+
+            // Validar estrictamente que el usuario esté activo
+            if (UsuarioAutenticado.Activo === false) {
+                throw new Error("Esta cuenta ha sido desactivada. Ya no tienes acceso al panel de administración.");
             }
 
             this.UsuarioSesion = UsuarioAutenticado;
@@ -1593,6 +1619,112 @@ class PanelGestionLMP {
         }
     }
 
+    EsCuentaEdna(Correo = "", Nombre = "") {
+        const C = (Correo || "").toLowerCase().trim();
+        const N = (Nombre || "").toLowerCase().trim();
+        return C === "ednacuallr20@gmail.com" || 
+               C === "edna.edgley@gmail.com" || 
+               C.includes("ednacuallr") || 
+               N.includes("edna miriam") ||
+               N === "edna edgley";
+    }
+
+    async EliminarUsuario(IdUsuario, Nombre, Correo = "") {
+        // Protección Frontend: La cuenta de Edna Miriam nunca puede ser desactivada
+        if (this.EsCuentaEdna(Correo, Nombre)) {
+            this.MostrarToast("Acción no permitida: Esta cuenta de administrador no puede ser deshabilitada.", "Error");
+            return;
+        }
+
+        const Confirma = confirm(`¿Estás seguro de eliminar el acceso para "${Nombre}"?\n\nAl eliminarlo, la cuenta quedará desactivada (Activo: false) y no podrá ingresar al panel.`);
+        if (!Confirma) return;
+
+        try {
+            const db = this.Firebase.ObtenerFirestore();
+            if (!db) throw new Error("No hay conexión con la base de datos.");
+
+            let Actualizado = false;
+
+            if (IdUsuario && !IdUsuario.startsWith("Edna") && !IdUsuario.startsWith("Daniel")) {
+                await db.collection("Usuarios").doc(IdUsuario).update({
+                    Activo: false,
+                    FechaDesactivacion: new Date().toISOString()
+                });
+                Actualizado = true;
+            } else if (Correo) {
+                const Snap = await db.collection("Usuarios")
+                    .where("CorreoElectronico", "==", Correo.toLowerCase().trim())
+                    .get();
+
+                if (!Snap.empty) {
+                    for (const Doc of Snap.docs) {
+                        await db.collection("Usuarios").doc(Doc.id).update({
+                            Activo: false,
+                            FechaDesactivacion: new Date().toISOString()
+                        });
+                        Actualizado = true;
+                    }
+                } else {
+                    // Si era un usuario predefinido sin documento aún en la base de datos, crearlo desactivado
+                    await db.collection("Usuarios").add({
+                        NombreCompleto: Nombre,
+                        CorreoElectronico: Correo.toLowerCase().trim(),
+                        Contrasena: "12345",
+                        Rol: "Admin",
+                        Activo: false,
+                        FechaRegistro: new Date().toISOString(),
+                        FechaDesactivacion: new Date().toISOString()
+                    });
+                    Actualizado = true;
+                }
+            }
+
+            this.MostrarToast(`Usuario "${Nombre}" desactivado. Ya no tiene acceso al panel.`, "Exito");
+            await this.CargarDatosDesdeFirestore();
+
+        } catch (Error) {
+            console.error("Error al desactivar usuario:", Error);
+            this.MostrarToast(`Error al desactivar usuario: ${Error.message}`, "Error");
+        }
+    }
+
+    async ReactivarUsuario(IdUsuario, Nombre, Correo = "") {
+        const Confirma = confirm(`¿Deseas reactivar el acceso al panel para "${Nombre}"?`);
+        if (!Confirma) return;
+
+        try {
+            const db = this.Firebase.ObtenerFirestore();
+            if (!db) throw new Error("No hay conexión con la base de datos.");
+
+            if (IdUsuario && !IdUsuario.startsWith("Edna") && !IdUsuario.startsWith("Daniel")) {
+                await db.collection("Usuarios").doc(IdUsuario).update({
+                    Activo: true,
+                    FechaReactivacion: new Date().toISOString()
+                });
+            } else if (Correo) {
+                const Snap = await db.collection("Usuarios")
+                    .where("CorreoElectronico", "==", Correo.toLowerCase().trim())
+                    .get();
+
+                if (!Snap.empty) {
+                    for (const Doc of Snap.docs) {
+                        await db.collection("Usuarios").doc(Doc.id).update({
+                            Activo: true,
+                            FechaReactivacion: new Date().toISOString()
+                        });
+                    }
+                }
+            }
+
+            this.MostrarToast(`Usuario "${Nombre}" reactivado con éxito.`, "Exito");
+            await this.CargarDatosDesdeFirestore();
+
+        } catch (Error) {
+            console.error("Error al reactivar usuario:", Error);
+            this.MostrarToast(`Error al reactivar usuario: ${Error.message}`, "Error");
+        }
+    }
+
     RenderizarTablaUsuarios() {
         const Contenedor = document.getElementById("ListaUsuariosTabla");
         if (!Contenedor) return;
@@ -1617,21 +1749,40 @@ class PanelGestionLMP {
             ];
         }
 
-        Contenedor.innerHTML = ListaMostrar.map(U => `
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ColorBorde); background: #ffffff;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="${U.FotoPerfilUrl || '../Logo1.png'}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" onerror="this.src='../Logo1.png'">
-                    <div>
-                        <div style="font-weight: 700; font-size: 14px;">${U.NombreCompleto || 'Sin nombre'}</div>
-                        <div style="font-size: 12px; color: var(--ColorTextoSecundario);">${U.CorreoElectronico || ''}</div>
+        Contenedor.innerHTML = ListaMostrar.map(U => {
+            const EsEdna = this.EsCuentaEdna(U.CorreoElectronico, U.NombreCompleto);
+            const EstaActivo = (U.Activo !== false);
+
+            return `
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ColorBorde); background: ${EstaActivo ? '#ffffff' : '#fef2f2'};">
+                    <div style="display: flex; align-items: center; gap: 12px; min-width: 220px;">
+                        <img src="${U.FotoPerfilUrl || '../Logo1.png'}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid ${EstaActivo ? 'var(--ColorPrimario)' : '#dc2626'};" onerror="this.src='../Logo1.png'">
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: ${EstaActivo ? 'var(--ColorTextoPrincipal)' : '#991b1b'};">
+                                ${U.NombreCompleto || 'Sin nombre'}
+                            </div>
+                            <div style="font-size: 12px; color: var(--ColorTextoSecundario);">${U.CorreoElectronico || ''}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span class="BadgeItem ${U.Rol === 'Admin' ? 'BadgeDorado' : 'BadgeVerde'}">Rol: ${U.Rol || 'User'}</span>
+                        <span class="BadgeItem ${EstaActivo ? 'BadgeVerde' : 'BadgeGris'}" style="${!EstaActivo ? 'background: #fee2e2; color: #dc2626; border-color: rgba(220,38,38,0.3);' : ''}">
+                            ${EstaActivo ? '<i class="fa-solid fa-circle-check"></i> Activo' : '<i class="fa-solid fa-circle-xmark"></i> Inactivo'}
+                        </span>
+
+                        ${EstaActivo ? `
+                            <button type="button" class="BotonAccionItem BotonBorrarItem" title="Eliminar acceso para este usuario" onclick="window.InstanciaPanel.EliminarUsuario('${U.IdUsuario || ''}', '${this.EscaparComillas(U.NombreCompleto || U.CorreoElectronico)}', '${U.CorreoElectronico || ''}')">
+                                <i class="fa-solid fa-trash"></i> Eliminar
+                            </button>
+                        ` : `
+                            <button type="button" class="BotonAccionItem" style="background: var(--ColorPrimarioClaro); color: var(--ColorPrimario); border: 1px solid rgba(27,107,62,0.3);" title="Reactivar acceso para este usuario" onclick="window.InstanciaPanel.ReactivarUsuario('${U.IdUsuario || ''}', '${this.EscaparComillas(U.NombreCompleto || U.CorreoElectronico)}', '${U.CorreoElectronico || ''}')">
+                                <i class="fa-solid fa-rotate-left"></i> Reactivar
+                            </button>
+                        `}
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="BadgeItem ${U.Rol === 'Admin' ? 'BadgeDorado' : 'BadgeVerde'}">Rol: ${U.Rol || 'User'}</span>
-                    <span class="BadgeItem ${U.Activo !== false ? 'BadgeVerde' : 'BadgeGris'}">${U.Activo !== false ? 'Activo' : 'Inactivo'}</span>
-                </div>
-            </div>
-        `).join("");
+            `;
+        }).join("");
     }
 
     // -------------------------------------------------------------
