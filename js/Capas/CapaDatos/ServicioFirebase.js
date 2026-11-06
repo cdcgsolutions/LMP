@@ -32,7 +32,11 @@ class ServicioFirebase {
                 return false;
             }
 
-            this.AppFirebase = firebase.initializeApp(this.ConfiguracionFirebase);
+            if (firebase.apps && firebase.apps.length > 0) {
+                this.AppFirebase = firebase.app();
+            } else {
+                this.AppFirebase = firebase.initializeApp(this.ConfiguracionFirebase);
+            }
             this.BaseDatosFirestore = firebase.firestore();
 
             if (firebase.auth) {

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>LMP - Panel de Gestión y Carga de Patrimonio</title>
+    <link rel="icon" type="image/png" href="../LogoInicialesSinFondoBlanco.png">
+
+    <!-- Tipografías Web -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Iconos Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos del Panel -->
+    <link rel="stylesheet" href="panel.css">
+
+    <!-- Script Inmediato para Ver/Ocultar Contraseña -->
+    <script>
+        function AlternarPassword(idInput, idIcono) {
+            var idTargetInput = idInput || "LoginPassword";
+            var idTargetIcono = idIcono || "IconoTogglePassword";
+            var input = document.getElementById(idTargetInput);
+            var icono = document.getElementById(idTargetIcono);
+            if (!input) return false;
+            if (input.type === "password") {
+                input.type = "text";
+                if (icono) {
+                    icono.className = "fa-solid fa-eye-slash";
+                }
+            } else {
+                input.type = "password";
+                if (icono) {
+                    icono.className = "fa-solid fa-eye";
+                }
+            }
+            return false;
+        }
+        window.AlternarPassword = AlternarPassword;
+        window.AlternarVisibilidadClave = AlternarPassword;
+    </script>
+</head>
+
+<body>
+
+    <!-- =============================================================
+         1. PANTALLA DE INICIO DE SESIÓN (PROTECCIÓN PRIVADA)
+         ============================================================= -->
+    <div id="VistaLogin" class="PantallaLogin">
+        <div class="TarjetaLogin">
+            <div class="HeaderLogin">
+                <img src="../Logo1.png" alt="LMP Logo" class="LogoLogin">
+                <div class="TituloLogin">Letras de Mi Poblao</div>
+                <div class="SubtituloLogin">Panel Privado de Carga y Gestión de Patrimonio Musical Beniano</div>
+            </div>
+
+            <div id="LoginError" class="AlertaMensaje AlertaPeligro" style="display: none;"></div>
+
+            <form id="FormularioLogin" class="FormularioLogin" autocomplete="off" onsubmit="event.preventDefault(); if (window.InstanciaPanel) window.InstanciaPanel.ProcesarLogin(event); return false;">
+                <div class="GrupoInput">
+                    <label class="LabelFormulario" for="LoginEmail">Correo Electrónico:</label>
+                    <div class="WrapperInputIcono">
+                        <i class="fa-solid fa-envelope IconoInput"></i>
+                        <input type="email" id="LoginEmail" class="InputFormulario" placeholder="" required onkeydown="if(event.key === 'Enter'){ event.preventDefault(); if (window.InstanciaPanel) window.InstanciaPanel.ProcesarLogin(event); }">
+                    </div>
+                </div>
+
+                <div class="GrupoInput">
+                    <label class="LabelFormulario" for="LoginPassword">Contraseña de Acceso:</label>
+                    <div class="WrapperInputIcono">
+                        <i class="fa-solid fa-lock IconoInput"></i>
+                        <input type="password" id="LoginPassword" class="InputFormulario" placeholder="" required onkeydown="if(event.key === 'Enter'){ event.preventDefault(); if (window.InstanciaPanel) window.InstanciaPanel.ProcesarLogin(event); }">
+                        <button type="button" id="BtnTogglePassword" class="BotonTogglePassword" title="Mostrar/ocultar contraseña" onclick="AlternarPassword('LoginPassword', 'IconoTogglePassword')">
+                            <i class="fa-solid fa-eye" id="IconoTogglePassword"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" id="BtnIniciarSesion" class="BotonPrincipal" style="margin-top: 6px;" onclick="if (window.InstanciaPanel) { window.InstanciaPanel.ProcesarLogin(event); }">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Ingresar al Panel
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 4px;">
+                <a href="../index.html" class="BotonSecundario" style="text-decoration: none; width: 100%; box-sizing: border-box;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver a la Galería Pública
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================================
+         2. PANTALLA PRINCIPAL: DASHBOARD Y GESTOR DE DATOS
+         ============================================================= -->
+    <div id="VistaDashboard" class="LayoutDashboard" style="display: none;">
+        <!-- Backdrop para oscurecer fondo en móviles al abrir menú lateral -->
+        <div id="BackdropSidebarMobile" class="BackdropSidebarMobile"></div>
+
+        <!-- Barra Lateral (Sidebar / Drawer en móvil) -->
+        <aside class="SidebarPanel" id="SidebarPanel">
+            <div class="HeaderSidebar">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="../LogoInicialesSinFondoBlanco.png" alt="LMP" class="LogoSidebar" onerror="this.src='../Logo1.png'">
+                    <div>
+                        <div class="TituloSidebar">LMP GESTOR</div>
+                        <div class="SubtituloSidebar">IFAEL Trinidad</div>
+                    </div>
+                </div>
+                <button type="button" id="BtnCerrarSidebarMobile" class="BotonCerrarSidebarMobile" title="Cerrar menú">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Perfil del Administrador conectado -->
+            <div class="UsuarioSidebarChip">
+                <img src="../Logo1.png" alt="Avatar" id="SidebarAvatarUsuario" class="AvatarUsuario">
+                <div class="InfoUsuarioTexto">
+                    <div class="NombreUsuario" id="SidebarNombreUsuario">Administrador</div>
+                    <div class="RolUsuario" id="SidebarRolUsuario">Rol: Admin</div>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="MenuNavegacionSidebar">
+                <span class="EtiquetaGrupoMenuSidebar">GALERÍA & ARCHIVO</span>
+
+                <a href="#" class="ItemMenuSidebar Activo" data-pestana="inicio">
+                    <i class="fa-solid fa-house"></i> Inicio
+                </a>
+                <a href="#" class="ItemMenuSidebar" data-pestana="canciones">
+                    <i class="fa-solid fa-scroll"></i> Cancionero y Letras
+                </a>
+                <a href="#" class="ItemMenuSidebar" data-pestana="partituras">
+                    <i class="fa-solid fa-file-audio"></i> Partituras Digitales
+                </a>
+                <a href="#" class="ItemMenuSidebar" data-pestana="generos">
+                    <i class="fa-solid fa-guitar"></i> Géneros Musicales
+                </a>
+                <a href="#" class="ItemMenuSidebar" data-pestana="artistas">
+                    <i class="fa-solid fa-users"></i> Artistas y Compositores
+                </a>
+                <a href="#" class="ItemMenuSidebar" data-pestana="ifael">
+                    <i class="fa-solid fa-building-columns"></i> Instituto IFAEL
+                </a>
+                <a href="#" class="ItemMenuSidebar" data-pestana="acerca-de">
+                    <i class="fa-solid fa-circle-info"></i> Acerca de Nosotros
+                </a>
+
+                <div class="SeparadorMenuSidebar"></div>
+                <span class="EtiquetaGrupoMenuSidebar">ADMINISTRACIÓN</span>
+
+                <a href="#" class="ItemMenuSidebar" data-pestana="usuarios">
+                    <i class="fa-solid fa-users-gear"></i> Cuentas y Accesos
+                </a>
+            </nav>
+
+            <!-- Pie del Sidebar -->
+            <div class="FooterSidebar">
+                <button id="BtnLogoutSidebar" class="BotonLogout">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Área de Contenido Principal -->
+        <main class="ContenidoPrincipal">
+            <!-- Barra Superior (TopBar) -->
+            <header class="HeaderTopBar">
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                    <button type="button" id="BtnToggleMenuMobile" class="BotonToggleMenuMobile" title="Abrir menú de navegación">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="TituloSeccionActiva" id="TituloSeccionTopbar">
+                        <i class="fa-solid fa-chart-pie" style="color: var(--ColorPrimario);"></i> Resumen General
+                    </div>
+                </div>
+                <div class="AccionesTopBar">
+                    <a href="../index.html" target="_blank" class="EnlaceSitioPublico" title="Abrir la web pública">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="TextoBtnSitioPublico">Ver Web</span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="CuerpoDashboard">
+
+                <!-- -----------------------------------------------------
+                     SECCIÓN: RESUMEN GENERAL (DASHBOARD)
+                     ----------------------------------------------------- -->
+                <!-- -----------------------------------------------------
+                     1. SECCIÓN: INICIO (RESUMEN GENERAL)
+                     ----------------------------------------------------- -->
+                <section id="Seccion_inicio" class="SeccionPanelDashboard">
+                    <div class="GridMetricas">
+                        <div class="CardMetrica" style="cursor: pointer;" onclick="window.InstanciaPanel.CambiarPestana('canciones')">
+                            <div class="IconoMetrica IconoVerde">
+                                <i class="fa-solid fa-scroll"></i>
+                            </div>
+                            <div>
+                                <div class="InfoMetricaValor" id="MetricaTotalCanciones">0</div>
+                                <div class="InfoMetricaEtiqueta">Cancionero y Letras</div>
+                            </div>
+                        </div>
+
+                        <div class="CardMetrica" style="cursor: pointer;" onclick="window.InstanciaPanel.CambiarPestana('partituras')">
+                            <div class="IconoMetrica IconoAzul">
+                                <i class="fa-solid fa-file-audio"></i>
+                            </div>
+                            <div>
+                                <div class="InfoMetricaValor" id="MetricaTotalPartituras">0</div>
+                                <div class="InfoMetricaEtiqueta">Partituras Digitales</div>
+                            </div>
+                        </div>
+
+                        <div class="CardMetrica" style="cursor: pointer;" onclick="window.InstanciaPanel.CambiarPestana('generos')">
+                            <div class="IconoMetrica IconoMorado">
+                                <i class="fa-solid fa-guitar"></i>
+                            </div>
+                            <div>
+                                <div class="InfoMetricaValor" id="MetricaTotalGeneros">0</div>
+                                <div class="InfoMetricaEtiqueta">Géneros Musicales</div>
+                            </div>
+                        </div>
+
+                        <div class="CardMetrica" style="cursor: pointer;" onclick="window.InstanciaPanel.CambiarPestana('artistas')">
+                            <div class="IconoMetrica IconoDorado">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="InfoMetricaValor" id="MetricaTotalArtistas">0</div>
+                                <div class="InfoMetricaEtiqueta">Artistas y Compositores</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjetas de Acceso Rápido Directo -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 8px;">
+                        <div class="CardContenedorFormulario" style="padding: 22px;">
+                            <h3 style="font-family: var(--FuenteTitulos); font-size: 15px; margin-bottom: 8px; color: var(--ColorPrimario); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-scroll"></i> Cancionero y Letras
+                            </h3>
+                            <p style="font-size: 13px; color: var(--ColorTextoSecundario); line-height: 1.45; margin-bottom: 14px;">
+                                Carga taquiraris, chovenas, polcas e himnos con su letra oficial, acordes de guitarra y pista de audio MP3.
+                            </p>
+                            <button class="BotonPrincipal" onclick="window.InstanciaPanel.CambiarPestana('canciones')">
+                                <i class="fa-solid fa-plus"></i> Cargar Canción
+                            </button>
+                        </div>
+
+                        <div class="CardContenedorFormulario" style="padding: 22px;">
+                            <h3 style="font-family: var(--FuenteTitulos); font-size: 15px; margin-bottom: 8px; color: var(--ColorInfo); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-file-audio"></i> Partituras Digitales
+                            </h3>
+                            <p style="font-size: 13px; color: var(--ColorTextoSecundario); line-height: 1.45; margin-bottom: 14px;">
+                                Archivo y preservación de manuscritos, partituras y arreglos digitalizados del acervo IFAEL.
+                            </p>
+                            <button class="BotonSecundario" onclick="window.InstanciaPanel.CambiarPestana('partituras')">
+                                <i class="fa-solid fa-file-arrow-up"></i> Subir Partitura
+                            </button>
+                        </div>
+
+                        <div class="CardContenedorFormulario" style="padding: 22px;">
+                            <h3 style="font-family: var(--FuenteTitulos); font-size: 15px; margin-bottom: 8px; color: var(--ColorMorado); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-guitar"></i> Géneros Musicales
+                            </h3>
+                            <p style="font-size: 13px; color: var(--ColorTextoSecundario); line-height: 1.45; margin-bottom: 14px;">
+                                Documenta ritmos tradicionales del Beni (compás, características, historia e instrumentación).
+                            </p>
+                            <button class="BotonSecundario" onclick="window.InstanciaPanel.CambiarPestana('generos')">
+                                <i class="fa-solid fa-plus"></i> Registrar Género
+                            </button>
+                        </div>
+
+                        <div class="CardContenedorFormulario" style="padding: 22px;">
+                            <h3 style="font-family: var(--FuenteTitulos); font-size: 15px; margin-bottom: 8px; color: var(--ColorDoradoHover); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-users"></i> Artistas y Compositores
+                            </h3>
+                            <p style="font-size: 13px; color: var(--ColorTextoSecundario); line-height: 1.45; margin-bottom: 14px;">
+                                Semblanzas, biografías, retratos y catálogo de obras de compositores e intérpretes benianos.
+                            </p>
+                            <button class="BotonSecundario" onclick="window.InstanciaPanel.CambiarPestana('artistas')">
+                                <i class="fa-solid fa-user-pen"></i> Registrar Artista
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de Contenido Reciente -->
+                    <div class="CardContenedorFormulario" style="margin-top: 12px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-clock-rotate-left"></i> Resumen de Obras Registradas
+                                </div>
+                                <div class="HeaderFormularioDesc">Últimas composiciones y partituras en el sistema</div>
+                            </div>
+                        </div>
+                        <div id="ContenedorResumenInicio" class="TablaResponsiveWrapper">
+                            <!-- Poblado dinámicamente con JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     2. SECCIÓN: CANCIONERO Y LETRAS
+                     ----------------------------------------------------- -->
+                <section id="Seccion_canciones" class="SeccionPanelDashboard" style="display: none;">
+                    <div class="CardContenedorFormulario">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo" id="TituloFormularioCancion">
+                                    <i class="fa-solid fa-scroll"></i> Cargar Canción y Letra
+                                </div>
+                                <div class="HeaderFormularioDesc">Registra obras musicales con su letra formateada, acordes y pista de audio</div>
+                            </div>
+                            <button type="button" id="BtnCancelarEdicionCancion" class="BotonSecundario" style="display: none;" onclick="window.InstanciaPanel.LimpiarFormularioCancion()">
+                                <i class="fa-solid fa-xmark"></i> Cancelar Edición
+                            </button>
+                        </div>
+
+                        <form id="FormularioCancion" class="CuerpoFormulario">
+                            <input type="hidden" id="FormCancionIdEdicion" value="">
+
+                            <!-- Fila 1: Título y Autor -->
+                            <div class="GridCampos2">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormCancionTitulo">Título de la Canción *</label>
+                                    <input type="text" id="FormCancionTitulo" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Viva Trinidad, El Harapahuana" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormCancionAutor">Autor / Compositor *</label>
+                                    <input type="text" id="FormCancionAutor" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Roger Becerra Casanovas" required>
+                                </div>
+                            </div>
+
+                            <!-- Fila 2: Género, Tono y Tempo -->
+                            <div class="GridCampos3">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormCancionGenero">Ritmo o Género Musical *</label>
+                                    <select id="FormCancionGenero" class="SelectFormulario">
+                                        <!-- Opciones pobladas dinámicamente -->
+                                    </select>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormCancionTono">Tono Original</label>
+                                    <input type="text" id="FormCancionTono" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Sol Mayor (G), Do Mayor (C)">
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormCancionTempo">Tempo (BPM)</label>
+                                    <input type="number" id="FormCancionTempo" class="InputFormulario InputFormularioSinIcono" value="108" min="40" max="220">
+                                </div>
+                            </div>
+
+                            <!-- Fila 3: Archivo de Audio MP3 -->
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario">
+                                    <span><i class="fa-solid fa-volume-high" style="color: var(--ColorPrimario);"></i> Pista de Audio (MP3)</span>
+                                </label>
+                                <div class="DropzoneCarga" onclick="document.getElementById('FormCancionAudioArchivo').click()">
+                                    <i class="fa-solid fa-file-audio DropzoneIcono"></i>
+                                    <div class="DropzoneTextoPrincipal">Seleccionar archivo MP3 / Audio</div>
+                                    <div class="DropzoneTextoSecundario">Subida a Cloudinary (lmp_audios)</div>
+                                    <input type="file" id="FormCancionAudioArchivo" accept="audio/*" style="display: none;">
+                                </div>
+                                <input type="text" id="FormCancionAudioUrl" class="InputFormulario InputFormularioSinIcono" placeholder="O pega una URL directa de audio" style="margin-top: 6px;">
+                                <audio id="AudioPreviewElemento" controls style="width: 100%; margin-top: 8px; display: none;"></audio>
+                            </div>
+
+                            <!-- Fila 4: Editor de Letra con Acordes y Toolbar -->
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormCancionLetra">
+                                    <span>Letra con Acordes Musicales *</span>
+                                    <span style="font-weight: 500; font-size: 12px; color: var(--ColorTextoSecundario);">Haz clic en un acorde para insertarlo en el cursor</span>
+                                </label>
+
+                                <div class="ToolbarAcordes">
+                                    <span style="font-size: 11.5px; font-weight: 700; color: var(--ColorTextoSecundario); margin-right: 4px;">Insertar:</span>
+                                    <button type="button" class="BtnAcordePill" data-acorde="C">[C]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="D">[D]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="E">[E]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="F">[F]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="G">[G]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="A">[A]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="B">[B]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="Am">[Am]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="Dm">[Dm]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="Em">[Em]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="G7">[G7]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="D7">[D7]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="A7">[A7]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="E7">[E7]</button>
+                                    <button type="button" class="BtnAcordePill" data-acorde="B7">[B7]</button>
+                                </div>
+
+                                <textarea id="FormCancionLetra" class="TextareaFormulario TextareaMono" rows="8" placeholder="[C] Canta victorioso pueblo de leyenda&#10;[G7] tu himno de trabajo, libertad y [C] unión..." required></textarea>
+                            </div>
+
+                            <!-- Fila 5: Descripción y Opciones -->
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormCancionDescripcion">Reseña o Memoria Histórica de la Obra</label>
+                                <textarea id="FormCancionDescripcion" class="TextareaFormulario" rows="3" placeholder="Contexto histórico, anécdotas o significado de la obra en el Beni..."></textarea>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 12px; padding: 14px; background: #f8fafc; border-radius: var(--RadioPequeno); border: 1px solid var(--ColorBorde);">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="FormCancionEsEstudiante" style="width: 18px; height: 18px; accent-color: var(--ColorPrimario); cursor: pointer;">
+                                    <label for="FormCancionEsEstudiante" style="font-size: 13.5px; font-weight: 600; cursor: pointer;">
+                                        ¿Obra creada o rescatada por estudiante / docente IFAEL?
+                                    </label>
+                                </div>
+                                <input type="hidden" id="FormCancionCaratulaUrl" value="Logo1.png">
+                                <input type="hidden" id="FormCancionPartituraUrl" value="">
+                            </div>
+
+                            <!-- Barra de progreso para Cloudinary -->
+                            <div id="BarraProgresoCancion" class="BarraProgresoSubida">
+                                <div id="BarraProgresoCancionInner" class="BarraProgresoSubidaInner"></div>
+                            </div>
+
+                            <button type="submit" id="BtnGuardarCancion" class="BotonPrincipal" style="padding: 14px 24px; font-size: 15px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Canción
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Canciones Registradas -->
+                    <div class="CardContenedorFormulario" style="margin-top: 24px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-list-ul"></i> Canciones Registradas en el Cancionero
+                                </div>
+                                <div class="HeaderFormularioDesc">Catálogo general de composiciones guardadas</div>
+                            </div>
+                        </div>
+
+                        <div class="BarraBusquedaSeccionAdmin">
+                            <div class="WrapperInputIcono" style="flex: 1; min-width: 240px;">
+                                <i class="fa-solid fa-magnifying-glass IconoInput"></i>
+                                <input type="text" id="InputBusquedaCanciones" class="InputFormulario" placeholder="Buscar por título, autor o ritmo...">
+                            </div>
+                        </div>
+
+                        <div id="ContenedorTablaCanciones" class="TablaResponsiveWrapper">
+                            <!-- Tabla generada dinámicamente -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     3. SECCIÓN: PARTITURAS DIGITALES
+                     ----------------------------------------------------- -->
+                <section id="Seccion_partituras" class="SeccionPanelDashboard" style="display: none;">
+                    <div class="CardContenedorFormulario">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo" id="TituloFormularioPartitura">
+                                    <i class="fa-solid fa-file-audio"></i> Cargar Partitura Digital
+                                </div>
+                                <div class="HeaderFormularioDesc">Sube y cataloga partituras, manuscritos y arreglos digitalizados del IFAEL</div>
+                            </div>
+                            <button type="button" id="BtnCancelarEdicionPartitura" class="BotonSecundario" style="display: none;" onclick="window.InstanciaPanel.LimpiarFormularioPartitura()">
+                                <i class="fa-solid fa-xmark"></i> Cancelar Edición
+                            </button>
+                        </div>
+
+                        <form id="FormularioPartitura" class="CuerpoFormulario">
+                            <input type="hidden" id="FormPartituraIdEdicion" value="">
+
+                            <!-- Fila 1: Título y Autor -->
+                            <div class="GridCampos2">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormPartituraTitulo">Título de la Partitura / Obra *</label>
+                                    <input type="text" id="FormPartituraTitulo" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Himno al Beni, Barata de Pasión" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormPartituraAutor">Autor / Compositor *</label>
+                                    <input type="text" id="FormPartituraAutor" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Alfredo Pereyra / Rafael Seghers" required>
+                                </div>
+                            </div>
+
+                            <!-- Fila 2: Género, Tono y Formato -->
+                            <div class="GridCampos3">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormPartituraGenero">Ritmo o Género *</label>
+                                    <select id="FormPartituraGenero" class="SelectFormulario">
+                                        <!-- Opciones pobladas dinámicamente -->
+                                    </select>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormPartituraTono">Tonalidad / Escala</label>
+                                    <input type="text" id="FormPartituraTono" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Mi Bemol Mayor (Eb), Do Mayor">
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormPartituraFormato">Instrumentación / Formato</label>
+                                    <input type="text" id="FormPartituraFormato" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Piano y Voz, Coral, Banda, Guitarra">
+                                </div>
+                            </div>
+
+                            <!-- Fila 3: Archivo de Partitura y Vinculación -->
+                            <div class="GridCampos2">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario">
+                                        <span><i class="fa-solid fa-file-image" style="color: var(--ColorPrimario);"></i> Imagen de la Partitura (JPG, PNG) *</span>
+                                    </label>
+                                    <div class="DropzoneCarga" onclick="document.getElementById('FormPartituraArchivo').click()">
+                                        <i class="fa-solid fa-cloud-arrow-up DropzoneIcono"></i>
+                                        <div class="DropzoneTextoPrincipal">Seleccionar imagen de la Partitura</div>
+                                        <div class="DropzoneTextoSecundario">Subida directa a Cloudinary (lmp_partituras)</div>
+                                        <input type="file" id="FormPartituraArchivo" accept="image/*" style="display: none;">
+                                    </div>
+                                    <input type="text" id="FormPartituraUrl" class="InputFormulario InputFormularioSinIcono" placeholder="O pega la URL de la partitura" style="margin-top: 6px;">
+                                    <img id="PartituraPreviewElemento2" class="ThumbnailPartituraPreview" style="display: none; margin-top: 8px; max-height: 140px; object-fit: contain; border-radius: 6px; border: 1px solid var(--ColorBorde);" alt="Vista previa">
+                                </div>
+
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormPartituraIdCancion">
+                                        <span>¿Vincular a una canción del Cancionero?</span>
+                                        <span style="font-weight: 500; font-size: 11.5px; color: var(--ColorTextoSecundario);">(Opcional)</span>
+                                    </label>
+                                    <select id="FormPartituraIdCancion" class="SelectFormulario">
+                                        <option value="">-- Ninguna (Partitura Documental Independiente) --</option>
+                                        <!-- Opciones pobladas dinámicamente -->
+                                    </select>
+
+                                    <div style="margin-top: 12px;">
+                                        <label class="LabelFormulario" for="FormPartituraNotas">Notas sobre el Manuscrito o Partitura</label>
+                                        <textarea id="FormPartituraNotas" class="TextareaFormulario" rows="3" placeholder="Ej: Manuscrito original conservado en el archivo histórico de IFAEL. Arreglo para piano de 1985."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Barra de progreso para Cloudinary -->
+                            <div id="BarraProgresoPartitura" class="BarraProgresoSubida">
+                                <div id="BarraProgresoPartituraInner" class="BarraProgresoSubidaInner"></div>
+                            </div>
+
+                            <button type="submit" id="BtnGuardarPartitura" class="BotonPrincipal" style="padding: 14px 24px; font-size: 15px;">
+                                <i class="fa-solid fa-file-arrow-up"></i> Guardar Partitura Digital
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Archivo de Partituras Registradas -->
+                    <div class="CardContenedorFormulario" style="margin-top: 24px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-boxes-stacked"></i> Archivo de Partituras Digitalizadas
+                                </div>
+                                <div class="HeaderFormularioDesc">Manuscritos y partituras en el archivo de consulta</div>
+                            </div>
+                        </div>
+
+                        <div class="BarraBusquedaSeccionAdmin">
+                            <div class="WrapperInputIcono" style="flex: 1; min-width: 240px;">
+                                <i class="fa-solid fa-magnifying-glass IconoInput"></i>
+                                <input type="text" id="InputBusquedaPartituras" class="InputFormulario" placeholder="Buscar partitura por título, autor o ritmo...">
+                            </div>
+                        </div>
+
+                        <div id="ContenedorGridPartituras" class="RejillaCardsAdmin">
+                            <!-- Rejilla generada con JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     4. SECCIÓN: GÉNEROS MUSICALES
+                     ----------------------------------------------------- -->
+                <section id="Seccion_generos" class="SeccionPanelDashboard" style="display: none;">
+                    <div class="CardContenedorFormulario">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo" id="TituloFormularioGenero">
+                                    <i class="fa-solid fa-guitar"></i> Registrar Nuevo Ritmo o Género
+                                </div>
+                                <div class="HeaderFormularioDesc">Registra y cataloga ritmos autóctonos del Beni</div>
+                            </div>
+                            <button type="button" id="BtnCancelarEdicionGenero" class="BotonSecundario" style="display: none;" onclick="window.InstanciaPanel.LimpiarFormularioGenero()">
+                                <i class="fa-solid fa-xmark"></i> Cancelar Edición
+                            </button>
+                        </div>
+
+                        <form id="FormularioGenero" class="CuerpoFormulario">
+                            <input type="hidden" id="FormGeneroIdEdicion" value="">
+
+                            <div class="GridCampos2">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormGeneroNombre">Nombre del Género *</label>
+                                    <input type="text" id="FormGeneroNombre" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Polca Beniana, Chovena, Sarao" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormGeneroCompas">Compás Musical *</label>
+                                    <input type="text" id="FormGeneroCompas" class="InputFormulario InputFormularioSinIcono" placeholder="2/4 o 4/4 Sincopado" required>
+                                </div>
+                            </div>
+
+                            <div class="GridCampos3">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormGeneroOrigen">Lugar de Origen</label>
+                                    <input type="text" id="FormGeneroOrigen" class="InputFormulario InputFormularioSinIcono" placeholder="Trinidad, San Ignacio de Moxos">
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormGeneroColor">Color Distintivo (Hex)</label>
+                                    <input type="color" id="FormGeneroColor" value="#1b6b3e" style="height: 42px; width: 100%; border-radius: var(--RadioPequeno); border: 1.5px solid var(--ColorBorde); cursor: pointer;">
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormGeneroIcono">Ícono FontAwesome</label>
+                                    <input type="text" id="FormGeneroIcono" class="InputFormulario InputFormularioSinIcono" value="fa-solid fa-guitar">
+                                </div>
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormGeneroDescripcion">Descripción / Carácter del Ritmo</label>
+                                <textarea id="FormGeneroDescripcion" class="TextareaFormulario" rows="3" placeholder="Origen histórico, instrumentos tradicionales y forma de baile..."></textarea>
+                            </div>
+
+                            <button type="submit" id="BtnGuardarGenero" class="BotonPrincipal">
+                                <i class="fa-solid fa-plus"></i> Guardar Género
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Catálogo de Géneros Registrados -->
+                    <div class="CardContenedorFormulario" style="margin-top: 24px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-shapes"></i> Ritmos y Géneros Catalogados
+                                </div>
+                                <div class="HeaderFormularioDesc">Géneros autóctonos disponibles para clasificar obras</div>
+                            </div>
+                        </div>
+
+                        <div id="ContenedorGridGeneros" class="RejillaCardsAdmin">
+                            <!-- Generado con JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     5. SECCIÓN: ARTISTAS Y COMPOSITORES
+                     ----------------------------------------------------- -->
+                <section id="Seccion_artistas" class="SeccionPanelDashboard" style="display: none;">
+                    <div class="CardContenedorFormulario">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo" id="TituloFormularioArtista">
+                                    <i class="fa-solid fa-users"></i> Registrar Artista o Compositor
+                                </div>
+                                <div class="HeaderFormularioDesc">Registra la semblanza biográfica, legado y obras del artista</div>
+                            </div>
+                            <button type="button" id="BtnCancelarEdicionArtista" class="BotonSecundario" style="display: none;" onclick="window.InstanciaPanel.LimpiarFormularioArtista()">
+                                <i class="fa-solid fa-xmark"></i> Cancelar Edición
+                            </button>
+                        </div>
+
+                        <form id="FormularioArtista" class="CuerpoFormulario">
+                            <input type="hidden" id="FormArtistaIdEdicion" value="">
+
+                            <div class="GridCampos2">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormArtistaNombreCompleto">Nombre Completo *</label>
+                                    <input type="text" id="FormArtistaNombreCompleto" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Reynaldo Revollo Hurtado" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormArtistaNombreArtistico">Nombre Artístico / Popular</label>
+                                    <input type="text" id="FormArtistaNombreArtistico" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Chiqui Revollo">
+                                </div>
+                            </div>
+
+                            <div class="GridCampos3">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormArtistaRolTitulo">Título / Rol Profesional</label>
+                                    <input type="text" id="FormArtistaRolTitulo" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Músico, Compositor & Educador">
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormArtistaEspecialidad">Especialidad</label>
+                                    <input type="text" id="FormArtistaEspecialidad" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Bajista, Guitarrista, Director Coral">
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormArtistaTrayectoriaAnos">Años de Trayectoria</label>
+                                    <input type="number" id="FormArtistaTrayectoriaAnos" class="InputFormulario InputFormularioSinIcono" value="25" min="1" max="80">
+                                </div>
+                            </div>
+
+                            <!-- Foto de Perfil del Artista -->
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario">Foto de Retrato del Artista</label>
+                                <div class="DropzoneCarga" onclick="document.getElementById('FormArtistaFotoArchivo').click()">
+                                    <i class="fa-solid fa-camera DropzoneIcono"></i>
+                                    <div class="DropzoneTextoPrincipal">Subir foto de retrato</div>
+                                    <div class="DropzoneTextoSecundario">Se subirá a Cloudinary (lmp_artistas)</div>
+                                    <input type="file" id="FormArtistaFotoArchivo" accept="image/*" style="display: none;">
+                                </div>
+                                <input type="text" id="FormArtistaFotoUrl" class="InputFormulario InputFormularioSinIcono" placeholder="O pega la URL de la imagen" style="margin-top: 6px;">
+                                <img id="FotoArtistaPreviewElemento" class="ThumbnailPartituraPreview" style="display: none; border-radius: 50%; width: 70px; height: 70px; margin-top: 8px;" alt="Vista previa">
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormArtistaBiografia">Semblanza Biográfica General *</label>
+                                <textarea id="FormArtistaBiografia" class="TextareaFormulario" rows="4" placeholder="Reseña completa de la vida y trayectoria del artista..." required></textarea>
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormArtistaObras">Obras y Composiciones Más Destacadas (una por renglón)</label>
+                                <textarea id="FormArtistaObras" class="TextareaFormulario" rows="3" placeholder="Utopía&#10;El Harapahuana / Yorebabasté&#10;Pa' la Trinidad"></textarea>
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormArtistaCita">Cita o Pensamiento Célebre</label>
+                                <input type="text" id="FormArtistaCita" class="InputFormulario InputFormularioSinIcono" placeholder="Frase destacada del compositor sobre la música beniana...">
+                            </div>
+
+                            <button type="submit" id="BtnGuardarArtista" class="BotonPrincipal" style="padding: 14px 24px;">
+                                <i class="fa-solid fa-user-plus"></i> Guardar Artista
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Directorio de Artistas Registrados -->
+                    <div class="CardContenedorFormulario" style="margin-top: 24px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-address-book"></i> Directorio de Artistas y Compositores
+                                </div>
+                                <div class="HeaderFormularioDesc">Artistas registrados en la memoria cultural beniana</div>
+                            </div>
+                        </div>
+
+                        <div class="BarraBusquedaSeccionAdmin">
+                            <div class="WrapperInputIcono" style="flex: 1; min-width: 240px;">
+                                <i class="fa-solid fa-magnifying-glass IconoInput"></i>
+                                <input type="text" id="InputBusquedaArtistas" class="InputFormulario" placeholder="Buscar artista por nombre o especialidad...">
+                            </div>
+                        </div>
+
+                        <div id="ContenedorGridArtistas" class="RejillaCardsAdmin">
+                            <!-- Generado con JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     6. SECCIÓN: INSTITUTO IFAEL
+                     ----------------------------------------------------- -->
+                <section id="Seccion_ifael" class="SeccionPanelDashboard" style="display: none;">
+                    <div class="CardContenedorFormulario" style="max-width: 860px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-building-columns"></i> Información del Instituto IFAEL
+                                </div>
+                                <div class="HeaderFormularioDesc">Edita los datos institucionales, sede y fotos de IFAEL en Trinidad</div>
+                            </div>
+                        </div>
+
+                        <form id="FormularioIFAEL" class="CuerpoFormulario">
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormIFAELNombre">Nombre Oficial de la Institución *</label>
+                                <input type="text" id="FormIFAELNombre" class="InputFormulario InputFormularioSinIcono" required>
+                            </div>
+
+                            <div class="GridCampos2">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormIFAELCiudad">Ciudad y Ubicación *</label>
+                                    <input type="text" id="FormIFAELCiudad" class="InputFormulario InputFormularioSinIcono" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormIFAELTelefono">Teléfono de Contacto</label>
+                                    <input type="text" id="FormIFAELTelefono" class="InputFormulario InputFormularioSinIcono">
+                                </div>
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormIFAELDireccion">Dirección Física</label>
+                                <input type="text" id="FormIFAELDireccion" class="InputFormulario InputFormularioSinIcono">
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormIFAELDescripcion">Descripción y Misión Institucional *</label>
+                                <textarea id="FormIFAELDescripcion" class="TextareaFormulario" rows="5" required></textarea>
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario">Fotografía de Portada / Fachada</label>
+                                <div class="DropzoneCarga" onclick="document.getElementById('FormIFAELArchivo').click()">
+                                    <i class="fa-solid fa-camera DropzoneIcono"></i>
+                                    <div class="DropzoneTextoPrincipal">Seleccionar imagen para la portada</div>
+                                    <div class="DropzoneTextoSecundario">Subida a Cloudinary</div>
+                                    <input type="file" id="FormIFAELArchivo" accept="image/*" style="display: none;">
+                                </div>
+                                <input type="text" id="FormIFAELPortadaUrl" class="InputFormulario InputFormularioSinIcono" style="margin-top: 6px;" placeholder="URL de la imagen de portada">
+                                <img id="IFAELPreviewElemento" style="max-height: 180px; width: 100%; object-fit: cover; border-radius: 8px; margin-top: 8px; display: none; border: 1px solid var(--ColorBorde);">
+                            </div>
+
+                            <button type="submit" id="BtnGuardarIFAEL" class="BotonPrincipal" style="padding: 14px 24px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios de IFAEL
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     7. SECCIÓN: ACERCA DE NOSOTROS
+                     ----------------------------------------------------- -->
+                <section id="Seccion_acerca-de" class="SeccionPanelDashboard" style="display: none;">
+                    <div class="CardContenedorFormulario" style="max-width: 860px;">
+                        <div class="HeaderFormulario">
+                            <div>
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-circle-info"></i> Acerca de Nosotros (Proyecto y Autores)
+                                </div>
+                                <div class="HeaderFormularioDesc">Edita el texto del proyecto de grado y las semblanzas del equipo</div>
+                            </div>
+                        </div>
+
+                        <form id="FormularioAcercaDe" class="CuerpoFormulario">
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormAcercaTitulo">Título de la Página *</label>
+                                <input type="text" id="FormAcercaTitulo" class="InputFormulario InputFormularioSinIcono" required>
+                            </div>
+
+                            <div class="GrupoInput">
+                                <label class="LabelFormulario" for="FormAcercaDescripcionPagina">Manifiesto y Descripción del Proyecto LMP *</label>
+                                <textarea id="FormAcercaDescripcionPagina" class="TextareaFormulario" rows="7" required></textarea>
+                            </div>
+
+                            <!-- 1. Edna -->
+                            <div style="border-top: 1px solid var(--ColorBorde); padding-top: 18px; margin-top: 12px;">
+                                <h4 style="font-family: var(--FuenteTitulos); font-size: 15px; margin-bottom: 12px; color: var(--ColorPrimario); display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-user-graduate"></i> Integrante 1: Edna Miriam Edgley Cuellar
+                                </h4>
+
+                                <div class="GridCampos2">
+                                    <div class="GrupoInput">
+                                        <label class="LabelFormulario" for="FormAcercaNombreEdna">Nombre Completo *</label>
+                                        <input type="text" id="FormAcercaNombreEdna" class="InputFormulario InputFormularioSinIcono" value="Edna Miriam Edgley Cuellar" required>
+                                    </div>
+                                    <div class="GrupoInput">
+                                        <label class="LabelFormulario" for="FormAcercaFotoEdna">Foto de Edna (Cloudinary / URL)</label>
+                                        <div class="DropzoneCarga" onclick="document.getElementById('FormAcercaArchivoEdna').click()" style="padding: 12px;">
+                                            <i class="fa-solid fa-camera DropzoneIcono" style="font-size: 20px;"></i>
+                                            <div class="DropzoneTextoPrincipal" style="font-size: 13px;">Subir foto de Edna</div>
+                                            <input type="file" id="FormAcercaArchivoEdna" accept="image/*" style="display: none;">
+                                        </div>
+                                        <input type="text" id="FormAcercaFotoEdna" class="InputFormulario InputFormularioSinIcono" style="margin-top: 6px;" placeholder="URL de la fotografía">
+                                        <img id="AcercaFotoEdnaPreview" style="max-height: 80px; width: 80px; object-fit: cover; border-radius: 50%; margin-top: 6px; display: none; border: 2px solid var(--ColorDorado);">
+                                    </div>
+                                </div>
+
+                                <div class="GrupoInput" style="margin-top: 10px;">
+                                    <label class="LabelFormulario" for="FormAcercaDescripcionEdna">Semblanza / Descripción de Edna *</label>
+                                    <textarea id="FormAcercaDescripcionEdna" class="TextareaFormulario" rows="4" required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 2. Lucy -->
+                            <div style="border-top: 1px solid var(--ColorBorde); padding-top: 18px; margin-top: 16px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                                    <h4 style="font-family: var(--FuenteTitulos); font-size: 15px; margin: 0; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
+                                        <i class="fa-solid fa-user-plus"></i> Integrante 2: Lucy
+                                    </h4>
+                                    <span style="font-size: 12px; color: var(--ColorTextoSecundario); font-style: italic;">Si se deja vacío no se mostrará en la web pública</span>
+                                </div>
+
+                                <div class="GridCampos2">
+                                    <div class="GrupoInput">
+                                        <label class="LabelFormulario" for="FormAcercaNombreLuci">Nombre Completo de Lucy</label>
+                                        <input type="text" id="FormAcercaNombreLuci" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Lucy... (o dejar vacío)">
+                                    </div>
+                                    <div class="GrupoInput">
+                                        <label class="LabelFormulario" for="FormAcercaFotoLuci">Foto de Lucy (Cloudinary / URL)</label>
+                                        <div class="DropzoneCarga" onclick="document.getElementById('FormAcercaArchivoLuci').click()" style="padding: 12px;">
+                                            <i class="fa-solid fa-camera DropzoneIcono" style="font-size: 20px;"></i>
+                                            <div class="DropzoneTextoPrincipal" style="font-size: 13px;">Subir foto de Lucy</div>
+                                            <input type="file" id="FormAcercaArchivoLuci" accept="image/*" style="display: none;">
+                                        </div>
+                                        <input type="text" id="FormAcercaFotoLuci" class="InputFormulario InputFormularioSinIcono" style="margin-top: 6px;" placeholder="URL de la fotografía (o dejar vacío)">
+                                        <img id="AcercaFotoLuciPreview" style="max-height: 80px; width: 80px; object-fit: cover; border-radius: 50%; margin-top: 6px; display: none; border: 2px solid var(--ColorDorado);">
+                                    </div>
+                                </div>
+
+                                <div class="GrupoInput" style="margin-top: 10px;">
+                                    <label class="LabelFormulario" for="FormAcercaDescripcionLuci">Semblanza / Descripción de Lucy</label>
+                                    <textarea id="FormAcercaDescripcionLuci" class="TextareaFormulario" rows="4" placeholder="Semblanza o biografía de Lucy... (o dejar vacío)"></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="BtnGuardarAcercaDe" class="BotonPrincipal" style="padding: 14px 24px; margin-top: 16px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios de Acerca de Nosotros
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- -----------------------------------------------------
+                     8. SECCIÓN: CUENTAS Y ACCESOS
+                     ----------------------------------------------------- -->
+                <section id="Seccion_usuarios" class="SeccionPanelDashboard" style="display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                        <!-- Formulario Crear Usuario -->
+                        <div class="CardContenedorFormulario">
+                            <div class="HeaderFormulario">
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-user-plus"></i> Registrar Usuario o Administrador
+                                </div>
+                                <div class="HeaderFormularioDesc">Crea una nueva cuenta de acceso administrativo</div>
+                            </div>
+
+                            <form id="FormularioUsuario" class="CuerpoFormulario">
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormUsuarioNombre">Nombre Completo *</label>
+                                    <input type="text" id="FormUsuarioNombre" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Edna Miriam Edgley" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormUsuarioEmail">Correo Electrónico *</label>
+                                    <input type="email" id="FormUsuarioEmail" class="InputFormulario InputFormularioSinIcono" placeholder="usuario@gmail.com" required>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormUsuarioPassword">Contraseña *</label>
+                                    <div class="WrapperInputIcono">
+                                        <i class="fa-solid fa-lock IconoInput"></i>
+                                        <input type="password" id="FormUsuarioPassword" class="InputFormulario" placeholder="••••••••" required>
+                                        <button type="button" class="BotonTogglePassword" title="Mostrar/ocultar contraseña" onclick="AlternarPassword('FormUsuarioPassword', 'IconoToggleUsuarioPassword')">
+                                            <i class="fa-solid fa-eye" id="IconoToggleUsuarioPassword"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="GrupoInput">
+                                    <label class="LabelFormulario" for="FormUsuarioRol">Rol de Cuenta</label>
+                                    <select id="FormUsuarioRol" class="SelectFormulario">
+                                        <option value="Admin">Admin (Control Total)</option>
+                                        <option value="User">User (Colaborador)</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" id="BtnGuardarUsuario" class="BotonPrincipal">
+                                    <i class="fa-solid fa-user-plus"></i> Guardar Usuario
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Lista de Usuarios Existentes -->
+                        <div class="CardContenedorFormulario">
+                            <div class="HeaderFormulario">
+                                <div class="HeaderFormularioTitulo">
+                                    <i class="fa-solid fa-users"></i> Cuentas de Acceso Registradas
+                                </div>
+                                <div class="HeaderFormularioDesc">Usuarios con credenciales autorizadas</div>
+                            </div>
+                            <div id="ListaUsuariosTabla">
+                                <!-- Generado con JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Visualizar Partitura en Tamaño Completo -->
+    <div id="ModalVisorPartitura" class="ModalOverlay" style="display: none;" onclick="if(event.target === this) this.style.display='none'">
+        <div class="ModalContenedorPartitura">
+            <div class="ModalHeaderPartitura">
+                <h3 id="ModalPartituraTitulo" style="font-family: var(--FuenteTitulos); font-size: 16px; margin: 0; color: var(--ColorTextoPrincipal);">Partitura</h3>
+                <button type="button" class="BotonCerrarModal" onclick="document.getElementById('ModalVisorPartitura').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ColorTextoSecundario); padding: 4px 8px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="ModalBodyPartitura">
+                <img id="ModalPartituraImagen" src="" alt="Partitura" class="ImagenPartituraZoom">
+            </div>
+            <div class="ModalFooterPartitura">
+                <a id="ModalPartituraDescarga" href="#" target="_blank" download class="BotonPrincipal" style="text-decoration: none;">
+                    <i class="fa-solid fa-download"></i> Descargar Imagen
+                </a>
+                <button type="button" class="BotonSecundario" onclick="document.getElementById('ModalVisorPartitura').style.display='none'">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor para Notificaciones Toast Flotantes -->
+    <div id="ContenedorToast" class="ContenedorToastGlobal"></div>
+
+    <!-- =============================================================
+         3. SCRIPTS Y DEPENDENCIAS
+         ============================================================= -->
+    <!-- Firebase SDK (versión compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <!-- Capas Reutilizadas de la Aplicación -->
+    <script src="../js/Capas/CapaDatos/ServicioFirebase.js"></script>
+    <script src="../js/Capas/CapaServicios/ServicioCloudinary.js"></script>
+
+    <!-- Controlador Lógico del Panel -->
+    <script src="panel.js"></script>
+
+</body>
+</html>
