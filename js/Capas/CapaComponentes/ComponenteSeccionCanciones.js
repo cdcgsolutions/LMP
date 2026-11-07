@@ -111,10 +111,17 @@ class ComponenteSeccionCanciones {
                     </div>
 
                     <div class="FilaAccionesTarjetaCancion" style="display: flex; gap: 8px; margin-top: 16px; align-items: center; width: 100%;">
+                        ${(Cancion.AudioUrl && /(?:youtu\.be\/|youtube(?:-nocookie)?\.com)/i.test(Cancion.AudioUrl)) ? `
+                        <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12.5px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; background-color: #dc2626; border-color: #dc2626;" title="Ver video / escuchar en YouTube">
+                            <i class="fa-brands fa-youtube"></i>
+                            <span>YouTube</span>
+                        </button>
+                        ` : `
                         <button class="BotonAccionPrimario BotonReproducirTarjeta BotonReproducirCancionEnLista" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12.5px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Reproducir audio">
                             <i class="fa-solid fa-play"></i>
                             <span>Escuchar</span>
                         </button>
+                        `}
                         <button class="BotonAccionSecundario BotonAbrirModalLetra" data-cancion-id="${Cancion.IdCancion}" style="flex: 1; font-size: 12.5px; padding: 7px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;" title="Ver letra y acordes">
                             <i class="fa-solid fa-scroll"></i>
                             <span>Letra</span>

@@ -18,7 +18,7 @@ class ComponenteBarraLateralIzquierda {
         <aside class="ColumnaLateralIzquierda" id="ColumnaLateralIzquierda">
             <!-- 1. Cabecera del Menú Lateral (Branding Institucional) -->
             <div class="CabeceraMarcaMenuLateral" id="BotonLogotipoInicioLateral" title="Volver al Inicio">
-                <img src="LogoInicialesSinFondoNegro.png" alt="LMP Logo" class="LogoMarcaSidebar" onerror="this.src='Logo1.png'">
+                <img src="Logo1.png" alt="LMP Logo" class="LogoMarcaSidebar" onerror="this.src='Logo1.png'">
                 <div class="TextosMarcaSidebar">
                     <span class="NombreProyectoSidebar">Letras de Mi Poblao</span>
                     <span class="InstitucionSidebar">IFAEL • Trinidad, Beni</span>

@@ -511,7 +511,15 @@ class PanelGestionLMP {
                             <td data-label="Autor">${C.Autor || 'Compositor Tradicional'}</td>
                             <td data-label="Ritmo"><span class="BadgeItem BadgeVerde">${C.Genero || 'Folclore'}</span></td>
                             <td data-label="Tono">${C.TonoOriginal || '-'}</td>
-                            <td data-label="Audio">${C.AudioUrl ? '<i class="fa-solid fa-volume-high" style="color: var(--ColorPrimario);"></i> Disponible' : '<span style="color: #94a3b8;">Sin audio</span>'}</td>
+                            <td data-label="Audio">${(() => {
+                                const IdYT = this.ExtraerIdYouTube(C.AudioUrl);
+                                if (IdYT) {
+                                    return `<button type="button" class="BotonAccionItem" style="background: #fef2f2; color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2);" onclick="window.InstanciaPanel.AbrirVisorYouTube('${IdYT}', '${this.EscaparComillas(C.Titulo)}')"><i class="fa-brands fa-youtube" style="color: #ef4444;"></i> YouTube</button>`;
+                                } else if (C.AudioUrl) {
+                                    return `<button type="button" class="BotonAccionItem" style="background: var(--ColorPrimarioClaro); color: var(--ColorPrimario);" onclick="const a = new Audio('${C.AudioUrl}'); a.play(); window.InstanciaPanel.MostrarToast('Reproduciendo audio...', 'Info');"><i class="fa-solid fa-play"></i> Escuchar</button>`;
+                                }
+                                return '<span style="color: #94a3b8;">Sin audio</span>';
+                            })()}</td>
                             <td class="CeldaAccionesCard" style="text-align: right;">
                                 <button type="button" class="BotonAccionItem BotonEditarItem" onclick="window.InstanciaPanel.EditarCancion('${C.IdCancion}')">
                                     <i class="fa-solid fa-pen-to-square"></i> Editar
@@ -617,6 +625,65 @@ class PanelGestionLMP {
         }
     }
 
+    ExtraerIdYouTube(url) {
+        if (!url || typeof url !== "string") return null;
+        const patron = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/;
+        const m = url.trim().match(patron);
+        return m ? m[1] : null;
+    }
+
+    ActualizarPreviewAudio() {
+        const InputUrl = document.getElementById("FormCancionAudioUrl");
+        const AudioElem = document.getElementById("AudioPreviewElemento");
+        const YouTubeWrapper = document.getElementById("YouTubePreviewWrapper");
+        const YouTubeIframe = document.getElementById("YouTubePreviewIframe");
+
+        const Valor = InputUrl ? InputUrl.value.trim() : "";
+        const IdYT = this.ExtraerIdYouTube(Valor);
+
+        if (IdYT) {
+            if (AudioElem) { AudioElem.style.display = "none"; AudioElem.src = ""; }
+            if (YouTubeWrapper && YouTubeIframe) {
+                YouTubeIframe.src = `https://www.youtube-nocookie.com/embed/${IdYT}`;
+                YouTubeWrapper.style.display = "block";
+            }
+        } else if (Valor && (Valor.startsWith("http://") || Valor.startsWith("https://") || Valor.includes("cloudinary.com"))) {
+            if (YouTubeWrapper && YouTubeIframe) {
+                YouTubeWrapper.style.display = "none";
+                YouTubeIframe.src = "";
+            }
+            if (AudioElem) {
+                AudioElem.src = Valor;
+                AudioElem.style.display = "block";
+            }
+        } else {
+            if (AudioElem) { AudioElem.style.display = "none"; AudioElem.src = ""; }
+            if (YouTubeWrapper && YouTubeIframe) {
+                YouTubeWrapper.style.display = "none";
+                YouTubeIframe.src = "";
+            }
+        }
+    }
+
+    AbrirVisorYouTube(IdYT, Titulo = "") {
+        const Modal = document.getElementById("ModalVisorYouTube");
+        const Iframe = document.getElementById("ModalYouTubeIframe");
+        const TituloElem = document.getElementById("ModalYouTubeTitulo");
+
+        if (Modal && Iframe) {
+            if (TituloElem) TituloElem.textContent = Titulo ? `Reproduciendo: ${Titulo}` : "Reproductor de YouTube";
+            Iframe.src = `https://www.youtube-nocookie.com/embed/${IdYT}?autoplay=1`;
+            Modal.style.display = "flex";
+        }
+    }
+
+    CerrarVisorYouTube() {
+        const Modal = document.getElementById("ModalVisorYouTube");
+        const Iframe = document.getElementById("ModalYouTubeIframe");
+        if (Iframe) Iframe.src = "";
+        if (Modal) Modal.style.display = "none";
+    }
+
     LimpiarFormularioCancion() {
         this.CancionEnEdicionId = null;
         document.getElementById("FormularioCancion")?.reset();
@@ -626,11 +693,14 @@ class PanelGestionLMP {
         const BtnGuardar = document.getElementById("BtnGuardarCancion");
         const BtnCancelar = document.getElementById("BtnCancelarEdicionCancion");
         const AudioPreview = document.getElementById("AudioPreviewElemento");
+        const YouTubeWrapper = document.getElementById("YouTubePreviewWrapper");
+        const YouTubeIframe = document.getElementById("YouTubePreviewIframe");
 
         if (TituloForm) TituloForm.innerHTML = '<i class="fa-solid fa-scroll"></i> Cargar Canción y Letra';
         if (BtnGuardar) BtnGuardar.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Canción';
         if (BtnCancelar) BtnCancelar.style.display = "none";
         if (AudioPreview) { AudioPreview.style.display = "none"; AudioPreview.src = ""; }
+        if (YouTubeWrapper && YouTubeIframe) { YouTubeWrapper.style.display = "none"; YouTubeIframe.src = ""; }
     }
 
     EditarCancion(IdCancion) {
@@ -651,13 +721,7 @@ class PanelGestionLMP {
         document.getElementById("FormCancionLetra").value = Cancion.LetraConAcordes || Cancion.LetraLimpia || "";
         document.getElementById("FormCancionAudioUrl").value = Cancion.AudioUrl || "";
 
-        if (Cancion.AudioUrl) {
-            const AudioPreview = document.getElementById("AudioPreviewElemento");
-            if (AudioPreview) {
-                AudioPreview.src = Cancion.AudioUrl;
-                AudioPreview.style.display = "block";
-            }
-        }
+        this.ActualizarPreviewAudio();
 
         const TituloForm = document.getElementById("TituloFormularioCancion");
         const BtnGuardar = document.getElementById("BtnGuardarCancion");
@@ -725,11 +789,23 @@ class PanelGestionLMP {
                             <td data-label="Ritmo"><span class="BadgeItem BadgeVerde">${C.Genero || 'Folclore'}</span></td>
                             <td data-label="Tono">${C.TonoOriginal || '-'}</td>
                             <td data-label="Audio">
-                                ${C.AudioUrl ? `
-                                    <button type="button" class="BotonAccionItem" style="background: var(--ColorPrimarioClaro); color: var(--ColorPrimario);" onclick="const a = new Audio('${C.AudioUrl}'); a.play(); window.InstanciaPanel.MostrarToast('Reproduciendo audio...', 'Info');">
-                                        <i class="fa-solid fa-play"></i> Escuchar
-                                    </button>
-                                ` : '<span style="color: #94a3b8; font-size: 12px;">Sin audio</span>'}
+                                ${(() => {
+                                    const IdYT = this.ExtraerIdYouTube(C.AudioUrl);
+                                    if (IdYT) {
+                                        return `
+                                            <button type="button" class="BotonAccionItem" style="background: #fef2f2; color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2);" onclick="window.InstanciaPanel.AbrirVisorYouTube('${IdYT}', '${this.EscaparComillas(C.Titulo)}')">
+                                                <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> YouTube
+                                            </button>
+                                        `;
+                                    } else if (C.AudioUrl) {
+                                        return `
+                                            <button type="button" class="BotonAccionItem" style="background: var(--ColorPrimarioClaro); color: var(--ColorPrimario);" onclick="const a = new Audio('${C.AudioUrl}'); a.play(); window.InstanciaPanel.MostrarToast('Reproduciendo audio...', 'Info');">
+                                                <i class="fa-solid fa-play"></i> Escuchar
+                                            </button>
+                                        `;
+                                    }
+                                    return '<span style="color: #94a3b8; font-size: 12px;">Sin audio</span>';
+                                })()}
                             </td>
                             <td class="CeldaAccionesCard" style="text-align: right; white-space: nowrap;">
                                 <button type="button" class="BotonAccionItem BotonEditarItem" onclick="window.InstanciaPanel.EditarCancion('${C.IdCancion}')">
@@ -1833,7 +1909,14 @@ class PanelGestionLMP {
         });
 
         // Previsualizaciones de archivos seleccionados
-        // 1. Audio preview
+        // 1. Audio URL / YouTube input
+        const InputAudioUrl = document.getElementById("FormCancionAudioUrl");
+        if (InputAudioUrl) {
+            InputAudioUrl.addEventListener("input", () => this.ActualizarPreviewAudio());
+            InputAudioUrl.addEventListener("change", () => this.ActualizarPreviewAudio());
+        }
+
+        // 1b. Audio file preview
         const InputAudio = document.getElementById("FormCancionAudioArchivo");
         const AudioElem = document.getElementById("AudioPreviewElemento");
         if (InputAudio && AudioElem) {

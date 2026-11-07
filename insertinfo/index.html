@@ -106,7 +106,7 @@
         <aside class="SidebarPanel" id="SidebarPanel">
             <div class="HeaderSidebar">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="../LogoInicialesSinFondoBlanco.png" alt="LMP" class="LogoSidebar" onerror="this.src='../Logo1.png'">
+                    <img src="../Logo1.png" alt="LMP" class="LogoSidebar" onerror="this.src='../Logo1.png'">
                     <div>
                         <div class="TituloSidebar">LMP GESTOR</div>
                         <div class="SubtituloSidebar">IFAEL Trinidad</div>
@@ -355,10 +355,11 @@
                                 </div>
                             </div>
 
-                            <!-- Fila 3: Archivo de Audio MP3 -->
+                            <!-- Fila 3: Archivo de Audio MP3 o Enlace de YouTube -->
                             <div class="GrupoInput">
                                 <label class="LabelFormulario">
-                                    <span><i class="fa-solid fa-volume-high" style="color: var(--ColorPrimario);"></i> Pista de Audio (MP3)</span>
+                                    <span><i class="fa-solid fa-volume-high" style="color: var(--ColorPrimario);"></i> Pista de Audio (MP3 o Enlace de YouTube)</span>
+                                    <span style="font-weight: 500; font-size: 11.5px; color: var(--ColorTextoSecundario);">Cloudinary MP3 o video de YouTube</span>
                                 </label>
                                 <div class="DropzoneCarga" onclick="document.getElementById('FormCancionAudioArchivo').click()">
                                     <i class="fa-solid fa-file-audio DropzoneIcono"></i>
@@ -366,8 +367,25 @@
                                     <div class="DropzoneTextoSecundario">Subida a Cloudinary (lmp_audios)</div>
                                     <input type="file" id="FormCancionAudioArchivo" accept="audio/*" style="display: none;">
                                 </div>
-                                <input type="text" id="FormCancionAudioUrl" class="InputFormulario InputFormularioSinIcono" placeholder="O pega una URL directa de audio" style="margin-top: 6px;">
+                                <div style="position: relative; margin-top: 6px;">
+                                    <i class="fa-brands fa-youtube" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ef4444; font-size: 16px; pointer-events: none;"></i>
+                                    <input type="text" id="FormCancionAudioUrl" class="InputFormulario" placeholder="Pega enlace de YouTube (youtu.be/... o youtube.com/watch?v=...) o URL directa de audio" style="padding-left: 38px;">
+                                </div>
+                                <!-- Previsualización de Audio HTML5 -->
                                 <audio id="AudioPreviewElemento" controls style="width: 100%; margin-top: 8px; display: none;"></audio>
+                                <!-- Previsualización de YouTube Embebido -->
+                                <div id="YouTubePreviewWrapper" style="display: none; margin-top: 8px; border-radius: 8px; overflow: hidden; background: #000; box-shadow: var(--SombraSuave);">
+                                    <div style="padding: 7px 12px; background: #1e293b; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: space-between;">
+                                        <span style="display: flex; align-items: center; gap: 6px;">
+                                            <i class="fa-brands fa-youtube" style="color: #ef4444; font-size: 14px;"></i>
+                                            <strong>Vista previa de YouTube detectada</strong>
+                                        </span>
+                                        <span style="color: #94a3b8; font-size: 11px;">Audio & Video enlazado</span>
+                                    </div>
+                                    <div style="position: relative; padding-bottom: 52%; height: 0; overflow: hidden;">
+                                        <iframe id="YouTubePreviewIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Fila 4: Editor de Letra con Acordes y Toolbar -->
@@ -865,21 +883,21 @@
                             <div style="border-top: 1px solid var(--ColorBorde); padding-top: 18px; margin-top: 16px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
                                     <h4 style="font-family: var(--FuenteTitulos); font-size: 15px; margin: 0; color: var(--ColorTextoPrincipal); display: flex; align-items: center; gap: 8px;">
-                                        <i class="fa-solid fa-user-plus"></i> Integrante 2: Lucy
+                                        <i class="fa-solid fa-user-plus"></i> Integrante 2: Luci
                                     </h4>
                                     <span style="font-size: 12px; color: var(--ColorTextoSecundario); font-style: italic;">Si se deja vacío no se mostrará en la web pública</span>
                                 </div>
 
                                 <div class="GridCampos2">
                                     <div class="GrupoInput">
-                                        <label class="LabelFormulario" for="FormAcercaNombreLuci">Nombre Completo de Lucy</label>
+                                        <label class="LabelFormulario" for="FormAcercaNombreLuci">Nombre Completo de Luci</label>
                                         <input type="text" id="FormAcercaNombreLuci" class="InputFormulario InputFormularioSinIcono" placeholder="Ej: Lucy... (o dejar vacío)">
                                     </div>
                                     <div class="GrupoInput">
-                                        <label class="LabelFormulario" for="FormAcercaFotoLuci">Foto de Lucy (Cloudinary / URL)</label>
+                                        <label class="LabelFormulario" for="FormAcercaFotoLuci">Foto de Luci (Cloudinary / URL)</label>
                                         <div class="DropzoneCarga" onclick="document.getElementById('FormAcercaArchivoLuci').click()" style="padding: 12px;">
                                             <i class="fa-solid fa-camera DropzoneIcono" style="font-size: 20px;"></i>
-                                            <div class="DropzoneTextoPrincipal" style="font-size: 13px;">Subir foto de Lucy</div>
+                                            <div class="DropzoneTextoPrincipal" style="font-size: 13px;">Subir foto de Luci</div>
                                             <input type="file" id="FormAcercaArchivoLuci" accept="image/*" style="display: none;">
                                         </div>
                                         <input type="text" id="FormAcercaFotoLuci" class="InputFormulario InputFormularioSinIcono" style="margin-top: 6px;" placeholder="URL de la fotografía (o dejar vacío)">
@@ -888,7 +906,7 @@
                                 </div>
 
                                 <div class="GrupoInput" style="margin-top: 10px;">
-                                    <label class="LabelFormulario" for="FormAcercaDescripcionLuci">Semblanza / Descripción de Lucy</label>
+                                    <label class="LabelFormulario" for="FormAcercaDescripcionLuci">Semblanza / Descripción de Luci</label>
                                     <textarea id="FormAcercaDescripcionLuci" class="TextareaFormulario" rows="4" placeholder="Semblanza o biografía de Lucy... (o dejar vacío)"></textarea>
                                 </div>
                             </div>
@@ -963,6 +981,27 @@
                 </section>
             </div>
         </main>
+    </div>
+
+    <!-- Modal para Reproducir YouTube en el Panel -->
+    <div id="ModalVisorYouTube" class="ModalOverlay" style="display: none;" onclick="if(event.target === this) window.InstanciaPanel.CerrarVisorYouTube()">
+        <div class="ModalContenedorPartitura" style="max-width: 680px;">
+            <div class="ModalHeaderPartitura">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-youtube" style="color: #ef4444; font-size: 20px;"></i>
+                    <h3 id="ModalYouTubeTitulo" style="font-family: var(--FuenteTitulos); font-size: 16px; margin: 0; color: var(--ColorTextoPrincipal);">Reproductor de YouTube</h3>
+                </div>
+                <button type="button" class="BotonCerrarModal" onclick="window.InstanciaPanel.CerrarVisorYouTube()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ColorTextoSecundario); padding: 4px 8px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="ModalBodyPartitura" style="padding: 0; background: #000; min-height: 340px;">
+                <iframe id="ModalYouTubeIframe" width="100%" height="360" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display: block;"></iframe>
+            </div>
+            <div class="ModalFooterPartitura">
+                <button type="button" class="BotonSecundario" onclick="window.InstanciaPanel.CerrarVisorYouTube()">Cerrar Reproductor</button>
+            </div>
+        </div>
     </div>
 
     <!-- Modal para Visualizar Partitura en Tamaño Completo -->

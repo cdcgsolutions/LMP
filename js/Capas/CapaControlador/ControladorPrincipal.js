@@ -1015,6 +1015,13 @@ class ControladorPrincipal {
         }
     }
 
+    ExtraerIdYouTube(url) {
+        if (!url || typeof url !== 'string') return null;
+        const patron = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/;
+        const m = url.match(patron);
+        return m ? m[1] : null;
+    }
+
     EjecutarReproduccionCancionPorId(IdCancion) {
         const Cancion = this.ModeloAlmacenamiento.ObtenerCancionPorId(IdCancion);
         if (Cancion) {
@@ -1025,6 +1032,18 @@ class ControladorPrincipal {
                 );
                 return;
             }
+
+            const IdYT = this.ExtraerIdYouTube(Cancion.AudioUrl);
+            if (IdYT) {
+                // Es un video o audio alojado en YouTube: abrimos el modal de la letra con el reproductor de YouTube integrado
+                this.AbrirModalLetra(IdCancion);
+                this.ServicioNotificaciones.MostrarMensajeToast(
+                    `Cargando video de '${Cancion.Titulo}'`,
+                    '<i class="fa-brands fa-youtube" style="color: #ef4444;"></i>'
+                );
+                return;
+            }
+
             const Exito = this.ServicioReproductor.CargarYReproducirCancion(Cancion);
             if (Exito) {
                 this.ServicioEstado.EstablecerCancionReproduciendo(Cancion, true);

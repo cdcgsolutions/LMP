@@ -16,6 +16,13 @@ class ComponenteModalLetra {
         this.EscalaNotas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     }
 
+    ExtraerIdYouTube(url) {
+        if (!url || typeof url !== 'string') return null;
+        const patron = /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|shorts\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/;
+        const m = url.match(patron);
+        return m ? m[1] : null;
+    }
+
     TransponerTextoConAcordes(TextoConAcordes, Semitonos) {
         if (Semitonos === 0) return TextoConAcordes;
 
@@ -63,6 +70,8 @@ class ComponenteModalLetra {
         const DespTexto = this.DesplazamientoSemitonos === 0 
             ? "Tono Original" 
             : (this.DesplazamientoSemitonos > 0 ? `+${this.DesplazamientoSemitonos} st` : `${this.DesplazamientoSemitonos} st`);
+
+        const IdYT = this.ExtraerIdYouTube(this.CancionSeleccionada.AudioUrl);
 
         return `
         <div class="CapaFondoModalOscuro" id="ModalVisorLetraFondo">
@@ -112,6 +121,22 @@ class ComponenteModalLetra {
                     </div>
                 </div>
 
+                <!-- Reproductor Embebido de YouTube si la canción tiene video -->
+                ${IdYT ? `
+                <div class="ContenedorYouTubeModalLetra" style="padding: 14px 20px 0; background: var(--ColorFondoSuperficie);">
+                    <div style="position: relative; width: 100%; max-width: 600px; margin: 0 auto; aspect-ratio: 16 / 9; border-radius: var(--RadioMediano); overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.18); background: #000;">
+                        <iframe 
+                            src="https://www.youtube-nocookie.com/embed/${IdYT}?rel=0" 
+                            title="${this.CancionSeleccionada.Titulo}" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen 
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+                        </iframe>
+                    </div>
+                </div>
+                ` : ''}
+
                 <!-- 3. Contenedor de la Letra y Acordes -->
                 <div class="CuerpoVentanaModal" id="CuerpoLetraScrollable" style="padding: 20px 24px;">
                     <div class="ContenedorLetraConAcordes" id="TextoLetraPreformateada">${LetraFinalHtml}</div>
@@ -130,10 +155,17 @@ class ComponenteModalLetra {
                             <span>Ver Partitura</span>
                         </button>
                         ` : ''}
+                        ${IdYT ? `
+                        <a href="https://www.youtube.com/watch?v=${IdYT}" target="_blank" rel="noopener noreferrer" class="BotonAccionPrimario" style="background-color: #ef4444; border-color: #ef4444; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fa-brands fa-youtube"></i>
+                            <span>Abrir en YouTube</span>
+                        </a>
+                        ` : `
                         <button class="BotonAccionPrimario BotonReproducirTarjeta" data-cancion-id="${this.CancionSeleccionada.IdCancion}">
                             <i class="fa-solid fa-play"></i>
                             <span>Escuchar Audio</span>
                         </button>
+                        `}
                     </div>
                 </div>
             </div>
