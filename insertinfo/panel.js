@@ -80,6 +80,9 @@ class PanelGestionLMP {
         if (VistaLogin) VistaLogin.style.display = "none";
         if (VistaDashboard) VistaDashboard.style.display = "flex";
 
+        // Mostrar spinners de carga inmediata en el dashboard
+        this.MostrarSpinnersMetricas();
+
         // Actualizar chip de usuario en sidebar
         if (this.UsuarioSesion) {
             const NombreElem = document.getElementById("SidebarNombreUsuario");
@@ -259,109 +262,147 @@ class PanelGestionLMP {
     }
 
     // -------------------------------------------------------------
+    // GESTIÓN DE SPINNERS Y ESTADO DE CARGA EN DASHBOARD
+    // -------------------------------------------------------------
+    MostrarSpinnersMetricas() {
+        const spinnerHtml = '<i class="fa-solid fa-circle-notch fa-spin SpinnerMetrica"></i>';
+        const MetricaCanciones = document.getElementById("MetricaTotalCanciones");
+        const MetricaPartituras = document.getElementById("MetricaTotalPartituras");
+        const MetricaArtistas = document.getElementById("MetricaTotalArtistas");
+        const MetricaGeneros = document.getElementById("MetricaTotalGeneros");
+
+        if (MetricaCanciones) MetricaCanciones.innerHTML = spinnerHtml;
+        if (MetricaPartituras) MetricaPartituras.innerHTML = spinnerHtml;
+        if (MetricaArtistas) MetricaArtistas.innerHTML = spinnerHtml;
+        if (MetricaGeneros) MetricaGeneros.innerHTML = spinnerHtml;
+
+        const ContenedorInicio = document.getElementById("ContenedorResumenInicio");
+        if (ContenedorInicio) {
+            ContenedorInicio.innerHTML = `
+                <div class="EstadoCargandoDashboard">
+                    <i class="fa-solid fa-circle-notch fa-spin IconoCargandoDashboard"></i>
+                    <span>Cargando obras registradas...</span>
+                </div>
+            `;
+        }
+    }
+
+    // -------------------------------------------------------------
     // CARGA DE DATOS DESDE BASE DE DATOS
     // -------------------------------------------------------------
     async CargarDatosDesdeFirestore() {
         if (!this.Firebase || !this.Firebase.ObtenerFirestore()) return;
-        const db = this.Firebase.ObtenerFirestore();
+        this.MostrarSpinnersMetricas();
 
-        // 1. Canciones
         try {
-            const SnapCanciones = await this.Firebase.ColeccionCanciones().get();
+            // Carga concurrente optimizada para máxima velocidad y rendimiento
+            const [
+                ResCanciones,
+                ResPartituras,
+                ResGeneros,
+                ResArtistas,
+                ResIFAEL,
+                ResAcerca,
+                ResUsuarios
+            ] = await Promise.allSettled([
+                this.Firebase.ColeccionCanciones().get(),
+                this.Firebase.ColeccionPartiturasDigitales().get(),
+                this.Firebase.ColeccionGeneros().get(),
+                this.Firebase.ColeccionArtistas().get(),
+                this.Firebase.ColeccionIFAEL().get(),
+                this.Firebase.ColeccionAcercaDeNosotros().get(),
+                this.Firebase.ColeccionUsuarios().get()
+            ]);
+
+            // 1. Canciones
             this.Canciones = [];
-            SnapCanciones.forEach(Doc => {
-                this.Canciones.push({ IdCancion: Doc.id, ...Doc.data() });
-            });
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer Canciones:", e);
-        }
-
-        // 2. Partituras (desde PartiturasDigitales y desde Canciones con partitura)
-        try {
-            const SnapPartituras = await this.Firebase.ColeccionPartiturasDigitales().get();
-            this.Partituras = [];
-            SnapPartituras.forEach(Doc => {
-                this.Partituras.push({ IdPartitura: Doc.id, ...Doc.data() });
-            });
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer PartiturasDigitales:", e);
-            this.Partituras = [];
-        }
-
-        // Incorporar canciones con partitura que no estén ya en la lista
-        this.Canciones.forEach(C => {
-            const url = C.ImagenPartituraUrl || C.PartituraUrl;
-            if (url && url !== "IFAEL.jpg" && !this.Partituras.some(P => (P.ImagenPartituraUrl === url) || (P.IdCancionAsociada === C.IdCancion))) {
-                this.Partituras.push({
-                    IdPartitura: "cancion_" + C.IdCancion,
-                    Titulo: C.Titulo,
-                    Autor: C.Autor,
-                    Genero: C.Genero,
-                    Tono: C.TonoOriginal,
-                    Instrumentacion: "Partitura General",
-                    ImagenPartituraUrl: url,
-                    Descripcion: C.Descripcion || "",
-                    IdCancionAsociada: C.IdCancion,
-                    EsDeCancion: true
+            if (ResCanciones.status === "fulfilled") {
+                ResCanciones.value.forEach(Doc => {
+                    this.Canciones.push({ IdCancion: Doc.id, ...Doc.data() });
                 });
+            } else {
+                console.warn("[PanelGestionLMP] Aviso al leer Canciones:", ResCanciones.reason);
             }
-        });
 
-        // 3. Géneros
-        try {
-            const SnapGeneros = await this.Firebase.ColeccionGeneros().get();
+            // 2. Partituras (desde PartiturasDigitales y desde Canciones con partitura)
+            this.Partituras = [];
+            if (ResPartituras.status === "fulfilled") {
+                ResPartituras.value.forEach(Doc => {
+                    this.Partituras.push({ IdPartitura: Doc.id, ...Doc.data() });
+                });
+            } else {
+                console.warn("[PanelGestionLMP] Aviso al leer PartiturasDigitales:", ResPartituras.reason);
+            }
+
+            // Incorporar canciones con partitura que no estén ya en la lista
+            this.Canciones.forEach(C => {
+                const url = C.ImagenPartituraUrl || C.PartituraUrl;
+                if (url && url !== "IFAEL.jpg" && !this.Partituras.some(P => (P.ImagenPartituraUrl === url) || (P.IdCancionAsociada === C.IdCancion))) {
+                    this.Partituras.push({
+                        IdPartitura: "cancion_" + C.IdCancion,
+                        Titulo: C.Titulo,
+                        Autor: C.Autor,
+                        Genero: C.Genero,
+                        Tono: C.TonoOriginal,
+                        Instrumentacion: "Partitura General",
+                        ImagenPartituraUrl: url,
+                        Descripcion: C.Descripcion || "",
+                        IdCancionAsociada: C.IdCancion,
+                        EsDeCancion: true
+                    });
+                }
+            });
+
+            // 3. Géneros
             this.Generos = [];
-            SnapGeneros.forEach(Doc => {
-                this.Generos.push({ IdGenero: Doc.id, ...Doc.data() });
-            });
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer Géneros:", e);
-        }
+            if (ResGeneros.status === "fulfilled") {
+                ResGeneros.value.forEach(Doc => {
+                    this.Generos.push({ IdGenero: Doc.id, ...Doc.data() });
+                });
+            } else {
+                console.warn("[PanelGestionLMP] Aviso al leer Géneros:", ResGeneros.reason);
+            }
 
-        // 4. Artistas
-        try {
-            const SnapArtistas = await this.Firebase.ColeccionArtistas().get();
+            // 4. Artistas
             this.Artistas = [];
-            SnapArtistas.forEach(Doc => {
-                this.Artistas.push({ IdArtista: Doc.id, ...Doc.data() });
-            });
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer Artistas:", e);
-        }
+            if (ResArtistas.status === "fulfilled") {
+                ResArtistas.value.forEach(Doc => {
+                    this.Artistas.push({ IdArtista: Doc.id, ...Doc.data() });
+                });
+            } else {
+                console.warn("[PanelGestionLMP] Aviso al leer Artistas:", ResArtistas.reason);
+            }
 
-        // 5. IFAEL
-        try {
-            const SnapIFAEL = await this.Firebase.ColeccionIFAEL().get();
-            if (!SnapIFAEL.empty) {
-                const Doc = SnapIFAEL.docs[0];
+            // 5. IFAEL
+            if (ResIFAEL.status === "fulfilled" && !ResIFAEL.value.empty) {
+                const Doc = ResIFAEL.value.docs[0];
                 this.IFAEL = { IdDocumento: Doc.id, ...Doc.data() };
                 this.CargarDatosFormularioIFAEL();
+            } else if (ResIFAEL.status === "rejected") {
+                console.warn("[PanelGestionLMP] Aviso al leer IFAEL:", ResIFAEL.reason);
             }
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer IFAEL:", e);
-        }
 
-        // 6. Acerca de Nosotros
-        try {
-            const SnapAcerca = await this.Firebase.ColeccionAcercaDeNosotros().get();
-            if (!SnapAcerca.empty) {
-                const Doc = SnapAcerca.docs[0];
+            // 6. Acerca de Nosotros
+            if (ResAcerca.status === "fulfilled" && !ResAcerca.value.empty) {
+                const Doc = ResAcerca.value.docs[0];
                 this.AcercaDeNosotros = { IdDocumento: Doc.id, ...Doc.data() };
                 this.CargarDatosFormularioAcercaDe();
+            } else if (ResAcerca.status === "rejected") {
+                console.warn("[PanelGestionLMP] Aviso al leer AcercaDeNosotros:", ResAcerca.reason);
             }
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer AcercaDeNosotros:", e);
-        }
 
-        // 7. Usuarios
-        try {
-            const SnapUsuarios = await this.Firebase.ColeccionUsuarios().get();
+            // 7. Usuarios
             this.Usuarios = [];
-            SnapUsuarios.forEach(Doc => {
-                this.Usuarios.push({ IdUsuario: Doc.id, ...Doc.data() });
-            });
-        } catch (e) {
-            console.warn("[PanelGestionLMP] Aviso al leer Usuarios:", e);
+            if (ResUsuarios.status === "fulfilled") {
+                ResUsuarios.value.forEach(Doc => {
+                    this.Usuarios.push({ IdUsuario: Doc.id, ...Doc.data() });
+                });
+            } else {
+                console.warn("[PanelGestionLMP] Aviso al leer Usuarios:", ResUsuarios.reason);
+            }
+
+        } catch (ErrorCarga) {
+            console.error("[PanelGestionLMP] Error en carga concurrente de Firestore:", ErrorCarga);
         }
 
         // Renderizados y Actualizaciones

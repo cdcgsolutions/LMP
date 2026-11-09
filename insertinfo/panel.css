@@ -630,6 +630,49 @@ body {
     margin-top: 4px;
 }
 
+/* Spinner de carga para métricas */
+.SpinnerMetrica {
+    font-size: 20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#MetricaTotalCanciones .SpinnerMetrica {
+    color: var(--ColorPrimario);
+}
+
+#MetricaTotalPartituras .SpinnerMetrica {
+    color: var(--ColorInfo);
+}
+
+#MetricaTotalGeneros .SpinnerMetrica {
+    color: var(--ColorMorado);
+}
+
+#MetricaTotalArtistas .SpinnerMetrica {
+    color: #d97706;
+}
+
+/* Estado de carga general para tablas y rejillas */
+.EstadoCargandoDashboard {
+    padding: 32px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--ColorTextoSecundario);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+}
+
+.EstadoCargandoDashboard .IconoCargandoDashboard {
+    font-size: 24px;
+    color: var(--ColorPrimario);
+}
+
 /* -------------------------------------------------------------
    SECCIONES Y FORMULARIOS
    ------------------------------------------------------------- */
