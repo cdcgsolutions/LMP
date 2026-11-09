@@ -80,7 +80,7 @@ class ComponenteSeccionInicio {
                 </div>
                 <div class="CuerpoTextoInformativo">
                     <p>
-                        Esta plataforma, <strong>Letras de Mi Poblao (LMP)</strong>, nace como una propuesta artística y documental dentro de la carrera de <strong>Técnico Superior en Música Boliviana</strong> del <strong>Instituto IFAEL</strong> en la ciudad de Trinidad, capital del departamento del Beni, bajo la autoría e investigación de <strong>Edna Miriam Edgley Cuellar</strong>.
+                        Esta plataforma, <strong>Letras de Mi Poblao (LMP)</strong>, nace como una propuesta artística y documental dentro de la carrera de <strong>Técnico Superior en Música Boliviana</strong> del <strong>Instituto IFAEL</strong> en la ciudad de Trinidad, capital del departamento del Beni, bajo la autoría e investigación de <strong>Edna Miriam Edgley Cuellar</strong> y <strong>Luci Xiomi Camacho Chavez</strong>.
                     </p>
                     <p>
                         Ante el riesgo de pérdida o dispersión de las partituras tradicionales y la tradición oral de nuestra región, este proyecto construye un <strong>puente digital interactivo</strong> que reúne:
