@@ -31,5 +31,5 @@ Simplemente abre `index.html` en cualquier navegador web moderno o sírvelo con 
 ---
 
 ### Créditos
-- **Autora e Investigadora:** Edna Miriam Edgley Cuellar (Técnico Superior en Música Boliviana - IFAEL)
+- **Autoras e Investigadoras:** Edna Miriam Edgley Cuellar y Luci Xiomi Camacho Chavez (Técnico Superior en Música Boliviana - IFAEL)
 - **Desarrollo:** By Ing. Daniel

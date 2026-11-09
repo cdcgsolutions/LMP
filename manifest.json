@@ -1,7 +1,7 @@
 {
   "name": "Letras Mi Poblau (LMP)",
   "short_name": "LMP",
-  "description": "Proyecto de grado de Edna Miriam Edgley Cuellar, Postulante a Técnico Superior en Música Boliviana",
+  "description": "Proyecto de grado de Edna Miriam Edgley Cuellar y Luci Xiomi Camacho Chavez, Postulantes a Técnico Superior en Música Boliviana",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
