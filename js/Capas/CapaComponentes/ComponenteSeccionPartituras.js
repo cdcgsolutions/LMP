@@ -14,7 +14,7 @@ class ComponenteSeccionPartituras {
         const TerminoBusqueda = (EstadoActual.TerminoBusquedaGlobal || "").toLowerCase();
 
         const TodasLasCanciones = this.ModeloAlmacenamiento.ObtenerTodasLasCanciones() || [];
-        
+
         // Filtrar aquellas canciones que tienen una partitura válida asociada
         let CancionesConPartitura = TodasLasCanciones.filter(C => {
             const url = C.ImagenPartituraUrl || C.PartituraUrl || C.ImagenPartitura;
@@ -22,7 +22,7 @@ class ComponenteSeccionPartituras {
         });
 
         if (TerminoBusqueda) {
-            CancionesConPartitura = CancionesConPartitura.filter(C => 
+            CancionesConPartitura = CancionesConPartitura.filter(C =>
                 (C.Titulo && C.Titulo.toLowerCase().includes(TerminoBusqueda)) ||
                 (C.Autor && C.Autor.toLowerCase().includes(TerminoBusqueda)) ||
                 (C.Genero && C.Genero.toLowerCase().includes(TerminoBusqueda))
@@ -36,7 +36,7 @@ class ComponenteSeccionPartituras {
                 <div class="TextosCabeceraPartituras">
                     <h1 class="TituloSeccionGrande">
                         <i class="fa-solid fa-file-audio" style="color: var(--ColorPrimarioAzul);"></i>
-                        <span>Archivo de Partituras Digitales</span>
+                        <span>Partituras Digitales</span>
                     </h1>
                     <p class="DescripcionSeccionSubtitulo">
                         Partituras y manuscritos digitalizados del acervo documental del IFAEL en Trinidad, Beni.
@@ -44,41 +44,52 @@ class ComponenteSeccionPartituras {
                 </div>
             </div>
 
-            <!-- Rejilla de Partituras -->
+            <!-- Rejilla de Partituras (Diseño Documental Sin Miniatura) -->
             ${CancionesConPartitura.length > 0 ? `
             <div class="RejillaPartiturasCatalogo">
                 ${CancionesConPartitura.map(C => {
-                    const UrlPartitura = C.ImagenPartituraUrl || C.PartituraUrl || C.ImagenPartitura;
-                    return `
-                    <div class="TarjetaPartituraItem" id="PartituraCard_${C.IdCancion}">
-                        <div class="PrevisualizacionMiniaturaPartitura" data-id-cancion="${C.IdCancion}">
-                            <img src="${UrlPartitura}" alt="Partitura de ${C.Titulo}" class="ImagenMiniaturaPartitura" onerror="this.src='IFAEL.jpg'">
-                            <div class="OverlayHoverPartitura">
-                                <span class="BotonLupaZoomPartitura">
-                                    <i class="fa-solid fa-magnifying-glass-plus"></i>
-                                    <span>Ver en Grande</span>
+            const UrlPartitura = C.ImagenPartituraUrl || C.PartituraUrl || C.ImagenPartitura;
+            const EsPdf = (UrlPartitura || "").toLowerCase().includes(".pdf");
+            return `
+                    <div class="TarjetaPartituraItem TarjetaPartituraDocumento" id="PartituraCard_${C.IdCancion}">
+                        <div class="CabeceraTarjetaDocumento BotonAbrirModalPartituraDirecto" data-id-cancion="${C.IdCancion}" title="Clic para visualizar partitura">
+                            <div class="IconoDocumentoPartitura">
+                                <img src="LogoIniciales.png" alt="LMP" class="ImagenLogoInicialesPartitura">
+                            </div>
+                            <div class="InsigniasTarjetaDocumento">
+                                <span class="InsigniaRitmoPartitura">${C.Genero || 'Folklore Beniano'}</span>
+                                <span class="InsigniaFormatoDocumento ${EsPdf ? 'FormatoPDF' : 'FormatoImagen'}">
+                                    <i class="${EsPdf ? 'fa-solid fa-file-pdf' : 'fa-solid fa-image'}"></i>
+                                    <span>${EsPdf ? 'Partitura PDF' : 'Manuscrito'}</span>
                                 </span>
                             </div>
                         </div>
+
                         <div class="CuerpoInfoPartitura">
-                            <div class="InsigniaRitmo" style="font-size: 11px;">${C.Genero || 'Folklore Beniano'}</div>
-                            <h3 class="TituloCancionPartitura">${C.Titulo}</h3>
-                            <p class="AutorCancionPartitura"><i class="fa-solid fa-user-pen" style="font-size: 12px; margin-right: 5px;"></i>${C.Autor || 'Tradicional'}</p>
-                            
-                            <div class="BotonesAccionTarjetaPartitura">
-                                <button class="BotonAccionSecundario BotonAbrirModalPartituraDirecto" data-id-cancion="${C.IdCancion}">
-                                    <i class="fa-solid fa-eye"></i>
-                                    <span>Visualizar</span>
-                                </button>
-                                <a href="${UrlPartitura}" target="_blank" rel="noopener noreferrer" class="BotonAccionPrimario BotonDescargarPartituraEnlace" download="Partitura_${C.Titulo.replace(/\s+/g, '_')}.jpg">
-                                    <i class="fa-solid fa-download"></i>
-                                    <span>Descargar</span>
-                                </a>
+                            <h3 class="TituloCancionPartitura BotonAbrirModalPartituraDirecto" data-id-cancion="${C.IdCancion}" title="Clic para visualizar">${C.Titulo}</h3>
+                            <p class="AutorCancionPartitura">
+                                <i class="fa-solid fa-user-pen" style="font-size: 12px; margin-right: 4px;"></i>
+                                <span>${C.Autor || 'Tradicional Beniano'}</span>
+                            </p>
+                            <div class="MetadatosDocumentoPartitura">
+                                <span class="DatoMetaItem"><i class="fa-solid fa-building-columns"></i> Archivo IFAEL</span>
+                                <span class="DatoMetaItem"><i class="fa-solid fa-circle-check" style="color: var(--ColorVerdeBeni);"></i> Digitalizado</span>
                             </div>
+                        </div>
+
+                        <div class="BotonesAccionTarjetaPartitura">
+                            <button class="BotonAccionPrimario BotonAbrirModalPartituraDirecto" data-id-cancion="${C.IdCancion}">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Visualizar</span>
+                            </button>
+                            <a href="${UrlPartitura}" data-url-descarga="${UrlPartitura}" class="BotonAccionSecundario BotonDescargarPartituraEnlace" download="Partitura_${C.Titulo.replace(/\s+/g, '_')}${EsPdf ? '.pdf' : '.jpg'}" title="Descargar archivo en tu dispositivo">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Descargar</span>
+                            </a>
                         </div>
                     </div>
                     `;
-                }).join('')}
+        }).join('')}
             </div>
             ` : `
             <div class="EstadoVacioGenerico" style="background: var(--ColorFondoSuperficie); padding: 50px 20px; border-radius: var(--RadioMediano); text-align: center; border: 1px solid var(--ColorBordeDivisor);">

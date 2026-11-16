@@ -853,6 +853,12 @@
         max-height: calc(94vh - 110px);
     }
 
+    .ContenedorLetraConAcordes {
+        padding: 16px 14px;
+        font-size: 14px;
+        line-height: 1.75;
+    }
+
     .CuadriculaFormularioDoble {
         grid-template-columns: 1fr;
         gap: 10px;

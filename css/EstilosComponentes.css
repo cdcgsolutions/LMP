@@ -940,75 +940,129 @@
     background-color: var(--ColorFondoSuperficie);
     border: 1px solid var(--ColorBordeTarjeta);
     border-radius: var(--RadioMediano);
-    padding: 22px;
+    overflow: hidden;
     display: flex;
-    gap: 18px;
-    align-items: center;
+    flex-direction: column;
     box-shadow: var(--SombraNivelUno);
     transition: all var(--TransicionMedia);
+    position: relative;
 }
 
 .TarjetaArtistaGaleria:hover {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
     box-shadow: var(--SombraTarjetaHover);
     border-color: var(--ColorVerdeBeni);
 }
 
+.BannerFondoTarjetaArtista {
+    height: 76px;
+    background: linear-gradient(135deg, rgba(27, 107, 62, 0.22) 0%, rgba(13, 110, 253, 0.15) 100%);
+    position: relative;
+    border-bottom: 1px solid var(--ColorBordeDivisor);
+}
+
 .ContenedorAvatarTarjetaArtista {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-radius: var(--RadioCircular);
     overflow: hidden;
-    border: 3px solid var(--ColorVerdeBeniClaro);
+    border: 4px solid var(--ColorFondoSuperficie);
+    outline: 2px solid var(--ColorVerdeBeni);
+    margin: -60px auto 0 auto;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+    transition: transform var(--TransicionRapida), box-shadow var(--TransicionRapida);
+    background-color: var(--ColorFondoSuperficie);
     flex-shrink: 0;
-    box-shadow: var(--SombraNivelUno);
+}
+
+.TarjetaArtistaGaleria:hover .ContenedorAvatarTarjetaArtista {
+    transform: scale(1.06);
+    box-shadow: 0 10px 28px rgba(27, 107, 62, 0.35);
 }
 
 .AvatarTarjetaArtista {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+    transition: transform var(--TransicionMedia);
+}
+
+.TarjetaArtistaGaleria:hover .AvatarTarjetaArtista {
+    transform: scale(1.05);
 }
 
 .InfoTarjetaArtista {
+    padding: 16px 20px 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
     flex: 1;
-    min-width: 0;
 }
 
 .NombreArtistaTarjeta {
     font-family: var(--FuenteTitulos);
-    font-size: 17px;
+    font-size: 18.5px;
     font-weight: 800;
     color: var(--ColorTextoPrincipal);
     margin: 0;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: color var(--TransicionRapida);
+}
+
+.NombreArtistaTarjeta:hover {
+    color: var(--ColorVerdeBeni);
 }
 
 .SubtituloArtistaTarjeta {
-    font-size: 12.5px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     color: var(--ColorVerdeBeni);
 }
 
 .InsigniasArtistaTarjeta {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin: 2px 0 6px 0;
+    justify-content: center;
+    margin: 4px 0 8px 0;
 }
 
 .InsigniaPillArtista {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-size: 11px;
-    padding: 3px 8px;
+    font-size: 11.5px;
+    padding: 4px 10px;
     border-radius: var(--RadioBotonPill);
     background-color: var(--ColorFondoSecundario);
     color: var(--ColorTextoSecundario);
+    border: 1px solid var(--ColorBordeDivisor);
     font-weight: 600;
+}
+
+.AccionTarjetaArtista {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+.AccionTarjetaArtista .BotonAccionPrimario,
+.AccionTarjetaArtista .BotonAccionSecundario {
+    flex: 1;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-sizing: border-box;
 }
 
 /* Página de Biografía Dedicada */
@@ -1055,11 +1109,11 @@
 }
 
 /* ==========================================================================
-   6. SECCIÓN PARTITURAS DIGITALES
+   6. SECCIÓN PARTITURAS DIGITALES (DISEÑO FICHA DOCUMENTAL SIN MINIATURA)
    ========================================================================== */
 .RejillaPartiturasCatalogo {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
     gap: 22px;
 }
 
@@ -1067,92 +1121,284 @@
     background-color: var(--ColorFondoSuperficie);
     border: 1px solid var(--ColorBordeTarjeta);
     border-radius: var(--RadioMediano);
-    overflow: hidden;
     box-shadow: var(--SombraNivelUno);
     display: flex;
     flex-direction: column;
+    padding: 22px 20px 18px 20px;
+    gap: 14px;
     transition: all var(--TransicionMedia);
+    position: relative;
+    border-top: 3px solid var(--ColorPrimarioAzul);
 }
 
 .TarjetaPartituraItem:hover {
     transform: translateY(-4px);
     box-shadow: var(--SombraTarjetaHover);
     border-color: var(--ColorVerdeBeni);
+    border-top-color: var(--ColorVerdeBeni);
 }
 
-.PrevisualizacionMiniaturaPartitura {
-    position: relative;
-    height: 230px;
-    overflow: hidden;
-    background-color: #0b1120;
+.CabeceraTarjetaDocumento {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     cursor: pointer;
 }
 
-.ImagenMiniaturaPartitura {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.94;
-    transition: transform var(--TransicionMedia);
-}
-
-.PrevisualizacionMiniaturaPartitura:hover .ImagenMiniaturaPartitura {
-    transform: scale(1.05);
-    opacity: 1;
-}
-
-.OverlayHoverPartitura {
-    position: absolute;
-    inset: 0;
-    background-color: rgba(9, 46, 24, 0.55);
+.IconoDocumentoPartitura {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity var(--TransicionRapida);
+    flex-shrink: 0;
+    transition: transform var(--TransicionRapida);
+    overflow: hidden;
+    border: 1px solid var(--ColorBordeTarjeta);
+    background-color: var(--ColorFondoSecundario);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.PrevisualizacionMiniaturaPartitura:hover .OverlayHoverPartitura {
-    opacity: 1;
+.TarjetaPartituraItem:hover .IconoDocumentoPartitura {
+    transform: scale(1.08);
 }
 
-.BotonLupaZoomPartitura {
-    background-color: var(--ColorVerdeBeni);
-    color: #ffffff;
-    padding: 9px 18px;
-    border-radius: var(--RadioBotonPill);
-    font-size: 13px;
+.ImagenLogoInicialesPartitura {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 10px;
+}
+
+.InsigniasTarjetaDocumento {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.InsigniaRitmoPartitura {
+    font-size: 11px;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 4px 9px;
+    border-radius: var(--RadioBotonPill);
+    background: var(--ColorFondoSecundario);
+    color: var(--ColorTextoSecundario);
+    border: 1px solid var(--ColorBordeDivisor);
+}
+
+.InsigniaFormatoDocumento {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: var(--RadioBotonPill);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    gap: 5px;
+}
+
+.InsigniaFormatoDocumento.FormatoPDF {
+    background: rgba(220, 53, 69, 0.12);
+    color: #e63946;
+    border: 1px solid rgba(220, 53, 69, 0.25);
+}
+
+.InsigniaFormatoDocumento.FormatoImagen {
+    background: rgba(13, 110, 253, 0.12);
+    color: #0d6efd;
+    border: 1px solid rgba(13, 110, 253, 0.25);
 }
 
 .CuerpoInfoPartitura {
-    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
     flex: 1;
 }
 
 .TituloCancionPartitura {
     font-family: var(--FuenteTitulos);
-    font-size: 16.5px;
+    font-size: 17.5px;
     font-weight: 800;
     color: var(--ColorTextoPrincipal);
     margin: 0;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: color var(--TransicionRapida);
+}
+
+.TituloCancionPartitura:hover {
+    color: var(--ColorVerdeBeni);
 }
 
 .AutorCancionPartitura {
-    font-size: 13px;
+    font-size: 13.5px;
     color: var(--ColorTextoSecundario);
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.MetadatosDocumentoPartitura {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid var(--ColorBordeDivisor);
+    font-size: 12px;
+    color: var(--ColorTextoAtenuado);
+}
+
+.DatoMetaItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.BotonesAccionTarjetaPartitura {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.BotonesAccionTarjetaPartitura .BotonAccionPrimario,
+.BotonesAccionTarjetaPartitura .BotonAccionSecundario {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* Visor Modal de Partituras */
+.ContenedorVentanaModal.ModalAnchoExtraGrande {
+    max-width: 1050px;
+    width: 95vw;
+    height: 90vh;
+}
+
+.ContenedorVisorPDF {
+    width: 100%;
+    height: 100%;
+    min-height: 540px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--RadioMediano);
+    overflow: hidden;
+}
+
+.ContenedorVisorPartituraModal {
+    position: relative;
+    width: 100%;
+    height: 75vh;
+    min-height: 520px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0b0c0d;
+    overflow: hidden;
+    border-radius: var(--RadioMediano);
+}
+
+.ContenedorVisorImagenCentrada {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 75vh;
+    min-height: 520px;
+    background-color: #0b0c0d;
+}
+
+.AreaDesplazamientoPartituraImagen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.ImagenPartituraZoomable {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    margin: auto;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
+    border-radius: 4px;
+    transition: transform 0.15s ease-out;
+}
+
+.BarraHerramientasZoomPartitura {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 10px;
+    border-radius: var(--RadioBotonPill);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.BotonZoomItem {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--TransicionRapida);
+}
+
+.BotonZoomItem:hover {
+    background: var(--ColorVerdeBeni);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.EtiquetaPorcentajeZoom {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 44px;
+    text-align: center;
+    user-select: none;
+    padding: 0 4px;
 }
 
 /* ==========================================================================
    7. GÉNEROS MUSICALES BENIANOS
+   ========================================================================== */
+/* ==========================================================================
+   7. GÉNEROS Y RITMOS TRADICIONALES (DISEÑO TARJETA MODERNA E INSTITUCIONAL)
    ========================================================================== */
 .CuadriculaGenerosMusicales {
     display: grid;
@@ -1164,49 +1410,165 @@
     background-color: var(--ColorFondoSuperficie);
     border: 1px solid var(--ColorBordeTarjeta);
     border-radius: var(--RadioMediano);
-    padding: 26px;
+    padding: 22px 20px 18px 20px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     box-shadow: var(--SombraNivelUno);
     transition: all var(--TransicionMedia);
+    position: relative;
+    border-top: 4px solid var(--ColorGenero, var(--ColorPrimarioAzul));
 }
 
 .TarjetaGeneroBeniano:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     box-shadow: var(--SombraTarjetaHover);
+    border-color: var(--ColorBordeDivisor);
+    border-top-color: var(--ColorGenero, var(--ColorPrimarioAzul));
 }
 
 .CabeceraGeneroTarjeta {
     display: flex;
     align-items: center;
     gap: 14px;
+    cursor: pointer;
 }
 
-.IconoGeneroTarjeta {
+.ContenedorIconoGenero {
     width: 48px;
     height: 48px;
-    border-radius: var(--RadioMediano);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 22px;
     flex-shrink: 0;
+    transition: transform var(--TransicionRapida);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.TarjetaGeneroBeniano:hover .ContenedorIconoGenero {
+    transform: scale(1.08);
+}
+
+.DatosCabeceraGenero {
+    flex: 1;
+    min-width: 0;
 }
 
 .TituloGeneroTarjeta {
     font-family: var(--FuenteTitulos);
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--ColorTextoPrincipal);
     margin: 0;
+    line-height: 1.25;
+    transition: color var(--TransicionRapida);
+}
+
+.TarjetaGeneroBeniano:hover .TituloGeneroTarjeta {
+    color: var(--ColorGenero, var(--ColorVerdeBeni));
 }
 
 .OrigenGeneroTarjeta {
     font-size: 12.5px;
     font-weight: 600;
     color: var(--ColorTextoSecundario);
-    margin-top: 2px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.EspecificacionesMusicalesGenero {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.PildoraSpecItem {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--RadioBotonPill);
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoPrincipal);
+    border: 1px solid var(--ColorBordeDivisor);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.DescripcionGeneroTexto {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ColorTextoSecundario);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 42px;
+}
+
+.SeccionInstrumentosGenero {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ColorBordeDivisor);
+}
+
+.EtiquetaInstrumentosTitulo {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ColorTextoAtenuado);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ListaTagsInstrumentos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.TagInstrumentoItem {
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background-color: var(--ColorFondoSecundario);
+    color: var(--ColorTextoSecundario);
+    border: 1px solid var(--ColorBordeDivisor);
+    font-weight: 500;
+}
+
+.TagInstrumentoItem.TagMas {
+    font-weight: 700;
+    color: var(--ColorTextoPrincipal);
+    background-color: var(--ColorFondoActivo);
+}
+
+.PieTarjetaGenero {
+    margin-top: auto;
+    padding-top: 6px;
+    display: flex;
+    gap: 10px;
+}
+
+.PieTarjetaGenero .BotonAccionPrimario,
+.PieTarjetaGenero .BotonAccionSecundario {
+    flex: 1;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    box-sizing: border-box;
+    text-decoration: none;
 }
 
 /* ==========================================================================
@@ -1666,22 +2028,25 @@ body.ModoOscuroActivo .AcordeResaltado {
 
 .FilaAvatarYDatosPrincipales {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 24px;
-    margin-top: -60px;
     margin-bottom: 24px;
+    position: relative;
     flex-wrap: wrap;
 }
 
 .ContenedorAvatarFlotantePerfil {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     border-radius: var(--RadioCircular);
     border: 4px solid var(--ColorFondoSuperficie);
     box-shadow: var(--SombraNivelTres);
     overflow: hidden;
     background-color: #ffffff;
     flex-shrink: 0;
+    margin-top: -65px;
+    position: relative;
+    z-index: 5;
 }
 
 .AvatarInstitucionGrande {
@@ -1692,19 +2057,20 @@ body.ModoOscuroActivo .AcordeResaltado {
 
 .DatosTextoInstitucion {
     flex: 1;
-    min-width: 260px;
-    padding-top: 10px;
+    min-width: 280px;
+    padding-top: 14px;
 }
 
 .NombreInstitucionGrande {
     font-family: var(--FuenteTitulos);
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 900;
     color: var(--ColorTextoPrincipal);
     margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
+    line-height: 1.25;
 }
 
 .SubtituloInstitucion {

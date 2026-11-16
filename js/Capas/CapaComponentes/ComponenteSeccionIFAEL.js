@@ -25,9 +25,9 @@ class ComponenteSeccionIFAEL {
                     <div class="ElementoShimmerLMP" style="width: 100%; height: 200px; border-radius: 0;"></div>
 
                     <div class="CuerpoPerfilInstitucion" style="padding: 0 20px 20px;">
-                        <div class="FilaAvatarYDatosPrincipales" style="display: flex; gap: 16px; align-items: flex-end; margin-top: -55px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div class="FilaAvatarYDatosPrincipales" style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap;">
                             <!-- Avatar Skeleton -->
-                            <div class="ElementoShimmerLMP" style="width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--ColorFondoSuperficie); flex-shrink: 0; box-shadow: var(--SombraNivelDos);"></div>
+                            <div class="ElementoShimmerLMP" style="width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--ColorFondoSuperficie); flex-shrink: 0; box-shadow: var(--SombraNivelDos); margin-top: -55px;"></div>
                             <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 200px; padding-top: 10px;">
                                 <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 65%; height: 22px;"></div>
                                 <div class="BarraTextoShimmer ElementoShimmerLMP" style="width: 40%; height: 14px;"></div>

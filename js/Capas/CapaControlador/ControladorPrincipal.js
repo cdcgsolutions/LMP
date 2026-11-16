@@ -661,11 +661,29 @@ class ControladorPrincipal {
             return;
         }
         if (Objetivo.closest("#BotonImprimirPartitura")) {
+            const IframePDF = document.getElementById("IframeVisorPartituraPDF");
+            if (IframePDF && IframePDF.contentWindow) {
+                try {
+                    IframePDF.contentWindow.focus();
+                    IframePDF.contentWindow.print();
+                    return;
+                } catch (e) {
+                    window.open(IframePDF.src, '_blank');
+                    return;
+                }
+            }
             window.print();
             return;
         }
-        if (Objetivo.closest("#BotonDescargarPartitura")) {
-            this.ServicioNotificaciones.MostrarMensajeToast("Descargando partitura digital del IFAEL...", '<i class="fa-solid fa-download"></i>');
+        // Descarga directa de Partitura (desde Modal o Tarjeta de Catálogo)
+        const DisparadorDescarga = Objetivo.closest("#BotonDescargarPartitura, .BotonDescargarPartituraEnlace");
+        if (DisparadorDescarga) {
+            Evento.preventDefault();
+            const UrlDescarga = DisparadorDescarga.dataset.urlDescarga || DisparadorDescarga.getAttribute("href");
+            const NombreArchivo = DisparadorDescarga.getAttribute("download") || "Partitura_IFAEL.pdf";
+            if (UrlDescarga && UrlDescarga !== "#") {
+                this.ForzarDescargaArchivo(UrlDescarga, NombreArchivo);
+            }
             return;
         }
 
@@ -1626,6 +1644,55 @@ class ControladorPrincipal {
         const Etiqueta = document.getElementById("EtiquetaPorcentajeZoom");
         if (Imagen) Imagen.style.transform = `scale(${this.ComponenteModalPartitura.NivelZoom})`;
         if (Etiqueta) Etiqueta.textContent = `${Math.round(this.ComponenteModalPartitura.NivelZoom * 100)}%`;
+    }
+
+    async ForzarDescargaArchivo(Url, NombreArchivo) {
+        if (!Url) return;
+        if (this.ServicioNotificaciones) {
+            this.ServicioNotificaciones.MostrarMensajeToast(
+                `Preparando descarga: ${NombreArchivo}`,
+                '<i class="fa-solid fa-cloud-arrow-down"></i>'
+            );
+        }
+
+        try {
+            // Método 1: Blob Fetch (descarga directa forzada al disco)
+            const Respuesta = await fetch(Url, { mode: 'cors' });
+            if (!Respuesta.ok) throw new Error("Fallo en fetch: HTTP " + Respuesta.status);
+            const BlobDescarga = await Respuesta.blob();
+            const BlobUrl = window.URL.createObjectURL(BlobDescarga);
+            
+            const Enlace = document.createElement("a");
+            Enlace.style.display = "none";
+            Enlace.href = BlobUrl;
+            Enlace.download = NombreArchivo;
+            document.body.appendChild(Enlace);
+            Enlace.click();
+            
+            setTimeout(() => {
+                window.URL.revokeObjectURL(BlobUrl);
+                Enlace.remove();
+            }, 1000);
+            return;
+        } catch (ErrorBlob) {
+            console.warn("[ControladorPrincipal] Descarga por Blob no disponible, aplicando método alternativo:", ErrorBlob);
+        }
+
+        // Método 2: Si es Cloudinary, inyectar fl_attachment para forzar cabecera Content-Disposition
+        let UrlFinal = Url;
+        if (Url.includes("cloudinary.com") && Url.includes("/upload/")) {
+            const NombreSinExtension = encodeURIComponent(NombreArchivo.replace(/\.[^/.]+$/, ""));
+            UrlFinal = Url.replace("/upload/", `/upload/fl_attachment:${NombreSinExtension}/`);
+        }
+
+        // Método 3: Descarga forzada en elemento temporal sin _blank
+        const EnlaceAlternativo = document.createElement("a");
+        EnlaceAlternativo.style.display = "none";
+        EnlaceAlternativo.href = UrlFinal;
+        EnlaceAlternativo.download = NombreArchivo;
+        document.body.appendChild(EnlaceAlternativo);
+        EnlaceAlternativo.click();
+        setTimeout(() => EnlaceAlternativo.remove(), 1000);
     }
 
     AbrirModalCrearAporte() {

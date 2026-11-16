@@ -110,7 +110,7 @@ class ComponenteSeccionArtistas {
             </div>
 
             <!-- Cuadrícula de Tarjetas de la Galería -->
-            <div class="CuadriculaArtistasGaleria" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px;">
+            <div class="CuadriculaArtistasGaleria" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
                 ${Artistas.map(Artista => this.RenderizarTarjetaArtista(Artista)).join('')}
             </div>
         </div>`;
@@ -125,15 +125,18 @@ class ComponenteSeccionArtistas {
 
         return `
         <article class="TarjetaArtistaGaleria">
-            <!-- Foto de Perfil a la Izquierda -->
-            <div class="ContenedorAvatarTarjetaArtista">
+            <!-- Banner Visual Decorativo Superior -->
+            <div class="BannerFondoTarjetaArtista"></div>
+
+            <!-- Foto de Perfil Central con Gran Relevancia Visual -->
+            <div class="ContenedorAvatarTarjetaArtista BotonVerBiografiaArtista" data-artista-id="${Artista.IdArtista}" title="Ver biografía de ${NombreMostrar}">
                 <img src="${FotoMostrar}" alt="${NombreMostrar}" class="AvatarTarjetaArtista" onerror="this.src='Logo1.png'">
             </div>
 
-            <!-- Información a la Derecha (Compacta en altura) -->
+            <!-- Información del Artista Centrada -->
             <div class="InfoTarjetaArtista">
                 <div class="TextosPrincipalesArtista">
-                    <h3 class="NombreArtistaTarjeta">${NombreMostrar}</h3>
+                    <h3 class="NombreArtistaTarjeta BotonVerBiografiaArtista" data-artista-id="${Artista.IdArtista}" title="Ver biografía">${NombreMostrar}</h3>
                     ${SubtituloMostrar ? `<div class="SubtituloArtistaTarjeta">${SubtituloMostrar}</div>` : ''}
                 </div>
 
@@ -149,12 +152,12 @@ class ComponenteSeccionArtistas {
                     </span>` : ''}
                 </div>` : ''}
 
-                <div class="AccionTarjetaArtista" style="display: flex; gap: 8px; width: 100%; margin-top: 10px;">
-                    <button class="BotonAccionPrimario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}" style="flex: 1; font-size: 12.5px; padding: 7px 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" title="Ver repertorio musical y partituras de este artista">
+                <div class="AccionTarjetaArtista">
+                    <button class="BotonAccionPrimario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}" title="Ver repertorio musical y partituras de este artista">
                         <i class="fa-solid fa-music"></i>
                         <span>Ver Músicas</span>
                     </button>
-                    <button class="BotonAccionSecundario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}" style="flex: 1; font-size: 12.5px; padding: 7px 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" title="Ver biografía y trayectoria completa">
+                    <button class="BotonAccionSecundario BotonVerBiografiaArtista BotonVerBioCompacto" data-artista-id="${Artista.IdArtista}" title="Ver biografía y trayectoria completa">
                         <i class="fa-solid fa-book-open"></i>
                         <span>Biografía</span>
                     </button>

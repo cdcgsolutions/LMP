@@ -121,24 +121,24 @@ class ComponenteModalLetra {
                     </div>
                 </div>
 
-                <!-- Reproductor Embebido de YouTube si la canción tiene video -->
-                ${IdYT ? `
-                <div class="ContenedorYouTubeModalLetra" style="padding: 14px 20px 0; background: var(--ColorFondoSuperficie);">
-                    <div style="position: relative; width: 100%; max-width: 600px; margin: 0 auto; aspect-ratio: 16 / 9; border-radius: var(--RadioMediano); overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.18); background: #000;">
-                        <iframe 
-                            src="https://www.youtube-nocookie.com/embed/${IdYT}?rel=0" 
-                            title="${this.CancionSeleccionada.Titulo}" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen 
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
-                        </iframe>
+                <!-- 3. Contenedor Scrollable Integral (Video + Letra y Acordes) -->
+                <div class="CuerpoVentanaModal" id="CuerpoLetraScrollable" style="padding: 16px 20px; overflow-y: auto;">
+                    <!-- Reproductor Embebido de YouTube si la canción tiene video -->
+                    ${IdYT ? `
+                    <div class="ContenedorYouTubeModalLetra" style="margin-bottom: 18px; width: 100%;">
+                        <div style="position: relative; width: 100%; max-width: 580px; margin: 0 auto; aspect-ratio: 16 / 9; border-radius: var(--RadioMediano); overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.22); background: #000;">
+                            <iframe 
+                                src="https://www.youtube-nocookie.com/embed/${IdYT}?rel=0" 
+                                title="${this.CancionSeleccionada.Titulo}" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+                            </iframe>
+                        </div>
                     </div>
-                </div>
-                ` : ''}
+                    ` : ''}
 
-                <!-- 3. Contenedor de la Letra y Acordes -->
-                <div class="CuerpoVentanaModal" id="CuerpoLetraScrollable" style="padding: 20px 24px;">
                     <div class="ContenedorLetraConAcordes" id="TextoLetraPreformateada">${LetraFinalHtml}</div>
                 </div>
 
